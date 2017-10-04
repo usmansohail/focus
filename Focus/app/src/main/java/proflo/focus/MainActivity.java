@@ -1,9 +1,13 @@
 package proflo.focus;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -16,11 +20,18 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
 
 
+
     // global activity variables here
     FrameLayout profileFrame;
     FrameLayout schedulesFrame;
     FrameLayout timerFrame;
     FrameLayout notificationsFrame;
+
+    public static final String PROFILE_STATUS = "proflo.focus.profile_status";
+    public static final String SCHEDULE_STATUS = "proflo.focus.schedule_status";
+    public static final String TIMER_STATUS = "proflo.focus.timer_status";
+
+
 
     Vector<FrameLayout> layouts;
     Vector<Integer> layoutIds;
@@ -51,13 +62,23 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
 
+        
     };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // setup stuff
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+        // create the toolbar
+        Toolbar myToolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+        ActionBar actionBar = getSupportActionBar();
+
+
 
         //set all the framelayouts to invisible
         setupFrames();
@@ -69,6 +90,43 @@ public class MainActivity extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.profile_header);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.main_action_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.add_profile:
+                Intent intentProfile = new Intent(this, ModifyProfileActivity.class);
+                Boolean newProfile = true;
+                intentProfile.putExtra(PROFILE_STATUS, newProfile);
+                startActivity(intentProfile);
+                return true;
+            case R.id.add_schedule:
+                Intent intentSchedule = new Intent(this, ModifyScheduleActivity.class);
+                Boolean newSchedule = true;
+                intentSchedule.putExtra(SCHEDULE_STATUS, newSchedule);
+                startActivity(intentSchedule);
+                return true;
+            case R.id.add_timer:
+                Intent intentTimer = new Intent(this, ModifyScheduleActivity.class);
+                Boolean newTimer = true;
+                intentTimer.putExtra(TIMER_STATUS, newTimer);
+                startActivity(intentTimer);
+                return true;
+            case R.id.clear_all_notifications:
+                //Intent intentClearAllNotifications = new Intent(this, )
+                // don't know what to do yet, since this doesn't need to launch a new activity
+        }
+        return true;
     }
 
     void setupFrames()
