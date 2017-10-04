@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Focus</string>
+    <string name="title_profiles">Profiles</string>
+    <string name="title_timers">Timers</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_schedules">Schedules</string>
+</resources>
