@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools">
+
 
     <!-- Add profile button -->
     <item
@@ -11,13 +13,14 @@
     <!-- Add profile button -->
     <item
         android:id="@+id/add_schedule"
-        android:icon="@drawable/add_icon"
+        android:icon="@drawable/calendar_icon"
         android:title="Add Schedule"
+
         />
     <!-- Add profile button -->
     <item
         android:id="@+id/clear_all_notifications"
-        android:icon="@drawable/add_icon"
+        android:icon="@drawable/notification_icon"
         android:title="Clear All Notifications"
         />
     <item
