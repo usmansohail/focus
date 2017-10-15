@@ -1,21 +1,32 @@
 package proflo.focus;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
+
+import org.w3c.dom.Text;
 
 import java.util.Vector;
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -43,74 +54,8 @@ public class MainActivity extends AppCompatActivity {
     int activeFrame;
 
     Vector<FrameLayout> layouts;
+    Vector<Integer> toolbars;
 
-    private ActionMode.Callback mActionCallback = new ActionMode.Callback(){
-
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            getMenuInflater().inflate(R.menu.main_action_bar, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            for(int i = 0; i < layouts.size(); i++)
-            {
-                if(i == activeFrame)
-                {
-                    // this is the menu item we want
-                    menu.findItem(getRInt(i)).setVisible(true);
-
-                    MenuItem item = (MenuItem)menu.findItem(getRInt(i));
-
-                    item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                }
-                else
-                {
-                    // this is not the correct menu item for this frame
-                    menu.findItem(getRInt(i)).setVisible(false);
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.add_profile:
-                    Intent intentProfile = new Intent(getApplicationContext(), ModifyProfileActivity.class);
-                    Boolean newProfile = true;
-                    intentProfile.putExtra(PROFILE_STATUS, newProfile);
-                    startActivity(intentProfile);
-                    return true;
-
-                case R.id.add_schedule:
-                    Intent intentSchedule = new Intent(getApplicationContext(), ModifyScheduleActivity.class);
-                    Boolean newSchedule = true;
-                    intentSchedule.putExtra(SCHEDULE_STATUS, newSchedule);
-                    startActivity(intentSchedule);
-                    return true;
-
-                case R.id.add_timer:
-                    Intent intentTimer = new Intent(getApplicationContext(), ModifyScheduleActivity.class);
-                    Boolean newTimer = true;
-                    intentTimer.putExtra(TIMER_STATUS, newTimer);
-                    startActivity(intentTimer);
-                    return true;
-
-                case R.id.clear_all_notifications:
-                    //Intent intentClearAllNotifications = new Intent(this, )
-                    // don't know what to do yet, since this doesn't need to launch a new activity
-            }
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
-    };
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -121,26 +66,22 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_profiles:
                     setFrameVisible(frameIndex.PROFILE.ordinal());
                     invalidateOptionsMenu();
-                    MainActivity.this.startSupportActionMode(mActionCallback);
                     mTextMessage.setText(R.string.title_profiles);
                     return true;
                 case R.id.navigation_schedule:
                     setFrameVisible(frameIndex.SCHEDULE.ordinal());
                     invalidateOptionsMenu();
-                    MainActivity.this.startSupportActionMode(mActionCallback);
                     mTextMessage.setText(R.string.title_schedules);
                     return true;
                 case R.id.navigation_timers:
                     setFrameVisible(frameIndex.TIMER.ordinal());
                     invalidateOptionsMenu();
-                    MainActivity.this.startSupportActionMode(mActionCallback);
                     mTextMessage.setText(R.string.title_timers);
                     return true;
                 case R.id.navigation_notifications:
                     setFrameVisible(frameIndex.NOTIFICATION.ordinal());
                     mTextMessage.setText(R.string.title_notifications);
                     invalidateOptionsMenu();
-                    MainActivity.this.startSupportActionMode( mActionCallback);
                     return true;
             }
             return false;
@@ -149,30 +90,16 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
-    /*
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        for(int i = 0; i < layouts.size(); i++)
-        {
-            if(i == activeFrame)
-            {
-                // this is the menu item we want
-                menu.findItem(getRInt(i)).setVisible(true);
+        menu.clear();
 
-                MenuItem item = (MenuItem)menu.findItem(getRInt(i));
-
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-            else
-            {
-                // this is not the correct menu item for this frame
-                menu.findItem(getRInt(i)).setVisible(false);
-            }
-        }
+        setToolbar(menu);
         return true;
     }
-    */
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,11 +108,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        /*
+
         // create the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
-        */
+
 
         //set all the framelayouts to invisible
         setupFrames();
@@ -196,24 +123,37 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
-
-        // start the menu that depends on the view
-        this.startSupportActionMode(mActionCallback);
-
+        setupProfile();
 
     }
 
-    /*
     // this method adds buttons to the options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_action_bar, menu);
+
+        // use the setToolbar method to handle this situation
+        setToolbar(menu);
         return true;
     }
-    */
 
-    /*
+    public void setToolbar(Menu menu)
+    {
+        // create a menuInflator to inflate the menu
+        MenuInflater inflator = getMenuInflater();
+
+        // check which layout is active
+        for(int i = 0; i < layouts.size(); i++)
+        {
+            if(activeFrame == i)
+            {
+                // set the ith toolbar to active
+                inflator.inflate(toolbars.get(i), menu);
+            }
+        }
+
+    }
+
+
     // This method gives functionality to each menu button
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -245,7 +185,60 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-    */
+
+
+    void setupProfile()
+    {
+        // create the views for all the profles in the database
+
+        // to be filled in
+        createProfile("Test Profle");
+    }
+
+    void createProfile(String profileName)
+    {
+        FrameLayout parentFrame = layouts.elementAt(activeFrame);
+
+        // create a button
+        ToggleButton toggleButton = new ToggleButton(MainActivity.this);
+
+        toggleButton.setLayoutParams(new LinearLayout.LayoutParams(100, 75));
+
+
+        toggleButton.setGravity(Gravity.RIGHT);
+
+
+
+
+
+        FrameLayout frameLayout = new FrameLayout(MainActivity.this);
+
+
+
+        frameLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+        frameLayout.setPadding(35,35,35,35);
+
+        // create and set the title text
+        TextView profileTitle = new TextView(MainActivity.this, null);
+        profileTitle.setText(profileName);
+        profileTitle.setGravity(Gravity.CENTER_VERTICAL);
+
+        frameLayout.setLayoutParams(new LinearLayout.LayoutParams(parentFrame.getWidth(), 150));
+
+        // add the text to the parent frame
+        frameLayout.addView(profileTitle);
+        frameLayout.addView(toggleButton);
+
+        ViewGroup.LayoutParams params = frameLayout.getLayoutParams();
+        params.height = 150;
+        params.width = parentFrame.getWidth() - 1;
+
+        parentFrame.addView(frameLayout);
+
+
+
+
+    }
 
     void setupFrames() {
         // instantiate FrameLayouts
@@ -256,12 +249,21 @@ public class MainActivity extends AppCompatActivity {
 
         // instantiate the vector of layouts
         layouts = new Vector<FrameLayout>();
+        toolbars = new Vector<>();
 
         // add all the layouts to the vector
         layouts.add(profileFrame);
         layouts.add(schedulesFrame);
         layouts.add(timerFrame);
         layouts.add(notificationsFrame);
+
+
+        // add the toolbar ids to the vector
+        toolbars.add(R.menu.profile_toolbar);
+        toolbars.add(R.menu.schedule_toolbar);
+        toolbars.add(R.menu.timer_toolbar);
+        toolbars.add(R.menu.notification_toolbar);
+
 
     }
 

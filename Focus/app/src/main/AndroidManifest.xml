@@ -18,7 +18,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="res.layout.ModifyProfileActivity" />
         <activity android:name=".ModifyProfileActivity" />
         <activity android:name=".ModifyTimerActivity" />
         <activity android:name=".ModifyScheduleActivity"></activity>

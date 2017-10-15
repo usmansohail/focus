@@ -9,6 +9,14 @@
     android:textAlignment="center"
     tools:context="proflo.focus.MainActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        />
+
 
     <FrameLayout
         android:id="@+id/profiles"
@@ -23,8 +31,7 @@
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:text="Profile Stuff here" />
+            android:layout_marginTop="@dimen/activity_vertical_margin" />
 
     </FrameLayout>
     <FrameLayout
@@ -79,12 +86,14 @@
 
     </FrameLayout>
 
+
+
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/colorPrimary"
         app:menu="@menu/navigation" />
 
 </LinearLayout>
