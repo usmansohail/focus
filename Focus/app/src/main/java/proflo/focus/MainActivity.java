@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
     boolean toggleProfile()
     {
-        
+        return true;
     }
 
     void createProfile(String profileName, final boolean status)
