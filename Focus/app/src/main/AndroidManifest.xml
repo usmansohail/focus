@@ -18,9 +18,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ModifyProfileActivity" />
-        <activity android:name=".ModifyTimerActivity" />
-        <activity android:name=".ModifyScheduleActivity"></activity>
+        <activity
+            android:name=".ModifyProfileActivity"
+            android:parentActivityName=".MainActivity"
+            />
+        <activity
+            android:name=".ModifyTimerActivity"
+            android:parentActivityName=".MainActivity"
+            />
+        <activity
+            android:name=".ModifyScheduleActivity"
+            android:parentActivityName=".MainActivity"
+            />
+
     </application>
 
 </manifest>
