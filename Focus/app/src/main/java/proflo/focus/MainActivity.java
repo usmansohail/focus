@@ -17,12 +17,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -71,21 +73,21 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_profiles:
                     setFrameVisible(frameIndex.PROFILE.ordinal());
                     invalidateOptionsMenu();
-                    mTextMessage.setText(R.string.title_profiles);
+
                     return true;
                 case R.id.navigation_schedule:
+                    setupSchedules();
                     setFrameVisible(frameIndex.SCHEDULE.ordinal());
                     invalidateOptionsMenu();
-                    mTextMessage.setText(R.string.title_schedules);
                     return true;
                 case R.id.navigation_timers:
                     setFrameVisible(frameIndex.TIMER.ordinal());
                     invalidateOptionsMenu();
-                    mTextMessage.setText(R.string.title_timers);
+
                     return true;
                 case R.id.navigation_notifications:
                     setFrameVisible(frameIndex.NOTIFICATION.ordinal());
-                    mTextMessage.setText(R.string.title_notifications);
+
                     invalidateOptionsMenu();
                     return true;
             }
@@ -205,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     void createProfile(String profileName, final boolean status)
     {
         // button status
@@ -216,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // create a toggle button with the correct status
-        final ToggleButton toggleButton = new ToggleButton(MainActivity.this);
+        final Switch toggleButton = new Switch(MainActivity.this);
         toggleButton.setChecked(status);
 
         // set the parameters of the button
@@ -228,10 +231,24 @@ public class MainActivity extends AppCompatActivity {
 
         // handle the situation of the button being pressed
         toggleButton.setOnClickListener(new View.OnClickListener() {
+
+            public boolean onTouch(View v, MotionEvent event) {
+                toggleButton.setChecked(toggleProfile());
+                return false;
+            }
+
+            // keep for now if you decide to switch back to the onClickListener
             @Override
             public void onClick(View v) {
                 // set the button to reflect the action
                 toggleButton.setChecked(!status);
+
+                // call toggleProfile. this should take in a profile object, and set it's value
+                // accordingly
+
+
+                // should be able to do this:
+                     toggleButton.setChecked(toggleProfile());
 
             }
         });
@@ -260,6 +277,56 @@ public class MainActivity extends AppCompatActivity {
         // add the text to the parent frame
         frameLayout.addView(profileTitle);
         frameLayout.addView(toggleButton);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
+        params.height = 150;
+        params.width = tableLayout.getWidth() - 1;
+        params.weight = 10;
+        frameLayout.setLayoutParams(params);
+
+        // add the frame to the table
+        tableLayout.addView(frameLayout);
+
+
+    }
+
+    void setupSchedules()
+    {
+        // this is where all the schedules in the database should populate the screen
+        createSchedule("Sample Schedule");
+    }
+
+    void createSchedule(String scheduleName)
+    {
+
+        // get the table to fill in
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.schedules_table);
+        TableRow tableRow = new TableRow(MainActivity.this);
+
+
+        // create the framelayout that displays the info
+        FrameLayout frameLayout = new FrameLayout(MainActivity.this);
+        frameLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+        frameLayout.setBottom(4);
+        frameLayout.setPadding(35,35,75,35);
+
+        // add the border
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(getResources().getColor(R.color.colorSecondary));
+        border.setStroke(3, getResources().getColor(R.color.border));
+        frameLayout.setBackground(border);
+
+        // create and set the title text
+        TextView profileTitle = new TextView(MainActivity.this, null);
+        profileTitle.setText(scheduleName);
+        profileTitle.setTextSize(25);
+        profileTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        profileTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
+
+
+        // add the text to the parent frame
+        frameLayout.addView(profileTitle);
+
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
         params.height = 150;
