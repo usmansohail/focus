@@ -2,6 +2,8 @@ package proflo.focus;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +23,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -119,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
         setFrameVisible(frameIndex.PROFILE.ordinal());
 
 
-        mTextMessage = (TextView) findViewById(R.id.profile_header);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -192,50 +196,64 @@ public class MainActivity extends AppCompatActivity {
         // create the views for all the profles in the database
 
         // to be filled in
-        createProfile("Test Profle");
+        createProfile("Test Profile", true);
+        createProfile("Another Test", false);
     }
 
-    void createProfile(String profileName)
+    void createProfile(String profileName, boolean status)
     {
-        FrameLayout parentFrame = layouts.elementAt(activeFrame);
+        // get the table to fill in
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.profile_table);
+        TableRow tableRow = new TableRow(MainActivity.this);
 
-        // create a button
+
+        // create a toggle button with the correct status
         ToggleButton toggleButton = new ToggleButton(MainActivity.this);
+        toggleButton.setChecked(status);
 
-        toggleButton.setLayoutParams(new LinearLayout.LayoutParams(100, 75));
+        // set the parameters of the button
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(150, 75);
+        buttonParams.gravity = Gravity.RIGHT;
+        buttonParams.weight = 10;
+        toggleButton.setLayoutParams(buttonParams);
+        toggleButton.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+
+        // handle the situation of the button being pressed
+        //toggleButton.
 
 
-        toggleButton.setGravity(Gravity.RIGHT);
-
-
-
-
-
+        // create the framelayout that displays the info
         FrameLayout frameLayout = new FrameLayout(MainActivity.this);
-
-
-
         frameLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-        frameLayout.setPadding(35,35,35,35);
+        frameLayout.setBottom(4);
+        frameLayout.setPadding(35,35,75,35);
+
+        // add the border
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(getResources().getColor(R.color.colorSecondary));
+        border.setStroke(3, getResources().getColor(R.color.border));
+        frameLayout.setBackground(border);
 
         // create and set the title text
         TextView profileTitle = new TextView(MainActivity.this, null);
         profileTitle.setText(profileName);
-        profileTitle.setGravity(Gravity.CENTER_VERTICAL);
+        profileTitle.setTextSize(25);
+        profileTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        profileTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
 
-        frameLayout.setLayoutParams(new LinearLayout.LayoutParams(parentFrame.getWidth(), 150));
 
         // add the text to the parent frame
         frameLayout.addView(profileTitle);
         frameLayout.addView(toggleButton);
 
-        ViewGroup.LayoutParams params = frameLayout.getLayoutParams();
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
         params.height = 150;
-        params.width = parentFrame.getWidth() - 1;
+        params.width = tableLayout.getWidth() - 1;
+        params.weight = 10;
+        frameLayout.setLayoutParams(params);
 
-        parentFrame.addView(frameLayout);
-
-
+        // add the frame to the table
+        tableLayout.addView(frameLayout);
 
 
     }
