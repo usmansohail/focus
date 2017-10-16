@@ -1,39 +1,31 @@
 package proflo.focus;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
-import org.w3c.dom.Text;
-
+import java.sql.Time;
 import java.util.Vector;
-import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,9 +48,21 @@ public class MainActivity extends AppCompatActivity {
     boolean scheduleActive;
     boolean timerActive;
 
-    public enum frameIndex {PROFILE, TIMER, SCHEDULE, NOTIFICATION}
+    // delete these after
+    boolean isOn = false;
+    boolean hasStarted = true;
 
+
+    public enum frameIndex {PROFILE, SCHEDULE, TIMER, NOTIFICATION}
+
+    // keeps track of the index of the active frame
     int activeFrame;
+
+    // keeps track of if the data was changed
+    boolean schedulesChanged;
+    boolean timersChanged;
+    boolean profileChanged;
+    boolean notificationsChanged;
 
     Vector<FrameLayout> layouts;
     Vector<Integer> toolbars;
@@ -71,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_profiles:
+                    setupProfile();
                     setFrameVisible(frameIndex.PROFILE.ordinal());
                     invalidateOptionsMenu();
-
                     return true;
                 case R.id.navigation_schedule:
                     setupSchedules();
@@ -81,13 +85,13 @@ public class MainActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                     return true;
                 case R.id.navigation_timers:
+                    setupTimers();
                     setFrameVisible(frameIndex.TIMER.ordinal());
                     invalidateOptionsMenu();
-
                     return true;
                 case R.id.navigation_notifications:
-                    setFrameVisible(frameIndex.NOTIFICATION.ordinal());
 
+                    setFrameVisible(frameIndex.NOTIFICATION.ordinal());
                     invalidateOptionsMenu();
                     return true;
             }
@@ -114,7 +118,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        // assume the data was changed in order to repopulate stuff
+        schedulesChanged = true;
+        timersChanged = true;
+        profileChanged = true;
+        notificationsChanged = true;
 
         // create the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -218,6 +226,63 @@ public class MainActivity extends AppCompatActivity {
         TableRow tableRow = new TableRow(MainActivity.this);
 
 
+
+
+        // create the framelayout that displays the info
+        FrameLayout frameLayout = new FrameLayout(MainActivity.this);
+        frameLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+        frameLayout.setBottom(4);
+        frameLayout.setPadding(35,35,75,35);
+
+        // add the border
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(getResources().getColor(R.color.colorSecondary));
+        border.setStroke(3, getResources().getColor(R.color.border));
+        frameLayout.setBackground(border);
+
+        // create and set the title text
+        TextView profileTitle = new TextView(MainActivity.this, null);
+        profileTitle.setText(profileName);
+        profileTitle.setTextSize(25);
+        profileTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        profileTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
+
+
+        // add the text to the parent frame
+        frameLayout.addView(profileTitle);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
+        params.height = 150;
+        params.width = tableLayout.getWidth() - 1;
+        params.weight = 10;
+        frameLayout.setLayoutParams(params);
+
+        // add the frame to the table
+        tableLayout.addView(frameLayout);
+
+
+    }
+
+    void setupSchedules()
+    {
+        // this is where all the schedules in the database should populate the screen
+
+        // sample
+        if(schedulesChanged) {
+            // actually query from the database/shared preferences
+            createSchedule("Sample Schedule", true);
+        }
+
+        schedulesChanged = false;
+    }
+
+    void createSchedule(String scheduleName, final boolean status)
+    {
+
+        // get the table to fill in
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.schedules_table);
+        //TableRow tableRow = new TableRow(MainActivity.this);
+
         // create a toggle button with the correct status
         final Switch toggleButton = new Switch(MainActivity.this);
         toggleButton.setChecked(status);
@@ -248,60 +313,10 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // should be able to do this:
-                     toggleButton.setChecked(toggleProfile());
+                toggleButton.setChecked(toggleProfile());
 
             }
         });
-
-
-        // create the framelayout that displays the info
-        FrameLayout frameLayout = new FrameLayout(MainActivity.this);
-        frameLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-        frameLayout.setBottom(4);
-        frameLayout.setPadding(35,35,75,35);
-
-        // add the border
-        GradientDrawable border = new GradientDrawable();
-        border.setColor(getResources().getColor(R.color.colorSecondary));
-        border.setStroke(3, getResources().getColor(R.color.border));
-        frameLayout.setBackground(border);
-
-        // create and set the title text
-        TextView profileTitle = new TextView(MainActivity.this, null);
-        profileTitle.setText(profileName);
-        profileTitle.setTextSize(25);
-        profileTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        profileTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
-
-
-        // add the text to the parent frame
-        frameLayout.addView(profileTitle);
-        frameLayout.addView(toggleButton);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
-        params.height = 150;
-        params.width = tableLayout.getWidth() - 1;
-        params.weight = 10;
-        frameLayout.setLayoutParams(params);
-
-        // add the frame to the table
-        tableLayout.addView(frameLayout);
-
-
-    }
-
-    void setupSchedules()
-    {
-        // this is where all the schedules in the database should populate the screen
-        createSchedule("Sample Schedule");
-    }
-
-    void createSchedule(String scheduleName)
-    {
-
-        // get the table to fill in
-        TableLayout tableLayout = (TableLayout)findViewById(R.id.schedules_table);
-        TableRow tableRow = new TableRow(MainActivity.this);
 
 
         // create the framelayout that displays the info
@@ -326,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
         // add the text to the parent frame
         frameLayout.addView(profileTitle);
-
+        frameLayout.addView(toggleButton);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
         params.height = 150;
@@ -335,9 +350,140 @@ public class MainActivity extends AppCompatActivity {
         frameLayout.setLayoutParams(params);
 
         // add the frame to the table
+        //tableRow.addView(frameLayout);
         tableLayout.addView(frameLayout);
 
 
+    }
+
+    void setupTimers()
+    {
+        if(timersChanged) {
+            // sample timer
+            Vector<String> profiles = new Vector<>();
+            profiles.add("profile 1");
+            profiles.add("profile 2");
+            createTimer(3, 45, profiles);
+        }
+    }
+
+    void createTimer(int hours, int minutes, Vector<String> profiles)
+    {
+        int buttonSizeConstant = 75;
+        int paddingConstant = 75;
+
+        // get  the table layout from the xml
+        TableLayout table = (TableLayout) findViewById(R.id.timer_table);
+
+        // create the framelayout that displays the info
+        LinearLayout linearLayout = new LinearLayout(MainActivity.this);
+        linearLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+        linearLayout.setBottom(4);
+        linearLayout.setPadding(35,35,75,35);
+
+        // add the border
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(getResources().getColor(R.color.colorSecondary));
+        border.setStroke(3, getResources().getColor(R.color.border));
+        linearLayout.setBackground(border);
+
+        // create and set the title text
+        TextView time = new TextView(MainActivity.this, null);
+        time.setText(hours + " hrs " + minutes + " min");
+        time.setTextSize(15);
+        time.setTypeface(Typeface.DEFAULT_BOLD);
+        time.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
+        time.setPadding(50, 0, 20, 0);
+
+
+        TableLayout profileTable = new TableLayout(MainActivity.this);
+        profileTable.setPadding(30,0,100,0);
+
+        // add all the profile names to the timer
+        for(String profile: profiles)
+        {
+            TextView profileTitle = new TextView(MainActivity.this, null);
+            profileTitle.setText(profile);
+            profileTitle.setTextSize(12);
+            profileTitle.setGravity(Gravity.LEFT);
+            profileTable.addView(profileTitle);
+        }
+        // add the table to the view
+        linearLayout.addView(profileTable);
+
+        // add the play and pause buttons
+        final Button playPauseButton = new Button(MainActivity.this);
+        if(isOn) {
+            playPauseButton.setBackground(getResources().getDrawable(R.drawable.pause_icon));
+        }
+        else
+        {
+            playPauseButton.setBackground(getResources().getDrawable(R.drawable.play_icon));
+        }
+        playPauseButton.setLayoutParams(new FrameLayout.LayoutParams(buttonSizeConstant, buttonSizeConstant));
+        playPauseButton.setPadding(75,0,75,0);
+
+        // add the reset button
+        final Button resetButton = new Button(MainActivity.this);
+        resetButton.setBackground(getResources().getDrawable(R.drawable.reset_icon));
+        resetButton.setLayoutParams(new FrameLayout.LayoutParams(buttonSizeConstant, buttonSizeConstant));
+        resetButton.setPadding(75,0,75,0);
+
+        // what happens if the play/pause button is clicked
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // setup whatever logic needs to happen on the backend
+                if(isOn) {
+                    isOn = false;
+                    playPauseButton.setBackground(getResources().getDrawable(R.drawable.play_icon));
+                }
+                else
+                {
+                    isOn = true;
+                    playPauseButton.setBackground(getResources().getDrawable(R.drawable.pause_icon));
+                }
+
+                if(!hasStarted) {
+                    hasStarted = true;
+                    resetButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+
+
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // update the variable
+                hasStarted = false;
+
+                // remove the button
+                resetButton.setVisibility(View.GONE);
+
+                isOn = false;
+                playPauseButton.setBackground(getResources().getDrawable(R.drawable.play_icon));
+            }
+        });
+
+        // add the appropriate button
+        linearLayout.addView(playPauseButton);
+
+
+        // if the timer has started, show the reset button
+        if(hasStarted)
+        {
+            linearLayout.addView(resetButton);
+        }
+
+
+        linearLayout.addView(time);
+
+        // add it  to the table
+        table.addView(linearLayout);
     }
 
     void setupFrames() {
