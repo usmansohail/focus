@@ -18,6 +18,41 @@
         />
 
 
+    <FrameLayout
+        android:id="@+id/profile_apps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
 
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/app_table">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:background="@color/colorSecondary"
+                        android:padding="20dp"
+
+                        >
+                    <EditText
+                        android:id="@+id/profile_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:background="@android:color/transparent"
+                        android:text="Profile Name"
+                        android:textColor="@color/soft_text"
+                        />
+                    </LinearLayout>
+
+
+            </TableLayout>
+        </ScrollView>
+    </FrameLayout>
 
 </LinearLayout>
