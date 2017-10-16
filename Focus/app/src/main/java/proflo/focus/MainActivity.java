@@ -200,15 +200,23 @@ public class MainActivity extends AppCompatActivity {
         createProfile("Another Test", false);
     }
 
-    void createProfile(String profileName, boolean status)
+    boolean toggleProfile()
     {
+        
+    }
+
+    void createProfile(String profileName, final boolean status)
+    {
+        // button status
+        final boolean statusTwo = status;
+
         // get the table to fill in
         TableLayout tableLayout = (TableLayout)findViewById(R.id.profile_table);
         TableRow tableRow = new TableRow(MainActivity.this);
 
 
         // create a toggle button with the correct status
-        ToggleButton toggleButton = new ToggleButton(MainActivity.this);
+        final ToggleButton toggleButton = new ToggleButton(MainActivity.this);
         toggleButton.setChecked(status);
 
         // set the parameters of the button
@@ -219,7 +227,14 @@ public class MainActivity extends AppCompatActivity {
         toggleButton.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 
         // handle the situation of the button being pressed
-        //toggleButton.
+        toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // set the button to reflect the action
+                toggleButton.setChecked(!status);
+
+            }
+        });
 
 
         // create the framelayout that displays the info
