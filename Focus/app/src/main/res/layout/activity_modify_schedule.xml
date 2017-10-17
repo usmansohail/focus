@@ -63,7 +63,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/profile_back_text"
+            android:id="@+id/schedule_back_text"
             android:layout_below="@+id/back_icon_schedule"
             />
 
