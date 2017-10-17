@@ -17,6 +17,59 @@
         android:elevation="4dp"
         />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="35dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/profile_error"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/cancel_icon"
+            android:id="@+id/cancel_icon"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/profile_error_text"
+            android:layout_below="@+id/cancel_icon"
+            />
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="35dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/profile_back"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/done_icon"
+            android:id="@+id/back_icon_profile"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/profile_back_text"
+            android:layout_below="@+id/back_icon_profile"
+            />
+
+
+
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/profile_apps"
@@ -54,5 +107,27 @@
             </TableLayout>
         </ScrollView>
     </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_popup"
+        android:visibility="gone"
+        android:gravity="center"
+        >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/profile_confirm"
+        />
+
+
+
+    </RelativeLayout>
+
+
+
+
 
 </LinearLayout>

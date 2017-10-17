@@ -4,4 +4,5 @@
     <string name="title_timers">Timers</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_schedules">Schedules</string>
+    <string name="profile_confirm">Please confirm that you would like to create this profile </string>
 </resources>

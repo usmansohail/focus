@@ -13,17 +13,28 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 public class ModifyProfileActivity extends AppCompatActivity {
 
     boolean nameModified;
+    boolean someAppChecked;
+
+    RelativeLayout errorLayout;
+    RelativeLayout doneConfirm;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_profile);
+
+        // get the objects we will need throughout
+        errorLayout =  (RelativeLayout)findViewById(R.id.profile_error);
+        doneConfirm = (RelativeLayout)findViewById(R.id.profile_back);
 
         // set the toolbar
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -34,8 +45,9 @@ public class ModifyProfileActivity extends AppCompatActivity {
         // fill the layout with possible apps
         fillLayout();
 
-        // assume the name has not yet been modified
+        // assume everything has not yet been modified
         nameModified = false;
+        someAppChecked = false;
 
         final EditText editText = (EditText)findViewById(R.id.profile_name);
         editText.setOnClickListener(new View.OnClickListener() {
@@ -70,25 +82,89 @@ public class ModifyProfileActivity extends AppCompatActivity {
                 //but first prompt the user for confirmation
                 if(validate()) {
                     onBackPressed();
-
                     return true;
                 }
-            case android.R.id.home:
-                onBackPressed();
+                return false;
 
+            case android.R.id.home:
+
+                if(someAppChecked || nameModified)
+                {
+                    displayDoneConfirmation();
+                }
+                else
+                {
+                    onBackPressed();
+                }
+
+                return true;
 
         }
 
+        return false;
 
-        return true;
     }
 
 
     boolean validate()
     {
-        // implement validation here
-        return true;
+        // confirm that the name is not empty
+        TextView profileName = (TextView)findViewById(R.id.profile_name);
+
+        if(profileName.getText().toString().length() == 0 || profileName.toString().equals("Profile Name"))
+        {
+            displayErrorMessage("Please enter a profile name");
+            return false;
+        }
+        else if(!someAppChecked)
+        {
+            // a single app hasn't been selected, send an error
+            displayErrorMessage("Please select at least one app for this profile");
+            return false;
+        }
+        else {
+
+            return true;
+        }
     }
+
+    void displayDoneConfirmation()
+    {
+        // display the back message
+        doneConfirm.setVisibility(View.VISIBLE);
+        TextView text = (TextView)findViewById(R.id.profile_back_text);
+        text.setText("Are you sure you want to discard the current profile?");
+
+        Button yes = (Button)findViewById(R.id.back_icon_profile);
+        yes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+    }
+
+    void displayErrorMessage(String errorMessage)
+    {
+        // get the error view
+        errorLayout.setVisibility(View.VISIBLE);
+
+        // set the  text as well
+        TextView text = (TextView)findViewById(R.id.profile_error_text);
+        text.setText(errorMessage);
+
+        // set the cancel on click stuff
+        Button cancel = (Button)findViewById(R.id.cancel_icon);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                errorLayout.setVisibility(View.GONE);
+            }
+        });
+
+
+    }
+
 
 
     void fillLayout()
@@ -96,9 +172,10 @@ public class ModifyProfileActivity extends AppCompatActivity {
         // logic to fill out all the apps here
 
         // some tests
-        createAppRow("app 1", 1);
-        createAppRow("app 2", 1);
-        createAppRow("app 3", 1);
+        for(int i = 0; i < 10; i++)
+        {
+            createAppRow("App " + i, 0);
+        }
 
     }
 
@@ -133,7 +210,18 @@ public class ModifyProfileActivity extends AppCompatActivity {
         // create a checkbox
         CheckBox checkBox = new CheckBox(ModifyProfileActivity.this);
         checkBox.setChecked(false);
-        //LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)checkBox.getLayoutParams();
+
+        // set a listener
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // logic of storing this data
+                someAppChecked = true;
+
+            }
+        });
+
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(50, 50);
         params.weight = 1;
         params.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
