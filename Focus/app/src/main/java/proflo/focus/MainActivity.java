@@ -32,6 +32,8 @@ import android.widget.ToggleButton;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.zip.Inflater;
 
@@ -114,7 +116,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        //AppBlocker blocker = new AppBlocker();
+        /*Intent intent = new Intent(this, AppBlocker.class);
+        ArrayList<String> temp = new ArrayList<String>();
+        intent.putStringArrayListExtra("mBlockedPackages", temp);
+        startService(intent);*/
 
         // create the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -169,6 +175,10 @@ public class MainActivity extends AppCompatActivity {
                 Boolean newProfile = true;
                 intentProfile.putExtra(PROFILE_STATUS, newProfile);
                 startActivity(intentProfile);
+                Intent intent = new Intent(this, AppBlocker.class);
+                ArrayList<String> temp = new ArrayList<String>();
+                intent.putStringArrayListExtra("mBlockedPackages", temp);
+                startService(intent);
                 return true;
 
             case R.id.add_schedule:

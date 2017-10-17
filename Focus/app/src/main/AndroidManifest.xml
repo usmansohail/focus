@@ -21,6 +21,7 @@
         <activity android:name=".ModifyProfileActivity" />
         <activity android:name=".ModifyTimerActivity" />
         <activity android:name=".ModifyScheduleActivity"></activity>
+        <service android:enabled="true" android:name=".AppBlocker" android:exported="false"/>
     </application>
 
 </manifest>
