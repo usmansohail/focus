@@ -1,11 +1,13 @@
 package proflo.focus;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +16,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Layout;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
 
-
     // global activity variables here
     FrameLayout profileFrame;
     FrameLayout schedulesFrame;
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SCHEDULE_STATUS = "proflo.focus.schedule_status";
     public static final String TIMER_STATUS = "proflo.focus.timer_status";
     private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
-
+    private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
 
     // these booleans indicate which framelayout is active
     boolean profileActive;
@@ -134,22 +136,10 @@ public class MainActivity extends AppCompatActivity {
 
         setupProfile();
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        alertDialogBuilder.setPositiveButton("YES",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
-                    }
-                });
-        alertDialogBuilder.setNegativeButton("NO",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // If you choose to not enable the notification listener
-                        // the app. will not work as expected
-                    }
-                });
-        alertDialogBuilder.show();
-
+        //dialog to turn on permissions appears if notification service has not yet been enabled
+        if(!isNotificationServiceEnabled()){
+            buildNotificationPermissionsAlertDialog().show();
+        }
     }
 
     // this method adds buttons to the options menu
@@ -424,5 +414,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isNotificationServiceEnabled(){
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(),
+                ENABLED_NOTIFICATION_LISTENERS);
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
+    private android.app.AlertDialog buildNotificationPermissionsAlertDialog(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.permissions_title);
+        alertDialogBuilder.setMessage(R.string.permissions_message);
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //will add functionality later to close app if user chooses no
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
 }
