@@ -2,19 +2,19 @@ package proflo.focus;
 
 import java.util.Vector;
 
-/**
- * Created by Cameron on 10/16/2017.
- */
+public class Notification{
 
-public class Notification extends android.app.Notification {
 
     private Vector<Profile> applicationProfiles;
+    private android.app.Notification notification;
 
-    public Notification(Vector<Profile> applicationProfiles) {
+    public Notification(android.app.Notification notification, Vector<Profile> applicationProfiles) {
+        this.notification = notification;
         this.applicationProfiles = applicationProfiles;
     }
 
     public Vector<Profile> getApplicationProfiles() {
         return applicationProfiles;
     }
+    public android.app.Notification getNotification () {return notification;}
 }
