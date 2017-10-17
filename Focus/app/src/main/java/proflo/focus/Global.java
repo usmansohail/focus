@@ -135,8 +135,8 @@ public class Global {
         return timers.remove(timer);
     }
 
-    public Boolean createNotification(Vector<Profile> profiles){
-        Notification not = new Notification(profiles);
+    public Boolean createNotification(Vector<Profile> profiles, android.app.Notification notification){
+        Notification not = new Notification(notification, profiles);
         notifications.add(not);
 
         return true;
