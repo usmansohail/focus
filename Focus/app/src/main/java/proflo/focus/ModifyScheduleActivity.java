@@ -10,6 +10,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
@@ -252,13 +253,13 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
 
         // add a time picker for the start
-        final TimePicker startTime = new TimePicker(ModifyScheduleActivity.this);
+        final TimePicker startTime = new TimePicker(new ContextThemeWrapper(ModifyScheduleActivity.this, R.style.TimePickerMode));
         final TimePicker endTime = new TimePicker(ModifyScheduleActivity.this);
 
 
 
-        startTime.setLayoutParams(new LinearLayout.LayoutParams(500, 500));
-        endTime.setLayoutParams(new LinearLayout.LayoutParams(500, 500));
+        startTime.setLayoutParams(new LinearLayout.LayoutParams(800, 1000));
+        endTime.setLayoutParams(new LinearLayout.LayoutParams(800, 1000));
 
         // LinearLayout for time
         LinearLayout timeBox = new LinearLayout(ModifyScheduleActivity.this);
@@ -290,19 +291,20 @@ public class ModifyScheduleActivity extends AppCompatActivity {
                         LinearLayout editTime = (LinearLayout) findViewById(R.id.edit_time);
 
                         // switch  the time picker
-                        startTime.setVisibility(View.GONE);
+                        editTime.removeView(startTime);
                         editTime.addView(endTime);
 
                         TextView message = (TextView)findViewById(R.id.set_time_text);
                        // message.setText("Please select a end time");
 
                         // get the button
-                        Button endFinish = (Button)findViewById(R.id.done_time);
+                        final Button endFinish = (Button)findViewById(R.id.done_time);
                         endFinish.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
                                 editTime.setVisibility(View.GONE);
+                                editTime.removeView(endTime);
 
                             }
                         });
@@ -315,6 +317,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
                                 // switch  the time picker
                                 LinearLayout editTime = (LinearLayout) findViewById(R.id.edit_time);
                                 editTime.setVisibility(View.GONE);
+                                editTime.removeView(endTime);
 
                             }
                         });
@@ -331,6 +334,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
                         // switch  the time picker
                         LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
                         editTime.setVisibility(View.GONE);
+                        editTime.removeView(startTime);
 
                     }
                 });
