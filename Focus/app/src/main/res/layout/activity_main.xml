@@ -17,40 +17,54 @@
         android:elevation="4dp"
         />
 
-
     <FrameLayout
         android:id="@+id/profiles"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
 
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/profile_table">
 
         </TableLayout>
-
+</ScrollView>
     </FrameLayout>
+
+
     <FrameLayout
         android:id="@+id/schedules"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/schedules_table">
-
         </TableLayout>
 
+    </ScrollView>
     </FrameLayout>
+
+
+
     <FrameLayout
         android:id="@+id/timers"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <TableLayout
             android:layout_width="match_parent"
@@ -58,19 +72,27 @@
             android:id="@+id/timer_table">
 
         </TableLayout>
+    </ScrollView>
     </FrameLayout>
+
+
+
     <FrameLayout
         android:id="@+id/notifications"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/notification_table">
 
         </TableLayout>
+    </ScrollView>
 
     </FrameLayout>
 

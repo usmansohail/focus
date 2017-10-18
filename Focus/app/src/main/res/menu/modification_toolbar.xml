@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:Focus="http://schemas.android.com/apk/res-auto">
+
+    <!-- Add clear notifications button -->
+    <item
+        android:id="@+id/done"
+        android:icon="@drawable/done_icon"
+        Focus:showAsAction="always"
+        android:title="Done" />
+
+</menu>

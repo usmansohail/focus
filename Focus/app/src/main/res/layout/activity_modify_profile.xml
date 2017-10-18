@@ -1,9 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container_modify_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="proflo.focus.ModifyProfileActivity">
+    android:orientation="vertical"
+    android:textAlignment="center"
+    tools:context="proflo.focus.MainActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="35dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/profile_error"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/cancel_icon"
+            android:id="@+id/cancel_icon"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/profile_error_text"
+            android:layout_below="@+id/cancel_icon"
+            />
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="35dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/profile_back"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/done_icon"
+            android:id="@+id/back_icon_profile"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/profile_back_text"
+            android:layout_below="@+id/back_icon_profile"
+            />
+
+
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/profile_apps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/app_table">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:background="@color/colorSecondary"
+                        android:padding="20dp"
+
+                        >
+                    <EditText
+                        android:id="@+id/profile_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:background="@android:color/transparent"
+                        android:text="Profile Name"
+                        android:textColor="@color/soft_text"
+                        />
+                    </LinearLayout>
+
+
+            </TableLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_popup"
+        android:visibility="gone"
+        android:gravity="center"
+        >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/profile_confirm"
+        />
+
+
+
+    </RelativeLayout>
+
+
+
+
+
+</LinearLayout>
