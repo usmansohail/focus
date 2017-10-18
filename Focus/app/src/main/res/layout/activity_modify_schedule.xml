@@ -77,47 +77,12 @@
         android:layout_height="fill_parent"
         android:padding="5dp"
         android:background="@color/colorAccent"
-        android:id="@+id/edit_time_container"
+        android:id="@+id/edit_time"
         android:visibility="gone"
-
+        android:orientation="vertical"
         >
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/cancel_icon"
-            android:id="@+id/cancel_time"
-
-            />
-        <Button
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/done_icon"
-            android:id="@+id/done_time"
-            android:layout_toLeftOf="@+id/cancel_time"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/set_time_text"
-            android:layout_below="@+id/cancel_time"
-            />
-
-
-</LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_time"
-            >
-
-        </LinearLayout>
 
     </LinearLayout>
 

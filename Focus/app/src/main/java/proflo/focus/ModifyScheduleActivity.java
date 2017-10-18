@@ -1,11 +1,8 @@
 package proflo.focus;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,22 +18,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.sql.Time;
 import java.util.Vector;
 
 public class ModifyScheduleActivity extends AppCompatActivity {
 
     boolean nameModified;
     boolean someBlockChanged;
+
+    // when the time picker is first activated, make it start time
+    // if this is false, then show the end time picker
+    boolean startPickerActive = true;
+
+    int newStartHour;
+    int newStartMin;
+    int newStopHour;
+    int newStopMin;
 
     RelativeLayout errorLayout;
     RelativeLayout doneConfirm;
@@ -126,7 +128,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
         for(int i = 0; i < 2; i++)
         {
-            createTimeBlock(8, 40, "am", "am", 10, days, 30);
+            displayTimeBlock(8, 40, "am", "am", 10, days, 30);
         }
 
         createNewTimeBlock();
@@ -172,17 +174,17 @@ public class ModifyScheduleActivity extends AppCompatActivity {
     boolean validate()
     {
         // confirm that the name is not empty
-        TextView profileName = (TextView)findViewById(R.id.profile_name);
+        TextView scheduleName = (TextView)findViewById(R.id.profile_name);
 
-        if(profileName.getText().toString().length() == 0 || profileName.toString().equals("Profile Name"))
+        if(scheduleName.getText().toString().length() == 0 || scheduleName.toString().equals("Schedule Name"))
         {
-            displayErrorMessage("Please enter a profile name");
+            displayErrorMessage("Please enter a Schedule name");
             return false;
         }
         else if(!someBlockChanged)
         {
             // a single app hasn't been selected, send an error
-            displayErrorMessage("Please select at least one app for this profile");
+            displayErrorMessage("Please enter appropriate time information");
             return false;
         }
         else {
@@ -205,14 +207,13 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
     void createNewTimeBlock()
     {
-        int startHour = 00;
-        int startMinute = 00;
-        int endHour = 00;
-        int endMinute = 00;
+        newStartHour = 00;
+        newStartMin = 00;
+        newStopHour = 00;
+        newStopMin = 00;
 
-        // when the time picker is first activated, make it start time
-            // if this is false, then show the end time picker
-        boolean startPickerActive = true;
+
+
 
 
         Vector<String> dayNames = new Vector<>();
@@ -265,9 +266,23 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         LinearLayout timeBox = new LinearLayout(ModifyScheduleActivity.this);
         timeBox.setLayoutParams(new LinearLayout.LayoutParams(300, 80));
 
+        final LinearLayout messageBox = new LinearLayout(ModifyScheduleActivity.this);
+        final TextView message = new TextView(ModifyScheduleActivity.this);
+        Button done = new Button(ModifyScheduleActivity.this);
+        done.setLayoutParams(new LinearLayoutCompat.LayoutParams(80, 80));
+        done.setBackground(getResources().getDrawable(R.drawable.done_icon));
+        Button cancel = new Button(ModifyScheduleActivity.this);
+        cancel.setLayoutParams(new LinearLayoutCompat.LayoutParams(80, 80));
+        cancel.setBackground(getResources().getDrawable(R.drawable.cancel_icon));
+        messageBox.addView(message);
+        messageBox.addView(done);
+        messageBox.addView(cancel);
+
+
+
         // Text for time
-        TextView timeText = new TextView(ModifyScheduleActivity.this);
-        timeText.setText(startHour + ":" + startMinute + " - " + endHour + ":" + endMinute);
+        final TextView timeText = new TextView(ModifyScheduleActivity.this);
+        timeText.setText(newStartHour + ":" + newStartMin + " - " + newStopHour + ":" + newStopMin);
 
         timeBox.addView(timeText);
 
@@ -278,79 +293,85 @@ public class ModifyScheduleActivity extends AppCompatActivity {
                 LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
                 editTime.setVisibility(View.VISIBLE);
                 editTime.addView(startTime);
+                message.setText("Please select a start time");
+                editTime.addView(messageBox);
 
-                // change the text
-                TextView message = (TextView)findViewById(R.id.set_time_text);
-               // message.setText("Please select a start time");
-
-                // get the button
-                Button startFinish = (Button)findViewById(R.id.done_time);
-                startFinish.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        LinearLayout editTime = (LinearLayout) findViewById(R.id.edit_time);
-
-                        // switch  the time picker
-                        editTime.removeView(startTime);
-                        editTime.addView(endTime);
-
-                        TextView message = (TextView)findViewById(R.id.set_time_text);
-                       // message.setText("Please select a end time");
-
-                        // get the button
-                        final Button endFinish = (Button)findViewById(R.id.done_time);
-                        endFinish.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
-                                editTime.setVisibility(View.GONE);
-                                editTime.removeView(endTime);
-
-                            }
-                        });
-
-                        // get the button
-                        Button startCancel = (Button)findViewById(R.id.cancel_time);
-                        startCancel.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // switch  the time picker
-                                LinearLayout editTime = (LinearLayout) findViewById(R.id.edit_time);
-                                editTime.setVisibility(View.GONE);
-                                editTime.removeView(endTime);
-
-                            }
-                        });
-
-
-                    }
-                });
-
-                // get the button
-                Button startCancel = (Button)findViewById(R.id.cancel_time);
-                startCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // switch  the time picker
-                        LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
-                        editTime.setVisibility(View.GONE);
-                        editTime.removeView(startTime);
-
-                    }
-                });
 
             }
         });
 
+        // get the button
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
+
+                if(startPickerActive)
+                {
+                    // change the time picker to end time
+                    editTime.removeAllViews();
+                    editTime.addView(endTime);
+                    startPickerActive = false;
+                    message.setText("Please select a end time");
+                    editTime.addView(messageBox);
+                }
+                else
+                {
+
+                    editTime.removeAllViews();
+                    editTime.setVisibility(View.GONE);
+
+
+                }
+
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // remove everything from the editTime view and make it disappear
+                LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
+
+                editTime.removeAllViews();
+                editTime.setVisibility(View.GONE);
+            }
+        });
+
+
+        startTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+                newStartHour = view.getHour();
+                newStartMin = view.getMinute();
+                timeText.setText(newStartHour + ":" + newStartMin + " - " + newStopHour + ":" + newStopMin);
+            }
+        });
+
+
+        endTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+                newStopHour = view.getHour();
+                newStopMin = view.getMinute();
+                timeText.setText(newStartHour + ":" + newStartMin + " - " + newStopHour + ":" + newStopMin);
+            }
+        });
 
         timeBlock.addView(timeBox);
 
+        final Vector<CheckBox> dayStatus = new Vector<>();
 
         for(int i = 0; i < 7; i++)
         {
             // create a checkbox
             CheckBox checkBox = new CheckBox(ModifyScheduleActivity.this);
             checkBox.setLayoutParams(new LinearLayout.LayoutParams(75, 75));
+
+            // add to the outer vector
+
+            dayStatus.add(checkBox);
 
             boxes.addView(checkBox);
             TextView dayTitle = new TextView(ModifyScheduleActivity.this);
@@ -371,13 +392,33 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
 
 
+        Button createBlock = new Button(ModifyScheduleActivity.this);
+        createBlock.setLayoutParams(new LinearLayoutCompat.LayoutParams(80, 80));
+        timeBlock.addView(createBlock);
+
+        createBlock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // call the validate method
+                // validate();
+                createTimeBlock(dayStatus);
+
+            }
+        });
+
         // add the app layout to the table
         table.addView(timeBlock);
     }
 
-    void createTimeBlock(int startHour, int startMinute, String startM, String stopM, int stopHour,
-                         final Vector<Integer> days, int stopMinute)
+    void createTimeBlock(Vector<CheckBox> days)
     {
+        // put all the logic into here
+
+    }
+
+    void displayTimeBlock(int startHour, int startMinute, String startM, String stopM, int stopHour,
+                          final Vector<Integer> days, int stopMinute) {
         Vector<String> dayNames = new Vector<>();
         dayNames.add("S");
         dayNames.add("M");
@@ -388,12 +429,12 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         dayNames.add("Sa");
 
         // get the table
-        TableLayout table = (TableLayout)findViewById(R.id.timeblock_table);
+        TableLayout table = (TableLayout) findViewById(R.id.timeblock_table);
 
         // create the framelayout that displays the info
         LinearLayout timeBlock = new LinearLayout(ModifyScheduleActivity.this);
         timeBlock.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-        timeBlock.setPadding(35,35,35,35);
+        timeBlock.setPadding(35, 35, 35, 35);
 
         // add the border
         GradientDrawable border = new GradientDrawable();
@@ -417,29 +458,22 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         LinearLayout titles = new LinearLayout(ModifyScheduleActivity.this);
 
         TextView dayNotTitle = new TextView(ModifyScheduleActivity.this);
-        dayNotTitle.setLayoutParams(new LinearLayout.LayoutParams(25,75));
+        dayNotTitle.setLayoutParams(new LinearLayout.LayoutParams(25, 75));
         titles.addView(dayNotTitle);
 
         Drawable[] daysIcons = new Drawable[7];
 
 
-
-        for(int i = 0; i < 7; i++)
-        {
+        for (int i = 0; i < 7; i++) {
             // create a checkbox
             ShapeDrawable checkBox = new ShapeDrawable(new OvalShape());
             LinearLayout dayBox = new LinearLayout(ModifyScheduleActivity.this);
 
-            if(days.get(i) == 1)
-            {
+            if (days.get(i) == 1) {
                 checkBox.getPaint().setColor(Color.GRAY);
-            }
-            else
-            {
+            } else {
                 checkBox.getPaint().setColor(Color.WHITE);
             }
-
-
 
 
             checkBox.setIntrinsicHeight(70);
@@ -461,16 +495,13 @@ public class ModifyScheduleActivity extends AppCompatActivity {
             boxes.addView(padd);
 
 
-
             TextView dayTitle = new TextView(ModifyScheduleActivity.this);
             dayTitle.setText(dayNames.get(i));
-            dayTitle.setLayoutParams(new LinearLayout.LayoutParams(75,75));
+            dayTitle.setLayoutParams(new LinearLayout.LayoutParams(75, 75));
             titles.addView(dayTitle);
 
 
-
         }
-
 
 
         dayTable.addView(boxes);
@@ -480,9 +511,9 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         timeBlock.addView(dayTable);
 
 
-
         // add the app layout to the table
         table.addView(timeBlock);
+
 
     }
 
