@@ -63,7 +63,7 @@ public class AppBlocker extends Service {
                     break;
                 }
             }
-            mHandler.postDelayed(this, 8000);
+            mHandler.postDelayed(this, 300);
         }
     };
 
@@ -106,9 +106,6 @@ public class AppBlocker extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
-        for(String temp : mBlockedPackages){
-            Toast.makeText(this, temp, Toast.LENGTH_SHORT).show();
-        }
         mHandler.post(mRunnableCode);
 
         /*for(String blocked : mBlockedPackages){
@@ -235,7 +232,7 @@ public class AppBlocker extends Service {
                         topPackageName =  mySortedMap.get(mySortedMap.lastKey()).getPackageName();
                     }
                 }
-                Toast.makeText(this, topPackageName, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, topPackageName, Toast.LENGTH_SHORT).show();
             }
 
         } else {
@@ -247,11 +244,6 @@ public class AppBlocker extends Service {
                 mPackageNames.add(componentInfo.getPackageName());
             }*/
         }
-
-        for(String name : mPackageNames){
-            Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
-        }
-
 
         return topPackageName;
     }
