@@ -10,18 +10,27 @@ import java.util.Vector;
  * Created by Cameron on 10/16/2017.
  */
 
-public class Global {
+class Global {
+    private static final Global instance = new Global();
+
+    static Global getInstance() { return instance; }
 
     private Vector<Profile> allProfiles;
     private Vector<Profile> activeProfiles;
-    private Vector<String> activeApps;
+
+    private Vector<ApplicationInfo> activeApps;
     private Vector<ApplicationInfo> allApps;
     private Vector<Schedule> schedules;
+
+    //TODO What the fuck is this precisely
     private Calendar schedule;
+
     private Vector<Timer> timers;
     private Vector<Notification> notifications;
 
-    public Global() {
+    public boolean loaded = false;
+
+    private Global() {
     }
 
     public Vector<Profile> getAllProfiles() {
@@ -30,10 +39,6 @@ public class Global {
 
     public Vector<Profile> getActiveProfiles() {
         return activeProfiles;
-    }
-
-    public Vector<String> getActiveApps() {
-        return activeApps;
     }
 
     public Vector<Schedule> getSchedules() {
@@ -85,6 +90,15 @@ public class Global {
         }
 
         return true;
+    }
+
+
+    public Vector<ApplicationInfo> getActiveApps() {
+        return activeApps;
+    }
+
+    public void setActiveApps(Vector<ApplicationInfo> activeApps) {
+        this.activeApps = activeApps;
     }
 
     public Boolean removeProfile(Profile profile){
@@ -162,4 +176,28 @@ public class Global {
     }
 
 
+    public Vector<Notification> getNotifications() {
+        return notifications;
+    }
+
+
+    public void setAllProfiles(Vector<Profile> allProfiles) {
+        this.allProfiles = allProfiles;
+    }
+
+    public void setActiveProfiles(Vector<Profile> activeProfiles) {
+        this.activeProfiles = activeProfiles;
+    }
+
+    public void setSchedules(Vector<Schedule> allSchedules) {
+        this.schedules = allSchedules;
+    }
+
+    public void setTimers(Vector<Timer> timers) {
+        this.timers = timers;
+    }
+
+    public void setNotifications(Vector<Notification> notifications) {
+        this.notifications = notifications;
+    }
 }

@@ -13,43 +13,27 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
-import org.w3c.dom.Text;
-
-import java.sql.Time;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.zip.Inflater;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
@@ -57,6 +41,8 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
+
+    //I low key find the activity package pointing kinda clever....
 
     // global activity variables here
     FrameLayout profileFrame;
@@ -95,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
 
     Vector<FrameLayout> layouts;
     Vector<Integer> toolbars;
-
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -147,6 +132,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        //Populates global with data from SharedPreferences
+        DataManager.getInstance().populateGlobal(this);
+
         // assume the data was changed in order to repopulate stuff
         schedulesChanged = true;
         timersChanged = true;
@@ -173,6 +162,13 @@ public class MainActivity extends AppCompatActivity {
         if(!isNotificationServiceEnabled()){
             buildNotificationPermissionsAlertDialog().show();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        DataManager.getInstance().saveGlobal(this);
+
+        super.onStop();
     }
 
     // this method adds buttons to the options menu
@@ -229,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.clear_all_notifications:
-                // Logic of removing all notifications 
+                //TODO Logic of removing all notifications
 
 
         }
@@ -239,11 +235,13 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-        // create the views for all the profles in the database
+        while(!Global.getInstance().loaded){}
 
-        // to be filled in
-        createProfile("Test Profile", true);
-        createProfile("Another Test", false);
+        //TODO populate the views for all the profiles in the database
+        Vector<Profile> profiles = Global.getInstance().getAllProfiles();
+        for(Profile p: profiles){
+            createProfile(p.getName(), p.isActive());
+        }
     }
 
     boolean toggleProfile()
@@ -705,6 +703,6 @@ public class MainActivity extends AppCompatActivity {
                 availableApps.add(appInfo);
             }
         }
-        //global update available apps
+        Global.getInstance().setActiveApps(availableApps);
     }
 }

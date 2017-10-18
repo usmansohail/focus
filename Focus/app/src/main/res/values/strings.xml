@@ -10,4 +10,10 @@
     <string name="permissions_message">You must first give Focus notification access</string>
     <string name="accept">Accept</string>
     <string name="deny">Deny</string>
+    <string name="AllProfileKey">ALL_PROF_KEY</string>
+    <string name="ActiveProfilesKey">ACTIVE_PROFILES</string>
+    <string name="ActiveAppsKey">ACTIVE_APPS</string>
+    <string name="SchedulesKey">SCHEDULES_SP</string>
+    <string name="TimersKey">TIMERS_SP</string>
+    <string name="NotificationsKey">NOTIFICATIONS_SP</string>
 </resources>
