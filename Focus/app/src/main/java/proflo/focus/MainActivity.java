@@ -1,5 +1,6 @@
 package proflo.focus;
 
+import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Process;
+import android.provider.Settings;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -35,12 +38,19 @@ import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.w3c.dom.Text;
 
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.zip.Inflater;
+
+import static android.app.AppOpsManager.MODE_ALLOWED;
+import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -138,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         timersChanged = true;
         profileChanged = true;
         notificationsChanged = true;
+
 
         // create the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -645,6 +656,12 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+    private boolean checkForPermission(Context context) {
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
+        return mode == MODE_ALLOWED;
+    }
+
 
     private android.app.AlertDialog buildNotificationPermissionsAlertDialog(){
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
