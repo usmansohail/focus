@@ -1,14 +1,18 @@
 package proflo.focus;
 
 import android.app.ActivityManager;
+import android.app.AppOpsManager;
 import android.app.Service;
 import android.app.usage.UsageEvents;
+import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,14 +20,22 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.widget.Toast;
 import android.util.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
+
+import static android.app.AppOpsManager.MODE_ALLOWED;
+import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 /**
  * Created by Patrick Truong on 10/16/2017.
@@ -33,6 +45,27 @@ public class AppBlocker extends Service {
 
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
+    private Handler mHandler;
+    private ArrayList<String> mBlockedPackages;
+    private Runnable mRunnableCode = new Runnable() {
+        @Override
+        public void run() {
+
+            //needPermissionForBlocking(getApplicationContext());
+            String currentApp = getCurrentApp(getApplicationContext());
+            //Toast.makeText(getApplicationContext(), test, Toast.LENGTH_SHORT).show();
+            for(String blocked : mBlockedPackages){
+                if(blocked.equals(currentApp)){
+                    String temp = "Blocked: " + currentApp;
+                    Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
+                    //killAppByPackName(getApplicationContext(), currentApp);
+                    StartApplication(getApplicationContext(), getPackageName());
+                    break;
+                }
+            }
+            mHandler.postDelayed(this, 8000);
+        }
+    };
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -44,6 +77,7 @@ public class AppBlocker extends Service {
         public void handleMessage(Message msg) {
 
         }
+
     }
 
     @Override
@@ -52,38 +86,41 @@ public class AppBlocker extends Service {
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block.  We also make it
         // background priority so CPU-intensive work will not disrupt our UI.
+
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
+        mServiceLooper = thread.getLooper();
+        mHandler = new Handler(mServiceLooper);
 
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
 
+    public ArrayList<String> ReturnBlockedApps(){
+        return mBlockedPackages;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        List<String> test = getRecentApps(getApplicationContext());
-        /*final ArrayList<String> mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
+        mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
+        for(String temp : mBlockedPackages){
+            Toast.makeText(this, temp, Toast.LENGTH_SHORT).show();
+        }
+        mHandler.post(mRunnableCode);
 
-        Timer timer = new Timer();
-        TimerTask myTask = new TimerTask() {
-            @Override
-            public void run() {
-                List<String> mPackageNames = getRecentApps(getApplicationContext());
-                for(String blocked : mBlockedPackages){
-                    for(String packageName : mPackageNames){
-                        if(blocked.equals(packageName)){
-                            killAppByPackName(getApplicationContext(), blocked);
-                            break;
-                        }
-                    }
+        /*for(String blocked : mBlockedPackages){
+            for(String packageName : mPackageNames){
+                if(blocked.equals(packageName)){
+                    Toast.makeText(this, "killing facebook?", Toast.LENGTH_SHORT).show();
+                    killAppByPackName(getApplicationContext(), blocked);
+                    break;
                 }
             }
-        };
-
-        timer.schedule(myTask, 500, 500);*/
+        }*/
+        //killAppByPackName(getApplicationContext(), "com.facebook.android");
 
         // If we get killed, after returning from here, restart
         return START_STICKY;
@@ -100,7 +137,7 @@ public class AppBlocker extends Service {
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 
-    public static void killAppByPermission (Context context, String permissionToKill)
+    public void killAppByPermission (Context context, String permissionToKill)
     {
         try
         {
@@ -145,6 +182,7 @@ public class AppBlocker extends Service {
         catch (Throwable t){}
     }
 
+
     public static void killAppByName (Context context, String appNameToKill)
     {
         try
@@ -156,7 +194,7 @@ public class AppBlocker extends Service {
                 if (process.processName.toLowerCase().contains(appNameToKill.toLowerCase()))
                 {
                     //Log.e("killed", process.processName);
-                    manager.killBackgroundProcesses(process.processName);
+                   // manager.killBackgroundProcesses(process.processName);
                     break;
                 }
             }
@@ -164,37 +202,72 @@ public class AppBlocker extends Service {
         catch (Throwable t){t.printStackTrace();}
     }
 
-    public List<String> getRecentApps(Context context) {
+    public static boolean needPermissionForBlocking(Context context){
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(context.getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOpsManager.checkOpNoThrow(OPSTR_GET_USAGE_STATS, applicationInfo.uid, applicationInfo.packageName);
+            return  (mode != MODE_ALLOWED);
+        } catch (PackageManager.NameNotFoundException e) {
+            return true;
+        }
+    }
+
+    public String getCurrentApp(Context context) {
         List<String> mPackageNames = new ArrayList<String>();
         String topPackageName = "";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
 
-            long time = System.currentTimeMillis();
-
-            UsageEvents usageEvents = mUsageStatsManager.queryEvents(time - 1000 * 30, System.currentTimeMillis() + (10 * 1000));
-            UsageEvents.Event event = new UsageEvents.Event();
-            while (usageEvents.hasNextEvent()) {
-                mPackageNames.add(event.getPackageName());
-                usageEvents.getNextEvent(event);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                UsageStatsManager mUsageStatsManager = (UsageStatsManager)getSystemService(Context.USAGE_STATS_SERVICE);
+                long time = System.currentTimeMillis();
+                // We get usage stats for the last 10 seconds
+                List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,  time - 1000*1000, time);
+                // Sort the stats by the last time used
+                if(stats != null) {
+                    SortedMap<Long,UsageStats> mySortedMap = new TreeMap<Long,UsageStats>();
+                    for (UsageStats usageStats : stats) {
+                        mySortedMap.put(usageStats.getLastTimeUsed(),usageStats);
+                    }
+                    if(mySortedMap != null && !mySortedMap.isEmpty()) {
+                        topPackageName =  mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+                    }
+                }
+                Toast.makeText(this, topPackageName, Toast.LENGTH_SHORT).show();
             }
 
         } else {
+            Toast.makeText(this, "second one", Toast.LENGTH_SHORT).show();
             ActivityManager am = (ActivityManager) context.getSystemService(context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-            for(int i = 0; i < taskInfo.size(); i++){
+            /*for(int i = 0; i < taskInfo.size(); i++){
                 ComponentName componentInfo = taskInfo.get(i).topActivity;
                 mPackageNames.add(componentInfo.getPackageName());
-            }
+            }*/
         }
 
         for(String name : mPackageNames){
-            String temp = name;
+            Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
         }
 
 
-        return mPackageNames;
+        return topPackageName;
+    }
+
+
+
+    public boolean StartApplication(Context context, String packageName){
+        PackageManager manager = context.getPackageManager();
+        Intent i = manager.getLaunchIntentForPackage(packageName);
+        if (i == null) {
+            return false;
+            //throw new PackageManager.NameNotFoundException();
+        }
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        context.startActivity(i);
+        return true;
     }
 
 }

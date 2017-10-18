@@ -1,10 +1,13 @@
 package proflo.focus;
 
+import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Process;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +31,7 @@ import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.w3c.dom.Text;
@@ -36,6 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.zip.Inflater;
+
+import static android.app.AppOpsManager.MODE_ALLOWED;
+import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -116,11 +123,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //AppBlocker blocker = new AppBlocker();
-        /*Intent intent = new Intent(this, AppBlocker.class);
-        ArrayList<String> temp = new ArrayList<String>();
-        intent.putStringArrayListExtra("mBlockedPackages", temp);
-        startService(intent);*/
 
         // create the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -177,7 +179,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intentProfile);
                 Intent intent = new Intent(this, AppBlocker.class);
                 ArrayList<String> temp = new ArrayList<String>();
+                temp.add("com.facebook.katana");
                 intent.putStringArrayListExtra("mBlockedPackages", temp);
+                boolean check = checkForPermission(getApplicationContext());
+                if(check){
+                    Toast.makeText(this, "Works", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(this, "Doesnt work", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                }
                 startService(intent);
                 return true;
 
@@ -413,6 +424,12 @@ public class MainActivity extends AppCompatActivity {
         {
             return R.id.clear_all_notifications;
         }
+    }
+
+    private boolean checkForPermission(Context context) {
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
+        return mode == MODE_ALLOWED;
     }
 
 
