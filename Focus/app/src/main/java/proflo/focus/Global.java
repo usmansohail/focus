@@ -120,11 +120,25 @@ public class Global {
         return true;
     }
 
-    public Boolean modifyTimer(String name, Long initialDuration, Profile newProfile){
+    public Boolean modifyTimerAP(String name, Long initialDuration, Profile newProfile){
         for (int i = 0; i < timers.size(); i++){
             if (timers.get(i).getName() == name){
                 timers.get(i).setInitialDuration(initialDuration);
                 timers.get(i).addProfile(newProfile);
+
+            }
+        }
+
+        return true;
+    }
+
+
+    public Boolean modifyTimerRP(String name, Long initialDuration, Profile newProfile){
+        for (int i = 0; i < timers.size(); i++){
+            if (timers.get(i).getName() == name){
+                timers.get(i).setInitialDuration(initialDuration);
+                timers.get(i).removeProfile(newProfile);
+
             }
         }
 

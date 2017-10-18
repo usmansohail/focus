@@ -31,9 +31,6 @@ public class Profile {
         return profileApps;
     }
 
-    public void setProfileApps(Vector<String> profileApps) {
-        this.profileApps = profileApps;
-    }
 
     public boolean addAppToProfile(String appID){
         profileApps.add(appID);

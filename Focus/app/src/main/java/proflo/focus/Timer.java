@@ -100,7 +100,7 @@ public class Timer{
         return true;
     }
 
-    public Boolean restart(){
+    public Boolean reset(){
         try{
             currentDuration = initialDuration;
             timer = new CountDownTimer(initialDuration, 1000) {
