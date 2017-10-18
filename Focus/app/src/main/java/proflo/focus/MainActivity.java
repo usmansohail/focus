@@ -127,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        //Populates global with data from SharedPreferences
         DataManager.getInstance().populateGlobal(this);
 
         // assume the data was changed in order to repopulate stuff
@@ -227,7 +229,13 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
+        while(!Global.getInstance().loaded){}
+
         //TODO populate the views for all the profiles in the database
+        Vector<Profile> profiles = Global.getInstance().getAllProfiles();
+        for(Profile p: profiles){
+            createProfile(p.getName(), p.isActive());
+        }
     }
 
     boolean toggleProfile()

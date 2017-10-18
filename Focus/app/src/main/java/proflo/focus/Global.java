@@ -12,17 +12,19 @@ class Global {
 
     static Global getInstance() { return instance; }
 
-    private Vector<Profile> allProfiles = new Vector<>();
-    private Vector<Profile> activeProfiles = new Vector<>();
+    private Vector<Profile> allProfiles;
+    private Vector<Profile> activeProfiles;
 
-    private Vector<String> activeApps = new Vector<>();
-    private Vector<Schedule> schedules = new Vector<>();
+    private Vector<String> activeApps;
+    private Vector<Schedule> schedules;
 
     //TODO What the fuck is this precisely
     private Calendar schedule;
 
-    private Vector<Timer> timers = new Vector<>();
-    private Vector<Notification> notifications = new Vector<>();
+    private Vector<Timer> timers;
+    private Vector<Notification> notifications;
+
+    public boolean loaded = false;
 
     private Global() {
     }

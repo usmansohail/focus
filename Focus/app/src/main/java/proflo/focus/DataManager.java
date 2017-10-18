@@ -3,6 +3,7 @@ package proflo.focus;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -116,9 +117,11 @@ class DataManager {
         populateActiveProfiles(context);
         populateActiveApps(context);
         populateSchedules(context);
+        //TODO schedule (Calendar?)
         populateTimers(context);
         populateNotifications(context);
-        
+
+        Global.getInstance().loaded = true;
     }
 
     private void populateAllProfiles(Context context) {
@@ -127,7 +130,13 @@ class DataManager {
         String json = mPrefs.getString(context.getString(R.string.AllProfileKey), "");
         Vector<Profile> vec = new Vector<>();
         Vector<Profile> obj = gson.fromJson(json, vec.getClass());
-        Global.getInstance().setAllProfiles(obj);
+
+        if(obj != null) {
+            Log.d("DataManager-popAllProf", "There are " + obj.size() + " profiles");
+            Global.getInstance().setAllProfiles(obj);
+        } else {
+            Global.getInstance().setAllProfiles(new Vector<Profile>());
+        }
     }
 
     private void populateActiveProfiles(Context context) {
@@ -136,7 +145,14 @@ class DataManager {
         String json = mPrefs.getString(context.getString(R.string.ActiveProfilesKey), "");
         Vector<Profile> vec = new Vector<>();
         Vector<Profile> obj = gson.fromJson(json, vec.getClass());
-        Global.getInstance().setActiveProfiles(obj);
+
+        if(obj != null) {
+            Log.d("DataManager-popAllProf", "There are " + obj.size() + " active profiles");
+            Global.getInstance().setActiveProfiles(obj);
+        } else {
+            Global.getInstance().setActiveProfiles(new Vector<Profile>());
+        }
+
     }
 
     private void populateActiveApps(Context context) {
@@ -145,7 +161,14 @@ class DataManager {
         String json = mPrefs.getString(context.getString(R.string.ActiveAppsKey), "");
         Vector<String> vec = new Vector<>();
         Vector<String> obj = gson.fromJson(json, vec.getClass());
-        Global.getInstance().setActiveApps(obj);
+
+        if(obj != null) {
+            Log.d("DataManager-popAllProf", "There are " + obj.size() + " ActiveApps");
+            Global.getInstance().setActiveApps(obj);
+        } else {
+            Global.getInstance().setActiveApps(new Vector<String>());
+        }
+
     }
 
     private void populateSchedules(Context context) {
@@ -154,7 +177,13 @@ class DataManager {
         String json = mPrefs.getString(context.getString(R.string.SchedulesKey), "");
         Vector<Schedule> vec = new Vector<>();
         Vector<Schedule> obj = gson.fromJson(json, vec.getClass());
-        Global.getInstance().setSchedules(obj);
+
+        if(obj != null) {
+            Log.d("DataManager-popAllProf", "There are " + obj.size() + " Schedules");
+            Global.getInstance().setSchedules(obj);
+        } else {
+            Global.getInstance().setSchedules(new Vector<Schedule>());
+        }
     }
 
     private void populateTimers(Context context) {
@@ -163,6 +192,14 @@ class DataManager {
         String json = mPrefs.getString(context.getString(R.string.TimersKey), "");
         Vector<Timer> vec = new Vector<>();
         Vector<Timer> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("DataManager-popAllProf", "There are " + obj.size() + " Timers");
+            Global.getInstance().setTimers(obj);
+        } else {
+            Global.getInstance().setTimers(new Vector<Timer>());
+        }
+
         Global.getInstance().setTimers(obj);
     }
 
@@ -172,6 +209,14 @@ class DataManager {
         String json = mPrefs.getString(context.getString(R.string.NotificationsKey), "");
         Vector<Notification> vec = new Vector<>();
         Vector<Notification> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("DataManager-popAllProf", "There are " + obj.size() + " Notifications");
+            Global.getInstance().setNotifications(obj);
+        } else {
+            Global.getInstance().setNotifications(new Vector<Notification>());
+        }
+
         Global.getInstance().setNotifications(obj);
     }
 
