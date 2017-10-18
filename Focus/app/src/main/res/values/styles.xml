@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="TimePickerMode">
+        <item name="android:timePickerMode">clock</item>
+
+    </style>
+
 </resources>
