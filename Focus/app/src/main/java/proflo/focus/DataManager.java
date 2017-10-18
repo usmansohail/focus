@@ -124,6 +124,8 @@ class DataManager {
         Global.getInstance().loaded = true;
     }
 
+
+    //TODO Make all of these stupid functions use the same abstract function
     private void populateAllProfiles(Context context) {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
