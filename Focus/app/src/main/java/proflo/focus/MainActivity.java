@@ -169,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
         if(!isNotificationServiceEnabled()){
             buildNotificationPermissionsAlertDialog().show();
         }
+        if(!checkForPermission(getApplicationContext())){
+            buildUsageAccessPermissionsAlertDialog().show();
+        }
     }
 
     // this method adds buttons to the options menu
@@ -613,6 +616,25 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //will add functionality later to close app if user chooses no
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+
+    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Usage Access Permission");
+        alertDialogBuilder.setMessage("You must first give Focus Usage Access Permission.");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
                     }
                 });
         alertDialogBuilder.setNegativeButton(R.string.deny,
