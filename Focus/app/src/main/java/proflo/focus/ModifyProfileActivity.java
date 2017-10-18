@@ -1,5 +1,6 @@
 package proflo.focus;
 
+import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import java.util.Vector;
 
 public class ModifyProfileActivity extends AppCompatActivity {
 
@@ -172,12 +175,12 @@ public class ModifyProfileActivity extends AppCompatActivity {
         // logic to fill out all the apps here
 
         // some tests
+        Vector<ApplicationInfo> apps = Global.getInstance().getAllApps();
 
-        //go through once global var exists
-//        for(int i = 0; i < //globalAllapps; i++)
-//        {
-//            createAppRow(//name + i, 0);
-//        }
+        for(int i = 0; i < apps.size(); i++)
+        {
+            createAppRow(apps.get(i).loadLabel(getPackageManager()).toString(), 0);
+        }
 
     }
 

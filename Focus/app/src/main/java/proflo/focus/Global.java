@@ -53,7 +53,7 @@ class Global {
         return timers;
     }
 
-    public Vector<ApplicationInfo> getallApps() {
+    public Vector<ApplicationInfo> getAllApps() {
         return allApps;
     }
 
