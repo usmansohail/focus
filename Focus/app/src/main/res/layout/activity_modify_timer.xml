@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container_modify_timer"
+    android:id="@+id/container_modify_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -16,6 +16,125 @@
         android:background="@color/colorPrimary"
         android:elevation="4dp"
         />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="35dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/timer_error"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/cancel_icon"
+            android:id="@+id/cancel_button"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timer_error_text"
+            android:layout_below="@+id/cancel_icon"
+            />
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="35dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/timer_back"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/done_icon"
+            android:id="@+id/back_icon_profile"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/timer_back_text"
+            android:layout_below="@+id/back_icon_profile"
+            />
+
+
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/profile_apps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/timer_new_table">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:background="@color/colorSecondary"
+                    android:padding="20dp"
+
+                    >
+
+                    <NumberPicker
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/num_hours"
+                        >
+
+                    </NumberPicker>
+
+
+                    <NumberPicker
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/num_min"
+                        >
+
+                    </NumberPicker>
+                </LinearLayout>
+
+
+            </TableLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_popup"
+        android:visibility="gone"
+        android:gravity="center"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_confirm"
+            />
+
+
+
+    </RelativeLayout>
+
 
 
 

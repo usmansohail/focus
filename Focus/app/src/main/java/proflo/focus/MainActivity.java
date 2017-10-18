@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     invalidateOptionsMenu();
                     return true;
                 case R.id.navigation_notifications:
-
+                    setupNotifications();
                     setFrameVisible(frameIndex.NOTIFICATION.ordinal());
                     invalidateOptionsMenu();
                     return true;
@@ -222,15 +222,16 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.add_timer:
-                Intent intentTimer = new Intent(this, ModifyScheduleActivity.class);
+                Intent intentTimer = new Intent(this, ModifyTimerActivity.class);
                 Boolean newTimer = true;
                 intentTimer.putExtra(TIMER_STATUS, newTimer);
                 startActivity(intentTimer);
                 return true;
 
             case R.id.clear_all_notifications:
-                //Intent intentClearAllNotifications = new Intent(this, )
-                // don't know what to do yet, since this doesn't need to launch a new activity
+                // Logic of removing all notifications 
+
+
         }
         return true;
     }
@@ -250,6 +251,63 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    void setupNotifications()
+    {
+        // get all the notifications in the notification vector
+
+        // some dummies for now:
+        for(int i = 0; i < 3; i++)
+        {
+            createNotification("App " + i, getDrawable(R.drawable.cancel_icon));
+        }
+    }
+
+
+    void createNotification(String appName, Drawable appIcon)
+    {
+
+
+        // get the table to fill in
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.notification_table);
+        TableRow tableRow = new TableRow(MainActivity.this);
+
+
+
+
+        // create the framelayout that displays the info
+        FrameLayout frameLayout = new FrameLayout(MainActivity.this);
+        frameLayout.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+        frameLayout.setBottom(4);
+        frameLayout.setPadding(35,35,75,35);
+
+        // add the border
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(getResources().getColor(R.color.colorSecondary));
+        border.setStroke(3, getResources().getColor(R.color.border));
+        frameLayout.setBackground(border);
+
+        // create and set the title text
+        TextView profileTitle = new TextView(MainActivity.this, null);
+        profileTitle.setText(appName);
+        profileTitle.setTextSize(25);
+        profileTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        profileTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
+
+
+        // add the text to the parent frame
+        frameLayout.addView(profileTitle);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(tableLayout.getWidth(), 150);
+        params.height = 150;
+        params.width = tableLayout.getWidth() - 1;
+        params.weight = 10;
+        frameLayout.setLayoutParams(params);
+
+        // add the frame to the table
+        tableLayout.addView(frameLayout);
+
+
+    }
 
     void createProfile(String profileName, final boolean status)
     {

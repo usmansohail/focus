@@ -71,6 +71,21 @@
 
     </RelativeLayout>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:padding="5dp"
+        android:background="@color/colorAccent"
+        android:id="@+id/edit_time"
+        android:visibility="gone"
+        android:orientation="vertical"
+        >
+
+
+
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/timeblocks"
         android:layout_width="match_parent"
