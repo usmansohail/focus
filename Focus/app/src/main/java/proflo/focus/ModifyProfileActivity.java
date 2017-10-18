@@ -172,10 +172,12 @@ public class ModifyProfileActivity extends AppCompatActivity {
         // logic to fill out all the apps here
 
         // some tests
-        for(int i = 0; i < 10; i++)
-        {
-            createAppRow("App " + i, 0);
-        }
+
+        //go through once global var exists
+//        for(int i = 0; i < //globalAllapps; i++)
+//        {
+//            createAppRow(//name + i, 0);
+//        }
 
     }
 

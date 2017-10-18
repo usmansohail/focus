@@ -1,5 +1,7 @@
 package proflo.focus;
 
+import android.content.pm.ApplicationInfo;
+
 import java.sql.Time;
 import java.util.Calendar;
 import java.util.Vector;
@@ -13,6 +15,7 @@ public class Global {
     private Vector<Profile> allProfiles;
     private Vector<Profile> activeProfiles;
     private Vector<String> activeApps;
+    private Vector<ApplicationInfo> allApps;
     private Vector<Schedule> schedules;
     private Calendar schedule;
     private Vector<Timer> timers;
@@ -29,6 +32,10 @@ public class Global {
         return activeProfiles;
     }
 
+    public Vector<String> getActiveApps() {
+        return activeApps;
+    }
+
     public Vector<Schedule> getSchedules() {
         return schedules;
     }
@@ -39,6 +46,14 @@ public class Global {
 
     public Vector<Timer> getTimers() {
         return timers;
+    }
+
+    public Vector<ApplicationInfo> getallApps() {
+        return allApps;
+    }
+
+    public void setAllApps(Vector<ApplicationInfo> apps){
+        allApps = apps;
     }
 
     public Vector<Profile> getActiveProfilesForApp(String appID){
