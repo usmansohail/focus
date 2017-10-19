@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
     private static final String ANDROID_MESSAGING = "com.android.messaging";
     private static final String ANDROID_EMAIL = "com.android.email";
+    private static final String ANDROID_GESTURE_BUILDER = "com.android.gesture.builder";
+    private static final String ANDROID_API_DEMOS = "API Demos";
 
     // these booleans indicate which framelayout is active
     boolean profileActive;
@@ -700,9 +702,11 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 //User installed app
-                availableApps.add(appInfo);
+                if(!appInfo.packageName.equals(ANDROID_GESTURE_BUILDER) && !appInfo.loadLabel(getPackageManager()).toString().equals(ANDROID_API_DEMOS)){
+                    availableApps.add(appInfo);
+                }
             }
         }
-        Global.getInstance().setActiveApps(availableApps);
+        Global.getInstance().setAllApps(availableApps);
     }
 }

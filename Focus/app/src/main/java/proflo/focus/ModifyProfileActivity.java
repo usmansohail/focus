@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -179,12 +180,12 @@ public class ModifyProfileActivity extends AppCompatActivity {
 
         for(int i = 0; i < apps.size(); i++)
         {
-            createAppRow(apps.get(i).loadLabel(getPackageManager()).toString(), 0);
+            createAppRow(apps.get(i), 0);
         }
 
     }
 
-    void createAppRow(String appName, int appIndex)
+    void createAppRow(ApplicationInfo appInfo, int appIndex)
     {
         // get the table
         TableLayout table = (TableLayout)findViewById(R.id.app_table);
@@ -201,16 +202,21 @@ public class ModifyProfileActivity extends AppCompatActivity {
         app.setBackground(border);
 
         // create  the text to add for the name
+        ImageView appIconView = new ImageView(ModifyProfileActivity.this);
+        LinearLayout.LayoutParams paramView = new LinearLayout.LayoutParams(10, 80);
+        paramView.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
+        paramView.weight = 6;
+        appIconView.setLayoutParams(paramView);
+        appIconView.setImageDrawable(appInfo.loadIcon(getPackageManager()));
+
+        // create  the text to add for the name
         TextView appNameView = new TextView(ModifyProfileActivity.this);
         LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(250, 80);
         paramsText.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
         paramsText.weight = 5;
         appNameView.setLayoutParams(paramsText);
-        appNameView.setText(appName);
+        appNameView.setText(appInfo.loadLabel(getPackageManager()).toString());
         appNameView.setTextSize(20);
-
-
-
 
         // create a checkbox
         CheckBox checkBox = new CheckBox(ModifyProfileActivity.this);
@@ -233,6 +239,7 @@ public class ModifyProfileActivity extends AppCompatActivity {
         checkBox.setLayoutParams(params);
 
         // add everything to the linearLayout
+        app.addView(appIconView);
         app.addView(appNameView);
         app.addView(checkBox);
 

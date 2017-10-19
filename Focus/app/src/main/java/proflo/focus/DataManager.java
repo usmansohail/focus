@@ -2,6 +2,7 @@ package proflo.focus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -161,14 +162,14 @@ class DataManager {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.ActiveAppsKey), "");
-        Vector<String> vec = new Vector<>();
-        Vector<String> obj = gson.fromJson(json, vec.getClass());
+        Vector<ApplicationInfo> vec = new Vector<>();
+        Vector<ApplicationInfo> obj = gson.fromJson(json, vec.getClass());
 
         if(obj != null) {
             Log.d("DataManager-popAllProf", "There are " + obj.size() + " ActiveApps");
             Global.getInstance().setActiveApps(obj);
         } else {
-            Global.getInstance().setActiveApps(new Vector<String>());
+            Global.getInstance().setActiveApps(new Vector<ApplicationInfo>());
         }
 
     }

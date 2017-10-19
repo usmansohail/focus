@@ -61,7 +61,7 @@ class Global {
         allApps = apps;
     }
 
-    public Vector<Profile> getActiveProfilesForApp(String appID){
+    public Vector<Profile> getActiveProfilesForApp(ApplicationInfo appID){
         Vector<Profile> activeprofiles = new Vector<Profile>();
 
         for (int i = 0; i < activeProfiles.size(); i++){
@@ -76,12 +76,12 @@ class Global {
     }
 
     //new profiles isActive set to false
-    public Boolean createProfile(String name, Vector<String> apps){
+    public Boolean createProfile(String name, Vector<ApplicationInfo> apps){
         Profile tprofile = new Profile(name, apps, false);
         return true;
     }
 
-    public Boolean modifyProfile(String name, Vector<String> apps){
+    public Boolean modifyProfile(String name, Vector<ApplicationInfo> apps){
 
         for (int i= 0; i < activeProfiles.size(); i++){
             if (activeProfiles.get(i).getName() == name ){
