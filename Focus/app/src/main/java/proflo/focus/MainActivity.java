@@ -243,10 +243,9 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-        while(!Global.getInstance().loaded){}
 
         //TODO populate the views for all the profiles in the database
-        Vector<Profile> profiles = Global.getInstance().getAllProfiles();
+        Vector<Profile> profiles = Global.getInstance().getAllProfiles(this);
         for(Profile p: profiles){
             createProfile(p.getName(), p.isActive());
         }
@@ -727,22 +726,26 @@ public class MainActivity extends AppCompatActivity {
                 });
         return(alertDialogBuilder.create());
     }
-
-    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(int message){
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.usage_permissions_title);
-        alertDialogBuilder.setMessage(message);
-        alertDialogBuilder.setPositiveButton(R.string.accept,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-                    }
-                });
-        alertDialogBuilder.setNegativeButton(R.string.deny,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-        return(alertDialogBuilder.create());
+    public void updateAvailableApps(){
+        Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
+        int flags = PackageManager.GET_META_DATA |
+                PackageManager.GET_SHARED_LIBRARY_FILES;
+        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> applications = pm.getInstalledApplications(flags);
+        for (ApplicationInfo appInfo : applications) {
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
+                //Android pre-installed app
+                if(appInfo.packageName.equals(ANDROID_EMAIL) || appInfo.packageName.equals(ANDROID_MESSAGING)){
+                    availableApps.add(appInfo);
+                }
+            }
+            else {
+                //User installed app
+                if(!appInfo.packageName.equals(ANDROID_GESTURE_BUILDER) && !appInfo.loadLabel(getPackageManager()).toString().equals(ANDROID_API_DEMOS)){
+                    availableApps.add(appInfo);
+                }
+            }
+        }
+        Global.getInstance().setAllApps(this, availableApps);
     }
 }
