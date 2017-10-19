@@ -20,6 +20,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -214,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
                 Boolean newProfile = true;
                 intentProfile.putExtra(PROFILE_STATUS, newProfile);
                 startActivity(intentProfile);
+                setupProfile();
                 updateAvailableApps();
                 return true;
 
@@ -242,9 +244,8 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-        while(!Global.getInstance().loaded){}
-
         //TODO populate the views for all the profiles in the database
+
         Vector<Profile> profiles = Global.getInstance().getAllProfiles();
         for(Profile p: profiles){
             createProfile(p.getName(), p.isActive());

@@ -61,6 +61,10 @@ class Global {
         allApps = apps;
     }
 
+    public void addProfile(Profile profile){
+        allProfiles.add(profile);
+    }
+
     public Vector<Profile> getActiveProfilesForApp(ApplicationInfo appID){
         Vector<Profile> activeprofiles = new Vector<Profile>();
 

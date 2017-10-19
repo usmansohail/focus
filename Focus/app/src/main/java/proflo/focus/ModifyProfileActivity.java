@@ -29,7 +29,7 @@ public class ModifyProfileActivity extends AppCompatActivity {
     RelativeLayout errorLayout;
     RelativeLayout doneConfirm;
 
-
+    Vector<ApplicationInfo> blocked = new Vector<ApplicationInfo>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +85,30 @@ public class ModifyProfileActivity extends AppCompatActivity {
             case R.id.done:
                 //but first prompt the user for confirmation
                 if(validate()) {
+                    TableLayout table = (TableLayout)findViewById(R.id.app_table);
+                    for(int i = 0; i < table.getChildCount(); i++){
+                        View view = table.getChildAt(i);
+                        if(view instanceof LinearLayout){
+                            LinearLayout app = (LinearLayout) table.getChildAt(i);
+                            for(int j = 0; j < app.getChildCount(); j++) {
+                                View element = app.getChildAt(j);
+                                if (element instanceof CheckBox) {
+                                    CheckBox checkBox = (CheckBox) element;
+                                    if (checkBox.isChecked()) {
+                                        blocked.add(Global.getInstance().getAllApps().get(i));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Vector<ApplicationInfo> temp = Global.getInstance().getActiveApps();
+                    for(int i = 0; i < blocked.size(); i++){
+                        temp.add(blocked.get(i));
+                    }
+                    Global.getInstance().setActiveApps(temp);
+                    TextView profileName = (TextView)findViewById(R.id.profile_name);
+                    Profile profile = new Profile(profileName.getText().toString(), blocked, false);
+                    Global.getInstance().addProfile(profile);
                     onBackPressed();
                     return true;
                 }
