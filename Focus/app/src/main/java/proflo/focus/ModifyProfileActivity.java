@@ -200,7 +200,7 @@ public class ModifyProfileActivity extends AppCompatActivity {
         // logic to fill out all the apps here
 
         // some tests
-        Vector<ApplicationInfo> apps = Global.getInstance().getAllApps();
+        Vector<ApplicationInfo> apps = Global.getInstance().getAllApps(this);
 
         for(int i = 0; i < apps.size(); i++)
         {
