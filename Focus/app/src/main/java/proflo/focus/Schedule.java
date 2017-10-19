@@ -19,6 +19,7 @@ public class Schedule {
         this.name = name;
         this.timeBlocks = timeBlocks;
         this.repeatWeekly = repeatWeekly;
+        this.isActive = true;
     }
 
     public String getName() {
@@ -71,6 +72,11 @@ public class Schedule {
 
     public Boolean isActive(){
         return isActive;
+    }
+
+    public void setActive(Boolean isActive)
+    {
+        this.isActive = isActive;
     }
 
     public Boolean isRepeatWeekly(){

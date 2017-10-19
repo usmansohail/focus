@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
     public static final String PROFILE_STATUS = "proflo.focus.profile_status";
     public static final String SCHEDULE_STATUS = "proflo.focus.schedule_status";
     public static final String TIMER_STATUS = "proflo.focus.timer_status";
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     boolean profileActive;
     boolean scheduleActive;
     boolean timerActive;
+
+    boolean toggleSchedule;
 
     // delete these after
     boolean isOn = false;
@@ -256,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     void setupNotifications()
     {
         // get all the notifications in the notification vector
@@ -364,17 +369,17 @@ public class MainActivity extends AppCompatActivity {
     void setupSchedules()
     {
         // this is where all the schedules in the database should populate the screen
+        Vector<Schedule> schedules = new Vector<>();
+        schedules = Global.getInstance().getSchedules(MainActivity.this);
 
-        // sample
-        if(schedulesChanged) {
-            // actually query from the database/shared preferences
-            createSchedule("Sample Schedule", true);
+        for(Schedule schedule: schedules) {
+            createSchedule(schedule, schedule.getName(), true);
+
         }
-
         schedulesChanged = false;
     }
 
-    void createSchedule(String scheduleName, final boolean status)
+    void createSchedule(final Schedule schedule, String scheduleName, final boolean status)
     {
 
         // get the table to fill in
@@ -383,7 +388,11 @@ public class MainActivity extends AppCompatActivity {
 
         // create a toggle button with the correct status
         final Switch toggleButton = new Switch(MainActivity.this);
-        toggleButton.setChecked(status);
+        if(schedule.isActive() == null)
+        {
+            schedule.setActive(true);
+        }
+        toggleButton.setChecked(schedule.isActive());
 
         // set the parameters of the button
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(150, 75);
@@ -392,11 +401,15 @@ public class MainActivity extends AppCompatActivity {
         toggleButton.setLayoutParams(buttonParams);
         toggleButton.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 
+
+
         // handle the situation of the button being pressed
         toggleButton.setOnClickListener(new View.OnClickListener() {
 
             public boolean onTouch(View v, MotionEvent event) {
-                toggleButton.setChecked(toggleProfile());
+                toggleButton.setChecked(!schedule.isActive());
+                schedule.setActive(!schedule.isActive());
+
                 return false;
             }
 
@@ -411,7 +424,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // should be able to do this:
-                toggleButton.setChecked(toggleProfile());
+                toggleButton.setChecked(!schedule.isActive());
+                schedule.setActive(!schedule.isActive());
 
             }
         });

@@ -27,6 +27,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.sql.Time;
 import java.util.Vector;
 
 public class ModifyScheduleActivity extends AppCompatActivity {
@@ -43,11 +44,19 @@ public class ModifyScheduleActivity extends AppCompatActivity {
     int newStopHour;
     int newStopMin;
 
+    Vector<TimeBlock> timeBlocks;
+
     RelativeLayout errorLayout;
     RelativeLayout doneConfirm;
 
     Vector<String> profileNames;
 
+
+    // get the table
+    TableLayout table;
+
+    // create the framelayout that displays the info
+    LinearLayout timeBlock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +66,13 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         // get the objects modified by various methods
         errorLayout = (RelativeLayout) findViewById(R.id.schedule_error);
         doneConfirm = (RelativeLayout) findViewById(R.id.schedule_back);
+
+        table = (TableLayout)findViewById(R.id.timeblock_table);
+        timeBlock = new LinearLayout(ModifyScheduleActivity.this);
+
+        timeBlocks = new Vector<>();
+
+        // TODO if we are modifying a schedule, then pull the list of timeblocks
 
         // set the toolbar
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -125,23 +141,20 @@ public class ModifyScheduleActivity extends AppCompatActivity {
     private void createSchedule() {
 
         // TODO logic for making the schedule
+        EditText name = (EditText)findViewById(R.id.schedule_name);
+        Global.getInstance().createSchedule(ModifyScheduleActivity.this,name.getText().toString(), timeBlocks, true);
+
 
     }
 
     void fillLayout()
     {
-        Vector<Integer> days = new Vector<>();
-        days.add(1);
-        days.add(0);
-        days.add(1);
-        days.add(1);
-        days.add(0);
-        days.add(1);
-        days.add(0);
-
-        for(int i = 0; i < 2; i++)
+        // get all the timeblocks
+        for(TimeBlock timeBlock: timeBlocks)
         {
-            displayTimeBlock(8, 40, "am", "am", 10, days, 30);
+            displayTimeBlock(timeBlock.getStartHour(), timeBlock.getStartMinute(),"", "", timeBlock.getStopHour(),timeBlock.getDays(), timeBlock.getStopMinute());
+
+
         }
 
         createNewTimeBlock();
@@ -187,14 +200,14 @@ public class ModifyScheduleActivity extends AppCompatActivity {
     boolean validate()
     {
         // confirm that the name is not empty
-        TextView scheduleName = (TextView)findViewById(R.id.profile_name);
+        TextView scheduleName = (TextView)findViewById(R.id.schedule_name);
 
         if(scheduleName.getText().toString().length() == 0 || scheduleName.toString().equals("Schedule Name"))
         {
             displayErrorMessage("Please enter a Schedule name");
             return false;
         }
-        else if(!someBlockChanged)
+        else if(timeBlocks.size() == 0)
         {
             // a single app hasn't been selected, send an error
             displayErrorMessage("Please enter appropriate time information");
@@ -220,10 +233,21 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
     void selectProfilesBlock()
     {
-        //TODO get a list of all the profiles and feed them into this profiles array
+
+        Global global = Global.getInstance();
+
+        // get the profiles
+        Vector<Profile> profile_objects = global.getAllProfiles(ModifyScheduleActivity.this);
+        final String profiles[] = new String[profile_objects.size()];
+
+        for(int i = 0; i < profile_objects.size(); i++)
+        {
+            profiles[i] = profile_objects.get(i).getName();
+
+        }
+
 
         // add the list of profiles
-        final String profiles[] = new String[] {"red", "green", "blue", "black"};     // change this line
         final boolean [] profilesBoolean = new boolean[profiles.length];
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ModifyScheduleActivity.this);
@@ -303,7 +327,8 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         newStopHour = 00;
         newStopMin = 00;
 
-
+        // clear the timeblock just in case
+        timeBlock.removeAllViews();
 
 
         Vector<String> dayNames = new Vector<>();
@@ -315,11 +340,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         dayNames.add("F");
         dayNames.add("Sa");
 
-        // get the table
-        TableLayout table = (TableLayout)findViewById(R.id.timeblock_table);
 
-        // create the framelayout that displays the info
-        LinearLayout timeBlock = new LinearLayout(ModifyScheduleActivity.this);
         timeBlock.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
         timeBlock.setPadding(35,35,35,35);
 
@@ -602,12 +623,32 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
     void createTimeBlock(Vector<CheckBox> days)
     {
-        // TODO actually create a new timeblock belonging to the schedule in global
+        Vector<Boolean> dayBools = new Vector<>();
 
+        for(CheckBox c: days)
+        {
+            if(c.isChecked())
+            {
+                dayBools.add(true);
+            }
+            else
+            {
+                dayBools.add(false);
+            }
+        }
+
+
+
+        TimeBlock newBlock = new TimeBlock(newStartHour, newStartMin, newStopHour, newStopMin, dayBools);
+        timeBlocks.add(newBlock);
+
+        //TODO update the view
+        table.removeView(timeBlock);
+        fillLayout();
     }
 
     void displayTimeBlock(int startHour, int startMinute, String startM, String stopM, int stopHour,
-                          final Vector<Integer> days, int stopMinute) {
+                          final Vector<Boolean> days, int stopMinute) {
         Vector<String> dayNames = new Vector<>();
         dayNames.add("S");
         dayNames.add("M");
@@ -658,7 +699,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
             ShapeDrawable checkBox = new ShapeDrawable(new OvalShape());
             LinearLayout dayBox = new LinearLayout(ModifyScheduleActivity.this);
 
-            if (days.get(i) == 1) {
+            if (days.get(i) == true) {
                 checkBox.getPaint().setColor(Color.GRAY);
             } else {
                 checkBox.getPaint().setColor(Color.WHITE);
