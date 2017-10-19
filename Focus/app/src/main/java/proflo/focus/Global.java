@@ -121,10 +121,6 @@ class Global {
         prefsEditor.commit();
     }
 
-    public void addProfile(Profile profile){
-        allProfiles.add(profile);
-    }
-
     public Vector<Profile> getActiveProfilesForApp(ApplicationInfo appID){
         Vector<Profile> activeProfiles = getActiveProfiles();
 
@@ -144,6 +140,14 @@ class Global {
         Profile tprofile = new Profile(name, apps, false);
         return true;
     }
+
+
+    public void addProfile(Profile profile){
+        Vector<Profile> profiles = getAllProfiles();
+        profiles.add(profile);
+
+    }
+
 
     public Boolean modifyProfile(String name, Vector<ApplicationInfo> apps){
 
