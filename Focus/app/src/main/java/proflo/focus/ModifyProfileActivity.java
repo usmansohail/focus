@@ -95,20 +95,20 @@ public class ModifyProfileActivity extends AppCompatActivity {
                                 if (element instanceof CheckBox) {
                                     CheckBox checkBox = (CheckBox) element;
                                     if (checkBox.isChecked()) {
-                                        blocked.add(Global.getInstance().getAllApps().get(i));
+                                        blocked.add(Global.getInstance().getAllApps(this).get(i));
                                     }
                                 }
                             }
                         }
                     }
-                    Vector<ApplicationInfo> temp = Global.getInstance().getActiveApps();
+                    Vector<ApplicationInfo> temp = Global.getInstance().getActiveApps(this);
                     for(int i = 0; i < blocked.size(); i++){
                         temp.add(blocked.get(i));
                     }
-                    Global.getInstance().setActiveApps(temp);
+                    Global.getInstance().setActiveApps(this, temp);
                     TextView profileName = (TextView)findViewById(R.id.profile_name);
                     Profile profile = new Profile(profileName.getText().toString(), blocked, false);
-                    Global.getInstance().addProfile(profile);
+                    Global.getInstance().addProfile(this, profile);
                     onBackPressed();
                     return true;
                 }

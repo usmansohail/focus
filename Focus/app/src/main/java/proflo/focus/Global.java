@@ -142,6 +142,14 @@ class Global {
         return false;
     }
 
+    public void addProfile(Context context, Profile profile){
+
+        Vector<Profile> allProfiles = getAllProfiles(context);
+
+        allProfiles.add(profile);
+
+    }
+
     public Boolean modifyProfile(Context context, String name, Vector<ApplicationInfo> apps){
 
         Vector<Profile> activeProfiles = getActiveProfiles(context);
