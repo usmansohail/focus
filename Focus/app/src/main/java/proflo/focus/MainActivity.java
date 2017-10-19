@@ -16,6 +16,8 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -163,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
         //dialog to turn on permissions appears if notification service has not yet been enabled
         if(!isNotificationServiceEnabled()){
             buildNotificationPermissionsAlertDialog().show();
+        }
+        if(!checkForPermission(getApplicationContext())){
+            buildUsageAccessPermissionsAlertDialog().show();
         }
     }
 
@@ -708,5 +713,24 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Global.getInstance().setAllApps(availableApps);
+    }
+
+    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Usage Access Permission");
+        alertDialogBuilder.setMessage("You must first give Focus Usage Access Permission.");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //will add functionality later to close app if user chooses no
+                    }
+                });
+        return(alertDialogBuilder.create());
     }
 }
