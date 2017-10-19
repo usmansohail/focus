@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,7 @@ import java.util.Vector;
 
 public class ModifyProfileActivity extends AppCompatActivity {
 
+    private static final String TAG = "ModifyProfileActivity";
     boolean nameModified;
     boolean someAppChecked;
 
@@ -80,12 +82,16 @@ public class ModifyProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+
+        Log.d(TAG, "Entering onOptionsItemSelected.");
         switch (item.getItemId())
         {
             case R.id.done:
                 //but first prompt the user for confirmation
+                Log.d(TAG, "Entering validate.");
                 if(validate()) {
                     TableLayout table = (TableLayout)findViewById(R.id.app_table);
+                    Log.d(TAG, "Table has: " + table.getChildCount() + " children.");
                     for(int i = 0; i < table.getChildCount(); i++){
                         View view = table.getChildAt(i);
                         if(view instanceof LinearLayout){
@@ -95,18 +101,23 @@ public class ModifyProfileActivity extends AppCompatActivity {
                                 if (element instanceof CheckBox) {
                                     CheckBox checkBox = (CheckBox) element;
                                     if (checkBox.isChecked()) {
+                                        Log.d(TAG, "Adding " + Global.getInstance().getAllApps(this).get(i).packageName + " to blocked list.");
                                         blocked.add(Global.getInstance().getAllApps(this).get(i));
                                     }
                                 }
                             }
                         }
                     }
+
                     Vector<ApplicationInfo> temp = Global.getInstance().getActiveApps(this);
                     for(int i = 0; i < blocked.size(); i++){
+                        Log.d(TAG, "Adding " + blocked.get(i).packageName + " to temp.");
                         temp.add(blocked.get(i));
                     }
                     Global.getInstance().setActiveApps(this, temp);
+
                     TextView profileName = (TextView)findViewById(R.id.profile_name);
+                    Log.d(TAG, "Profile name set to be: " + profileName.getText().toString());
                     Profile profile = new Profile(profileName.getText().toString(), blocked, false);
                     Global.getInstance().addProfile(this, profile);
                     onBackPressed();
@@ -141,17 +152,20 @@ public class ModifyProfileActivity extends AppCompatActivity {
 
         if(profileName.getText().toString().length() == 0 || profileName.toString().equals("Profile Name"))
         {
+            Log.d(TAG, "Enter Display Name message.");
             displayErrorMessage("Please enter a profile name");
             return false;
         }
         else if(!someAppChecked)
         {
             // a single app hasn't been selected, send an error
+            Log.d(TAG, "No apps are checked.");
             displayErrorMessage("Please select at least one app for this profile");
             return false;
         }
         else {
 
+            Log.d(TAG, "Successful validation.");
             return true;
         }
     }

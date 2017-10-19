@@ -35,8 +35,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.AllProfileKey), "");
-        Vector<Profile> vec = new Vector<>();
-        Vector<Profile> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVector = new TypeToken<Vector<Profile>>(){}.getType();
+        Vector<Profile> obj = gson.fromJson(json, typeOfVector);
 
         if(obj != null) {
             Log.d("Global-popAllProf", "There are " + obj.size() + " total profiles");
@@ -50,8 +50,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.ActiveProfilesKey), "");
-        Vector<Profile> vec = new Vector<>();
-        Vector<Profile> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVector = new TypeToken<Vector<Profile>>(){}.getType();
+        Vector<Profile> obj = gson.fromJson(json, typeOfVector);
 
         if(obj != null) {
             Log.d("Global-popAllProf", "There are " + obj.size() + " active profiles");
@@ -65,8 +65,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.SchedulesKey), "");
-        Vector<Schedule> vec = new Vector<>();
-        Vector<Schedule> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVector = new TypeToken<Vector<Schedule>>(){}.getType();
+        Vector<Schedule> obj = gson.fromJson(json, typeOfVector);
 
         if(obj != null) {
             Log.d("Global-popAllProf", "There are " + obj.size() + " schedules");
@@ -84,8 +84,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.TimersKey), "");
-        Vector<Timer> vec = new Vector<>();
-        Vector<Timer> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVector = new TypeToken<Vector<Timer>>(){}.getType();
+        Vector<Timer> obj = gson.fromJson(json, typeOfVector);
 
         if(obj != null) {
             Log.d("Global-popAllProf", "There are " + obj.size() + " timers");
@@ -151,6 +151,7 @@ class Global {
 
         allProfiles.add(profile);
 
+        setAllProfiles(context, allProfiles);
     }
 
     public Boolean modifyProfile(Context context, String name, Vector<ApplicationInfo> apps){
@@ -171,8 +172,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.ActiveAppsKey), "");
-        Vector<ApplicationInfo> vec = new Vector<>();
-        Vector<ApplicationInfo> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVectorOfApplicationInfo = new TypeToken<Vector<ApplicationInfo>>(){}.getType();
+        Vector<ApplicationInfo> obj = gson.fromJson(json, typeOfVectorOfApplicationInfo);
 
         if(obj != null) {
             Log.d("Global", "There are " + obj.size() + " active apps");
@@ -325,8 +326,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.NotificationsKey), "");
-        Vector<Notification> vec = new Vector<>();
-        Vector<Notification> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVector = new TypeToken<Vector<Notification>>(){}.getType();
+        Vector<Notification> obj = gson.fromJson(json, typeOfVector);
 
         if(obj != null) {
             Log.d("Global-popAllProf", "There are " + obj.size() + " active apps");
