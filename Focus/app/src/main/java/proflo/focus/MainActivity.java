@@ -243,7 +243,8 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.profile_table);
+        tableLayout.removeAllViews();
         //TODO populate the views for all the profiles in the database
         Vector<Profile> profiles = Global.getInstance().getAllProfiles(this);
         for(Profile p: profiles){
