@@ -707,6 +707,23 @@ public class MainActivity extends AppCompatActivity {
                 });
         return(alertDialogBuilder.create());
     }
+    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(int message){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Usage Access");
+        alertDialogBuilder.setMessage("You must first grant Focus! usage access before continuing.");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
     public void updateAvailableApps(){
         Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
         int flags = PackageManager.GET_META_DATA |
@@ -729,23 +746,4 @@ public class MainActivity extends AppCompatActivity {
         }
         Global.getInstance().setAllApps(this, availableApps);
     }
-
-    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(int message){
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.usage_permissions_title);
-        alertDialogBuilder.setMessage(message);
-        alertDialogBuilder.setPositiveButton(R.string.accept,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-                    }
-                });
-        alertDialogBuilder.setNegativeButton(R.string.deny,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-        return(alertDialogBuilder.create());
-    }
-
 }
