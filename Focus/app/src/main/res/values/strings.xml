@@ -16,4 +16,5 @@
     <string name="SchedulesKey">SCHEDULES_SP</string>
     <string name="TimersKey">TIMERS_SP</string>
     <string name="NotificationsKey">NOTIFICATIONS_SP</string>
+    <string name="AppsKey">AppsKey</string>
 </resources>
