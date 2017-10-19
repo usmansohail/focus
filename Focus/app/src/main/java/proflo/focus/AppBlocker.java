@@ -8,6 +8,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -52,18 +53,31 @@ public class AppBlocker extends Service {
         public synchronized void run() {
 
             String currentApp = getCurrentApp(getApplicationContext());
-
             for(String blocked : mBlockedPackages){
                 if(blocked.equals(currentApp)){
-                    String temp = "Blocked: " + currentApp;
-                    Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
+                    //String temp = "Blocked: " + currentApp;
+                    //Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
                     StartApplication(getApplicationContext(), getPackageName());
+                    BlockedApplicationAlert().show();
                     break;
                 }
             }
             mHandler.postDelayed(this, 300);
         }
     };
+
+    private android.app.AlertDialog BlockedApplicationAlert(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Blocked Application");
+        alertDialogBuilder.setMessage("Focus! You are trying to access a distracting application that has been blocked! ");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
