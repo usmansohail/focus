@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/tab_profiles"
+        icon="@drawable/ic_profile_white"/>
+    <tab
+        id="@+id/tab_schedules"
+        icon="@drawable/ic_schedule_white"/>
+    <tab
+        id="@+id/tab_timers"
+        icon="@drawable/ic_timer_white"/>
+    <tab
+        id="@+id/tab_notifications"
+        icon="@drawable/ic_notification_white"/>
+</tabs>
