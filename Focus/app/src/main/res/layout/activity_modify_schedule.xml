@@ -80,6 +80,8 @@
         android:id="@+id/edit_time"
         android:visibility="gone"
         android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
         >
 
 

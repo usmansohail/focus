@@ -264,10 +264,20 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
         // LinearLayout for time
         LinearLayout timeBox = new LinearLayout(ModifyScheduleActivity.this);
-        timeBox.setLayoutParams(new LinearLayout.LayoutParams(300, 80));
+        LinearLayout.LayoutParams timeBoxParams = new LinearLayout.LayoutParams(800, 120);
+        timeBoxParams.weight = 1.0f;
+        timeBoxParams.gravity = Gravity.CENTER;
+        timeBox.setPadding(10, 10, 10, 10);
+
+        timeBox.setLayoutParams(timeBoxParams);
+
+        LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
 
         final LinearLayout messageBox = new LinearLayout(ModifyScheduleActivity.this);
+        LinearLayout.LayoutParams messageBoxParams = new LinearLayout.LayoutParams(900, 80);
+        messageBox.setLayoutParams(messageBoxParams);
         final TextView message = new TextView(ModifyScheduleActivity.this);
+        message.setTextSize(20);
         Button done = new Button(ModifyScheduleActivity.this);
         done.setLayoutParams(new LinearLayoutCompat.LayoutParams(80, 80));
         done.setBackground(getResources().getDrawable(R.drawable.done_icon));
@@ -282,9 +292,29 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
         // Text for time
         final TextView timeText = new TextView(ModifyScheduleActivity.this);
-        timeText.setText(newStartHour + ":" + newStartMin + " - " + newStopHour + ":" + newStopMin);
+        timeText.setText("00:00  -  00:00");
 
         timeBox.addView(timeText);
+
+        // create an edit button
+        Button edit = new Button(ModifyScheduleActivity.this);
+        edit.setBackground(getResources().getDrawable(R.drawable.edit_icon));
+        edit.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+        timeBox.addView(edit);
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // get the edit_time block
+                LinearLayout editTime = (LinearLayout)findViewById(R.id.edit_time);
+                editTime.setVisibility(View.VISIBLE);
+                editTime.addView(startTime);
+                message.setText("Please select a start time");
+                editTime.addView(messageBox);
+
+
+            }
+        });
 
         timeBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -315,6 +345,11 @@ public class ModifyScheduleActivity extends AppCompatActivity {
                     startPickerActive = false;
                     message.setText("Please select a end time");
                     editTime.addView(messageBox);
+
+
+
+                    // update the time
+                    setTime(timeText, startTime, endTime);
                 }
                 else
                 {
@@ -322,7 +357,10 @@ public class ModifyScheduleActivity extends AppCompatActivity {
                     editTime.removeAllViews();
                     editTime.setVisibility(View.GONE);
 
+                    // if they edit the time again, go to the startPickerActive
+                    startPickerActive = true;
 
+                    setTime(timeText, startTime, endTime);
                 }
 
             }
@@ -343,9 +381,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         startTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                newStartHour = view.getHour();
-                newStartMin = view.getMinute();
-                timeText.setText(newStartHour + ":" + newStartMin + " - " + newStopHour + ":" + newStopMin);
+                setTime(timeText, startTime, endTime);
             }
         });
 
@@ -353,9 +389,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         endTime.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                newStopHour = view.getHour();
-                newStopMin = view.getMinute();
-                timeText.setText(newStartHour + ":" + newStartMin + " - " + newStopHour + ":" + newStopMin);
+                setTime(timeText, startTime, endTime);
             }
         });
 
@@ -394,6 +428,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
 
         Button createBlock = new Button(ModifyScheduleActivity.this);
         createBlock.setLayoutParams(new LinearLayoutCompat.LayoutParams(80, 80));
+        createBlock.setBackground(getResources().getDrawable(R.drawable.done_icon));
         timeBlock.addView(createBlock);
 
         createBlock.setOnClickListener(new View.OnClickListener() {
@@ -407,8 +442,72 @@ public class ModifyScheduleActivity extends AppCompatActivity {
             }
         });
 
+        timeBlock.setBackgroundColor(getResources().getColor(R.color.soft_background));
+
         // add the app layout to the table
         table.addView(timeBlock);
+    }
+
+    void setTime(TextView text, TimePicker start, TimePicker stop) {
+        newStartHour = start.getHour();
+        newStartMin = start.getMinute();
+        newStopHour = stop.getHour();
+        newStopMin = stop.getMinute();
+
+        String startH, startM, stopH, stopM, startP, stopP;
+
+        startH = "" + newStartHour;
+        stopH = "" + newStopHour;
+
+        if(newStartHour >= 12)
+        {
+            startP = "PM";
+        }
+        else
+        {
+            startP = "AM";
+        }
+        if(newStopHour >= 12)
+        {
+            stopP = "PM";
+        }
+        else
+        {
+            stopP = "AM";
+        }
+        if(newStartHour > 12)
+        {
+            startH = ""  + (newStartHour - 12);
+        }
+        if(newStopHour > 12)
+        {
+            stopH = "" + (newStopHour - 12);
+        }
+
+
+        if (newStopMin < 10) {
+            stopM = "0" + newStopMin;
+        }
+        if(newStopMin == 0)
+        {
+            stopM = "00";
+        }
+        else {
+            stopM = "" + newStopMin;
+        }
+
+        if (newStartMin < 10) {
+            startM = "0" + newStartMin;
+        }
+        if(newStartMin == 0)
+        {
+            startM = "00";
+        }
+        else
+        {
+            startM = "" + newStartMin;
+        }
+        text.setText(startH + ":" + startM + startP + " - " + stopH + ":" + stopM + stopP);
     }
 
     void createTimeBlock(Vector<CheckBox> days)

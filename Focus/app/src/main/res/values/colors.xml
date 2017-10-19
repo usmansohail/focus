@@ -7,4 +7,5 @@
     <color name="border">#706f6f</color>
     <color name="soft_text">#9c9c9c</color>
     <color name="text">#3f3f3f</color>
+    <color name="soft_background">#f7baba</color>
 </resources>
