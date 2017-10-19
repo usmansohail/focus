@@ -1,10 +1,12 @@
 package proflo.focus;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.ContextThemeWrapper;
@@ -44,6 +46,8 @@ public class ModifyScheduleActivity extends AppCompatActivity {
     RelativeLayout errorLayout;
     RelativeLayout doneConfirm;
 
+    Vector<String> profileNames;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +64,11 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        profileNames = new Vector<>();
 
         // fill the layout with possible apps
         fillLayout();
+        selectProfilesBlock();
 
         // assume everything has not yet been modified
         nameModified = false;
@@ -91,6 +97,7 @@ public class ModifyScheduleActivity extends AppCompatActivity {
             case R.id.done:
                 //but first prompt the user for confirmation
                 if(validate()) {
+                    createSchedule();
                     onBackPressed();
                     return true;
                 }
@@ -112,6 +119,12 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         }
 
         return false;
+
+    }
+
+    private void createSchedule() {
+
+        // TODO logic for making the schedule
 
     }
 
@@ -205,13 +218,90 @@ public class ModifyScheduleActivity extends AppCompatActivity {
     }
 
 
+    void selectProfilesBlock()
+    {
+        //TODO get a list of all the profiles and feed them into this profiles array
+
+        // add the list of profiles
+        final String profiles[] = new String[] {"red", "green", "blue", "black"};     // change this line
+        final boolean [] profilesBoolean = new boolean[profiles.length];
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(ModifyScheduleActivity.this);
+        DialogInterface.OnMultiChoiceClickListener listener = new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                profilesBoolean[which] = isChecked;
+            }
+        };
+
+
+        builder.setMultiChoiceItems(profiles, profilesBoolean, listener);
+        builder.setTitle("Select all Profiles");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // fill the correct textView with the list of profiles
+                TextView list = (TextView)findViewById(R.id.list_text);
+                String listText = "";
+                for(int i = 0; i < profiles.length; i++)
+                {
+                    if(profilesBoolean[i])
+                    {
+                        listText = listText + profiles[i] + '\n';
+                        profileNames.add(profiles[i]);
+                    }
+                    else
+                    {
+                        for(int j = 0; j < profileNames.size(); j++)
+                        {
+                            if(profileNames.get(j).toString().equalsIgnoreCase(profiles[i].toString()))
+                            {
+                                profileNames.remove(j);
+                            }
+                        }
+                    }
+
+                }
+
+                list.setText(listText);
+            }
+        });
+
+
+        builder.show();
+
+
+        LinearLayout profile_list= (LinearLayout)findViewById(R.id.list_of_profiles);
+        Button edit = new Button(ModifyScheduleActivity.this);
+        edit.setBackground(getResources().getDrawable(R.drawable.edit_icon));
+        edit.setLayoutParams(new LinearLayoutCompat.LayoutParams(80, 80));
+        profile_list.addView(edit);
+
+        // add the border
+        GradientDrawable border = new GradientDrawable();
+        border.setColor(getResources().getColor(R.color.colorSecondary));
+        border.setStroke(3, getResources().getColor(R.color.border));
+        profile_list.setBackground(border);
+        profile_list.setPadding(10,10,10,10);
+
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                builder.show();
+            }
+        });
+    }
+
     void createNewTimeBlock()
     {
         newStartHour = 00;
         newStartMin = 00;
         newStopHour = 00;
         newStopMin = 00;
-
 
 
 
@@ -485,9 +575,6 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         }
 
 
-        if (newStopMin < 10) {
-            stopM = "0" + newStopMin;
-        }
         if(newStopMin == 0)
         {
             stopM = "00";
@@ -496,9 +583,6 @@ public class ModifyScheduleActivity extends AppCompatActivity {
             stopM = "" + newStopMin;
         }
 
-        if (newStartMin < 10) {
-            startM = "0" + newStartMin;
-        }
         if(newStartMin == 0)
         {
             startM = "00";
@@ -507,12 +591,18 @@ public class ModifyScheduleActivity extends AppCompatActivity {
         {
             startM = "" + newStartMin;
         }
+        if (newStopMin < 10) {
+            stopM = "0" + newStopMin;
+        }
+        if (newStartMin < 10) {
+            startM = "0" + newStartMin;
+        }
         text.setText(startH + ":" + startM + startP + " - " + stopH + ":" + stopM + stopP);
     }
 
     void createTimeBlock(Vector<CheckBox> days)
     {
-        // put all the logic into here
+        // TODO actually create a new timeblock belonging to the schedule in global
 
     }
 

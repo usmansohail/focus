@@ -91,25 +91,77 @@
                     android:layout_width="match_parent"
                     android:background="@color/colorSecondary"
                     android:padding="20dp"
-
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
                     >
-
-                    <NumberPicker
+                    <RelativeLayout
                         android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hours"
+                        android:id="@+id/hours_id"
+
+                        />
+                    <NumberPicker
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/num_hours"
+                        android:layout_below="@id/hours_id"
                         >
 
                     </NumberPicker>
+                        </RelativeLayout>
 
-
-                    <NumberPicker
+                    <RelativeLayout
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Minutes"
+                            android:id="@+id/minutes_id"
+                            />
+
+                    <NumberPicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:id="@+id/num_min"
+                        android:layout_below="@+id/minutes_id"
                         >
 
                     </NumberPicker>
+                    </RelativeLayout>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:id="@+id/list_of_profiles"
+                    android:orientation="horizontal"
+                    android:background="@color/colorSecondary"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_vertical"
+                    >
+                    <TextView
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:text="Selected Profiles:  "
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="190dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/list_text"/>
+
+
                 </LinearLayout>
 
 

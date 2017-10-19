@@ -72,6 +72,8 @@
     </RelativeLayout>
 
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
@@ -118,6 +120,26 @@
                         android:text="Profile Name"
                         android:textColor="@color/soft_text"
                         />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:id="@+id/list_of_profiles"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="150dp"
+                        android:layout_height="wrap_content"
+                        android:text="Selected Profiles:  "
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="190dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/list_text"/>
+
+
                 </LinearLayout>
 
 
