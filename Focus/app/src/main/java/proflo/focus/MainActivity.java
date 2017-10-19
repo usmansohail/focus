@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.SharedLibraryInfo;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -20,6 +21,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -162,6 +164,9 @@ public class MainActivity extends AppCompatActivity {
 
         setupProfile();
 
+        Intent AppBlockerIntent = new Intent(this, AppBlocker.class);
+        startService(AppBlockerIntent);
+
         checkPermissions(R.string.usage_permissions_message, R.string.usage_permissions_message_profiles);
     }
 
@@ -243,7 +248,8 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.profile_table);
+        tableLayout.removeAllViews();
         //TODO populate the views for all the profiles in the database
         Vector<Profile> profiles = Global.getInstance().getAllProfiles(this);
         for(Profile p: profiles){
@@ -725,23 +731,27 @@ public class MainActivity extends AppCompatActivity {
         return(alertDialogBuilder.create());
     }
     public void updateAvailableApps(){
-        Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
-        int flags = PackageManager.GET_META_DATA |
-                PackageManager.GET_SHARED_LIBRARY_FILES;
-        PackageManager pm = getPackageManager();
-        List<ApplicationInfo> applications = pm.getInstalledApplications(flags);
-        for (ApplicationInfo appInfo : applications) {
-            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
-                //Android pre-installed app
-                if(appInfo.packageName.equals(ANDROID_EMAIL) || appInfo.packageName.equals(ANDROID_MESSAGING)){
-                    availableApps.add(appInfo);
-                }
-            }
-            else {
-                //User installed app
-                if(!appInfo.packageName.equals(ANDROID_GESTURE_BUILDER) && !appInfo.loadLabel(getPackageManager()).toString().equals(ANDROID_API_DEMOS)){
-                    availableApps.add(appInfo);
-                }
+        Vector<ApplicationInfo> availableApps = new Vector<>();
+
+        final PackageManager packageManager = getApplicationContext().getPackageManager();
+        List<ApplicationInfo> installedApplications =
+                packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        for (ApplicationInfo appInfo : installedApplications)
+        {
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0)
+            {
+                // IS A SYSTEM APP
+                Log.d("updateAvailableApps", "System App: " + appInfo.packageName);
+//                availableApps.add(appInfo);
+            } else if ((appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0)
+            {
+                // APP WAS INSTALL AS AN UPDATE TO A BUILD-IN SYSTEM APP
+                Log.d("updateAvailableApps", "Updated App: " + appInfo.packageName);
+                availableApps.add(appInfo);
+            } else {
+                Log.d("updateAvailableApps", "User App: " + appInfo.packageName);
+                availableApps.add(appInfo);
             }
         }
         Global.getInstance().setAllApps(this, availableApps);

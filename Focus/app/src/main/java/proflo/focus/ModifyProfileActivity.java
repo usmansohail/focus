@@ -92,7 +92,7 @@ public class ModifyProfileActivity extends AppCompatActivity {
                 if(validate()) {
                     TableLayout table = (TableLayout)findViewById(R.id.app_table);
                     Log.d(TAG, "Table has: " + table.getChildCount() + " children.");
-                    for(int i = 0; i < table.getChildCount(); i++){
+                    for(int i = 0; i < table.getChildCount() - 1; i++){
                         View view = table.getChildAt(i);
                         if(view instanceof LinearLayout){
                             LinearLayout app = (LinearLayout) table.getChildAt(i);

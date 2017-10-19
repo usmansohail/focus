@@ -34,6 +34,8 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 public class AppBlocker extends Service {
 
+    public static boolean running = false;
+
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private Handler mHandler;
@@ -43,6 +45,16 @@ public class AppBlocker extends Service {
         public synchronized void run() {
 
             String currentApp = getCurrentApp(getApplicationContext());
+
+            if(mBlockedPackages == null){
+                mBlockedPackages = new ArrayList<String>();
+            }
+
+            mBlockedPackages.clear();
+            for(ApplicationInfo AI : Global.getInstance().getActiveApps(getApplicationContext())){
+                mBlockedPackages.add(AI.packageName);
+            }
+
             for(String blocked : mBlockedPackages){
                 if(blocked.equals(currentApp)){
                     //String temp = "Blocked: " + currentApp;
@@ -106,15 +118,13 @@ public class AppBlocker extends Service {
 
     @Override
     public synchronized int onStartCommand(Intent intent, int flags, int startId) {
+        if(!running) {
+            running = true;
 
-        //If we have ORIGINAL_INENT
-        if(intent.hasExtra("ORIGINAL_INTENT")){
-
+            Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+            mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
+            mHandler.post(mRunnableCode);
         }
-
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
-        mHandler.post(mRunnableCode);
 
         // If we get killed, after returning from here, restart
         return START_STICKY;
@@ -128,6 +138,7 @@ public class AppBlocker extends Service {
 
     @Override
     public void onDestroy() {
+        running = false;
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 
