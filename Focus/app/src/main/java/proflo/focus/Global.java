@@ -1,6 +1,5 @@
 package proflo.focus;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -8,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
-
 import java.util.Calendar;
 import java.util.Vector;
 
