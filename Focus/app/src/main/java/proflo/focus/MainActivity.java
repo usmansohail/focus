@@ -259,11 +259,11 @@ public class MainActivity extends AppCompatActivity {
     void setupNotifications()
     {
         // get all the notifications in the notification vector
-
+        Vector<Notification> notifications = Global.getInstance().getNotifications(this);
         // some dummies for now:
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < notifications.size(); i++)
         {
-            createNotification("App " + i, getDrawable(R.drawable.cancel_icon));
+            createNotification(notifications.get(i).getNotification().toString().substring(0, 40), getDrawable(R.drawable.cancel_icon));
         }
     }
 
