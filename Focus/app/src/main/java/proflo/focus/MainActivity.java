@@ -235,10 +235,9 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-        while(!Global.getInstance().loaded){}
 
         //TODO populate the views for all the profiles in the database
-        Vector<Profile> profiles = Global.getInstance().getAllProfiles();
+        Vector<Profile> profiles = Global.getInstance().getAllProfiles(this);
         for(Profile p: profiles){
             createProfile(p.getName(), p.isActive());
         }
@@ -705,6 +704,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        Global.getInstance().setAllApps(availableApps);
+        Global.getInstance().setAllApps(this, availableApps);
     }
 }

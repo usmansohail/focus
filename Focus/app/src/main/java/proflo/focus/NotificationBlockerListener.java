@@ -40,7 +40,7 @@ public class NotificationBlockerListener extends NotificationListenerService{
     }
 
     private boolean appIsBlocked(String packageName){
-        Vector<ApplicationInfo> appInfo = Global.getInstance().getActiveApps();
+        Vector<ApplicationInfo> appInfo = Global.getInstance().getActiveApps(this);
         for(int i = 0; i < appInfo.size(); i++)
         {
             if(appInfo.get(i).packageName == packageName)
