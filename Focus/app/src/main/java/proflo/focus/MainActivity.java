@@ -162,13 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupProfile();
 
-        //dialog to turn on permissions appears if notification service has not yet been enabled
-        if(!isNotificationServiceEnabled()){
-            buildNotificationPermissionsAlertDialog().show();
-        }
-        if(!checkForPermission(getApplicationContext())){
-            buildUsageAccessPermissionsAlertDialog().show();
-        }
+        checkPermissions(R.string.usage_permissions_message, R.string.usage_permissions_message_profiles);
     }
 
     @Override
@@ -210,6 +204,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_profile:
+                if(!checkPermissions(R.string.usage_permissions_message_profiles, R.string.usage_permissions_message_profiles)){
+                    return false;
+                }
                 Intent intentProfile = new Intent(this, ModifyProfileActivity.class);
                 Boolean newProfile = true;
                 intentProfile.putExtra(PROFILE_STATUS, newProfile);
@@ -218,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.add_schedule:
+                if(!checkPermissions(R.string.usage_permissions_message_schedules, R.string.usage_permissions_message_schedules)){
+                    return false;
+                }
                 Intent intentSchedule = new Intent(this, ModifyScheduleActivity.class);
                 Boolean newSchedule = true;
                 intentSchedule.putExtra(SCHEDULE_STATUS, newSchedule);
@@ -225,6 +225,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.add_timer:
+                if(!checkPermissions(R.string.usage_permissions_message_timers, R.string.usage_permissions_message_timers)){
+                    return false;
+                }
                 Intent intentTimer = new Intent(this, ModifyTimerActivity.class);
                 Boolean newTimer = true;
                 intentTimer.putExtra(TIMER_STATUS, newTimer);
@@ -649,49 +652,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isNotificationServiceEnabled(){
-        String pkgName = getPackageName();
-        final String flat = Settings.Secure.getString(getContentResolver(),
-                ENABLED_NOTIFICATION_LISTENERS);
-        if (!TextUtils.isEmpty(flat)) {
-            final String[] names = flat.split(":");
-            for (int i = 0; i < names.length; i++) {
-                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
-                if (cn != null) {
-                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    private boolean checkForPermission(Context context) {
-        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
-        return mode == MODE_ALLOWED;
-    }
-
-
-    private android.app.AlertDialog buildNotificationPermissionsAlertDialog(){
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.permissions_title);
-        alertDialogBuilder.setMessage(R.string.permissions_message);
-        alertDialogBuilder.setPositiveButton(R.string.accept,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
-                    }
-                });
-        alertDialogBuilder.setNegativeButton(R.string.deny,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //will add functionality later to close app if user chooses no
-                    }
-                });
-        return(alertDialogBuilder.create());
-    }
-
     public void updateAvailableApps(){
         Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
         int flags = PackageManager.GET_META_DATA |
@@ -715,10 +675,65 @@ public class MainActivity extends AppCompatActivity {
         Global.getInstance().setAllApps(availableApps);
     }
 
-    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(){
+    public boolean checkPermissions(int usageMessage, int notificationsMessage){
+        //dialog to turn on permissions appears if notification service has not yet been enabled
+        if(!isUsageAccessEnabled(getApplicationContext())){
+            buildUsageAccessPermissionsAlertDialog(usageMessage).show();
+        }
+        if(!isNotificationServiceEnabled() && isUsageAccessEnabled(getApplicationContext())) {
+            buildNotificationPermissionsAlertDialog(notificationsMessage).show();
+        }
+        if(!isNotificationServiceEnabled() || !isUsageAccessEnabled(getApplicationContext())){
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isNotificationServiceEnabled(){
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(),
+                ENABLED_NOTIFICATION_LISTENERS);
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private boolean isUsageAccessEnabled(Context context) {
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
+        return mode == MODE_ALLOWED;
+    }
+
+    private android.app.AlertDialog buildNotificationPermissionsAlertDialog(int message){
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Usage Access Permission");
-        alertDialogBuilder.setMessage("You must first give Focus Usage Access Permission.");
+        alertDialogBuilder.setTitle(R.string.notification_permissions_title);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+
+    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(int message){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.usage_permissions_title);
+        alertDialogBuilder.setMessage(message);
         alertDialogBuilder.setPositiveButton(R.string.accept,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -728,7 +743,6 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.setNegativeButton(R.string.deny,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //will add functionality later to close app if user chooses no
                     }
                 });
         return(alertDialogBuilder.create());
