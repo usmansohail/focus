@@ -16,6 +16,8 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     FrameLayout schedulesFrame;
     FrameLayout timerFrame;
     FrameLayout notificationsFrame;
+
+
 
     public static final String PROFILE_STATUS = "proflo.focus.profile_status";
     public static final String SCHEDULE_STATUS = "proflo.focus.schedule_status";
@@ -135,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //Populates global with data from SharedPreferences
-        DataManager.getInstance().populateGlobal(this);
 
         // assume the data was changed in order to repopulate stuff
         schedulesChanged = true;
@@ -160,16 +162,11 @@ public class MainActivity extends AppCompatActivity {
 
         setupProfile();
 
-        //dialog to turn on permissions appears if notification service has not yet been enabled
-        if(!isNotificationServiceEnabled()){
-            buildNotificationPermissionsAlertDialog().show();
-        }
+        checkPermissions(R.string.usage_permissions_message, R.string.usage_permissions_message_profiles);
     }
 
     @Override
     protected void onStop() {
-        DataManager.getInstance().saveGlobal(this);
-
         super.onStop();
     }
 
@@ -205,6 +202,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add_profile:
+                if(!checkPermissions(R.string.usage_permissions_message_profiles, R.string.usage_permissions_message_profiles)){
+                    return false;
+                }
                 Intent intentProfile = new Intent(this, ModifyProfileActivity.class);
                 Boolean newProfile = true;
                 intentProfile.putExtra(PROFILE_STATUS, newProfile);
@@ -213,6 +213,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.add_schedule:
+                if(!checkPermissions(R.string.usage_permissions_message_schedules, R.string.usage_permissions_message_schedules)){
+                    return false;
+                }
                 Intent intentSchedule = new Intent(this, ModifyScheduleActivity.class);
                 Boolean newSchedule = true;
                 intentSchedule.putExtra(SCHEDULE_STATUS, newSchedule);
@@ -220,6 +223,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.add_timer:
+                if(!checkPermissions(R.string.usage_permissions_message_timers, R.string.usage_permissions_message_timers)){
+                    return false;
+                }
                 Intent intentTimer = new Intent(this, ModifyTimerActivity.class);
                 Boolean newTimer = true;
                 intentTimer.putExtra(TIMER_STATUS, newTimer);
@@ -237,10 +243,9 @@ public class MainActivity extends AppCompatActivity {
 
     void setupProfile()
     {
-        while(!Global.getInstance().loaded){}
 
         //TODO populate the views for all the profiles in the database
-        Vector<Profile> profiles = Global.getInstance().getAllProfiles();
+        Vector<Profile> profiles = Global.getInstance().getAllProfiles(this);
         for(Profile p: profiles){
             createProfile(p.getName(), p.isActive());
         }
@@ -644,49 +649,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isNotificationServiceEnabled(){
-        String pkgName = getPackageName();
-        final String flat = Settings.Secure.getString(getContentResolver(),
-                ENABLED_NOTIFICATION_LISTENERS);
-        if (!TextUtils.isEmpty(flat)) {
-            final String[] names = flat.split(":");
-            for (int i = 0; i < names.length; i++) {
-                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
-                if (cn != null) {
-                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    private boolean checkForPermission(Context context) {
-        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
-        return mode == MODE_ALLOWED;
-    }
-
-
-    private android.app.AlertDialog buildNotificationPermissionsAlertDialog(){
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.permissions_title);
-        alertDialogBuilder.setMessage(R.string.permissions_message);
-        alertDialogBuilder.setPositiveButton(R.string.accept,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
-                    }
-                });
-        alertDialogBuilder.setNegativeButton(R.string.deny,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //will add functionality later to close app if user chooses no
-                    }
-                });
-        return(alertDialogBuilder.create());
-    }
-
     public void updateAvailableApps(){
         Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
         int flags = PackageManager.GET_META_DATA |
@@ -708,5 +670,82 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Global.getInstance().setAllApps(availableApps);
+    }
+
+    public boolean checkPermissions(int usageMessage, int notificationsMessage){
+        //dialog to turn on permissions appears if notification service has not yet been enabled
+        if(!isUsageAccessEnabled(getApplicationContext())){
+            buildUsageAccessPermissionsAlertDialog(usageMessage).show();
+        }
+        if(!isNotificationServiceEnabled() && isUsageAccessEnabled(getApplicationContext())) {
+            buildNotificationPermissionsAlertDialog(notificationsMessage).show();
+        }
+        if(!isNotificationServiceEnabled() || !isUsageAccessEnabled(getApplicationContext())){
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isNotificationServiceEnabled(){
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(),
+                ENABLED_NOTIFICATION_LISTENERS);
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private boolean isUsageAccessEnabled(Context context) {
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
+        return mode == MODE_ALLOWED;
+    }
+
+    private android.app.AlertDialog buildNotificationPermissionsAlertDialog(int message){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.notification_permissions_title);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+    public void updateAvailableApps(){
+        Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
+        int flags = PackageManager.GET_META_DATA |
+                PackageManager.GET_SHARED_LIBRARY_FILES;
+        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> applications = pm.getInstalledApplications(flags);
+        for (ApplicationInfo appInfo : applications) {
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
+                //Android pre-installed app
+                if(appInfo.packageName.equals(ANDROID_EMAIL) || appInfo.packageName.equals(ANDROID_MESSAGING)){
+                    availableApps.add(appInfo);
+                }
+            }
+            else {
+                //User installed app
+                if(!appInfo.packageName.equals(ANDROID_GESTURE_BUILDER) && !appInfo.loadLabel(getPackageManager()).toString().equals(ANDROID_API_DEMOS)){
+                    availableApps.add(appInfo);
+                }
+            }
+        }
+        Global.getInstance().setAllApps(this, availableApps);
     }
 }

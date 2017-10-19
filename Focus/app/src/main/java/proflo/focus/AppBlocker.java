@@ -3,16 +3,14 @@ package proflo.focus;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.Service;
-import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -20,18 +18,11 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.provider.Settings;
-import android.text.TextUtils;
 import android.widget.Toast;
-import android.util.*;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
@@ -49,23 +40,34 @@ public class AppBlocker extends Service {
     private ArrayList<String> mBlockedPackages;
     private Runnable mRunnableCode = new Runnable() {
         @Override
-        public void run() {
+        public synchronized void run() {
 
-            //needPermissionForBlocking(getApplicationContext());
             String currentApp = getCurrentApp(getApplicationContext());
-            //Toast.makeText(getApplicationContext(), test, Toast.LENGTH_SHORT).show();
             for(String blocked : mBlockedPackages){
                 if(blocked.equals(currentApp)){
-                    String temp = "Blocked: " + currentApp;
-                    Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
-                    //killAppByPackName(getApplicationContext(), currentApp);
+                    //String temp = "Blocked: " + currentApp;
+                    //Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
                     StartApplication(getApplicationContext(), getPackageName());
+                    BlockedApplicationAlert().show();
                     break;
                 }
             }
             mHandler.postDelayed(this, 300);
         }
     };
+
+    private android.app.AlertDialog BlockedApplicationAlert(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Blocked Application");
+        alertDialogBuilder.setMessage("Focus! You are trying to access a distracting application that has been blocked! ");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -103,21 +105,16 @@ public class AppBlocker extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
+
+        //If we have ORIGINAL_INENT
+        if(intent.hasExtra("ORIGINAL_INTENT")){
+
+        }
+
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
         mHandler.post(mRunnableCode);
-
-        /*for(String blocked : mBlockedPackages){
-            for(String packageName : mPackageNames){
-                if(blocked.equals(packageName)){
-                    Toast.makeText(this, "killing facebook?", Toast.LENGTH_SHORT).show();
-                    killAppByPackName(getApplicationContext(), blocked);
-                    break;
-                }
-            }
-        }*/
-        //killAppByPackName(getApplicationContext(), "com.facebook.android");
 
         // If we get killed, after returning from here, restart
         return START_STICKY;

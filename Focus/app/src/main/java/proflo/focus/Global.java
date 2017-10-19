@@ -1,13 +1,19 @@
 package proflo.focus;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
-import java.sql.Time;
+import com.google.gson.Gson;
 import java.util.Calendar;
 import java.util.Vector;
 
 /**
  * Created by Cameron on 10/16/2017.
+ *
+ * Modified to be a SharedPreference wrapper on 10/18/17 by Forrest.
  */
 
 class Global {
@@ -15,73 +21,130 @@ class Global {
 
     static Global getInstance() { return instance; }
 
-    private Vector<Profile> allProfiles;
-    private Vector<Profile> activeProfiles;
-
-    private Vector<ApplicationInfo> activeApps;
-    private Vector<ApplicationInfo> allApps;
-    private Vector<Schedule> schedules;
-
     //TODO What the fuck is this precisely
     private Calendar schedule;
 
-    private Vector<Timer> timers;
-    private Vector<Notification> notifications;
-
-    public boolean loaded = false;
 
     private Global() {
     }
 
-    public Vector<Profile> getAllProfiles() {
-        return allProfiles;
+    public Vector<Profile> getAllProfiles(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.AllProfileKey), "");
+        Vector<Profile> vec = new Vector<>();
+        Vector<Profile> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global-popAllProf", "There are " + obj.size() + " total profiles");
+            return obj;
+        } else {
+            return (new Vector<Profile>());
+        }
     }
 
-    public Vector<Profile> getActiveProfiles() {
-        return activeProfiles;
+    public Vector<Profile> getActiveProfiles(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.ActiveProfilesKey), "");
+        Vector<Profile> vec = new Vector<>();
+        Vector<Profile> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global-popAllProf", "There are " + obj.size() + " active profiles");
+            return obj;
+        } else {
+            return (new Vector<Profile>());
+        }
     }
 
-    public Vector<Schedule> getSchedules() {
-        return schedules;
+    public Vector<Schedule> getSchedules(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.SchedulesKey), "");
+        Vector<Schedule> vec = new Vector<>();
+        Vector<Schedule> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global-popAllProf", "There are " + obj.size() + " schedules");
+            return obj;
+        } else {
+            return (new Vector<Schedule>());
+        }
     }
 
-    public Calendar getSchedule() {
+    public Calendar getSchedule(Context context) {
         return schedule;
     }
 
-    public Vector<Timer> getTimers() {
-        return timers;
+    public Vector<Timer> getTimers(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.TimersKey), "");
+        Vector<Timer> vec = new Vector<>();
+        Vector<Timer> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global-popAllProf", "There are " + obj.size() + " timers");
+            return obj;
+        } else {
+            return (new Vector<Timer>());
+        }
     }
 
-    public Vector<ApplicationInfo> getAllApps() {
-        return allApps;
+    public Vector<ApplicationInfo> getAllApps(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.AppsKey), "");
+        Vector<ApplicationInfo> vec = new Vector<>();
+        Vector<ApplicationInfo> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global-popAllProf", "There are " + obj.size() + " apps");
+            return obj;
+        } else {
+            return (new Vector<ApplicationInfo>());
+        }
     }
 
-    public void setAllApps(Vector<ApplicationInfo> apps){
-        allApps = apps;
+    public void setAllApps(Context context, Vector<ApplicationInfo> apps){
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(apps);
+        prefsEditor.putString(context.getString(R.string.AppsKey), json);
+        prefsEditor.commit();
     }
 
-    public Vector<Profile> getActiveProfilesForApp(ApplicationInfo appID){
-        Vector<Profile> activeprofiles = new Vector<Profile>();
+    public Vector<Profile> getActiveProfilesForApp(Context context, ApplicationInfo appID){
+        Vector<Profile> activeProfiles = getActiveProfiles(context);
 
         for (int i = 0; i < activeProfiles.size(); i++){
             for (int j = 0; j < activeProfiles.get(i).getProfileApps().size(); j++){
                 if (activeProfiles.get(i).getProfileApps().get(j) == appID){
-                    activeprofiles.add(activeProfiles.get(i));
+                    activeProfiles.add(activeProfiles.get(i));
                 }
             }
         }
 
-        return activeprofiles;
+        return activeProfiles;
     }
 
     //new profiles isActive set to false
-    public Boolean createProfile(String name, Vector<ApplicationInfo> apps){
+    public Boolean createProfile(Context context, String name, Vector<ApplicationInfo> apps){
+        Vector<Profile> allProfiles = getAllProfiles(context);
+
         Profile tprofile = new Profile(name, apps, false);
-        return true;
+        if(allProfiles.add(tprofile)){
+            setAllProfiles(context, allProfiles);
+            return true;
+        }
+        return false;
     }
 
-    public Boolean modifyProfile(String name, Vector<ApplicationInfo> apps){
+    public Boolean modifyProfile(Context context, String name, Vector<ApplicationInfo> apps){
+
+        Vector<Profile> activeProfiles = getActiveProfiles(context);
 
         for (int i= 0; i < activeProfiles.size(); i++){
             if (activeProfiles.get(i).getName() == name ){
@@ -93,40 +156,87 @@ class Global {
     }
 
 
-    public Vector<ApplicationInfo> getActiveApps() {
-        return activeApps;
+    public Vector<ApplicationInfo> getActiveApps(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.ActiveAppsKey), "");
+        Vector<ApplicationInfo> vec = new Vector<>();
+        Vector<ApplicationInfo> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global", "There are " + obj.size() + " active apps");
+            return obj;
+        } else {
+            return new Vector<ApplicationInfo>();
+        }
     }
 
-    public void setActiveApps(Vector<ApplicationInfo> activeApps) {
-        this.activeApps = activeApps;
+    public void setActiveApps(Context context, Vector<ApplicationInfo> activeApps) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(activeApps);
+        prefsEditor.putString(context.getString(R.string.ActiveAppsKey), json);
+        prefsEditor.commit();
     }
 
-    public Boolean removeProfile(Profile profile){
-        return allProfiles.remove(profile);
+    public boolean removeProfile(Context context, Profile profile){
+        Vector<Profile> allProfiles = getAllProfiles(context);
+        if(allProfiles.remove(profile)){
+            setAllProfiles(context, allProfiles);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public Boolean addActiveProfile(Profile profile){
-        for (int i = 0; i < allProfiles.size(); i++){
-            if (allProfiles.get(i) == profile){
-                activeProfiles.add(allProfiles.get(i));
+    public Boolean addActiveProfile(Context context, Profile profile){
+        Vector<Profile> activeProfiles = getActiveProfiles(context);
+        Vector<Profile> allProfiles = getAllProfiles(context);
+
+        for(Profile p: activeProfiles) {
+            if (profile == p) {
+                //Profile is already active
+                return false;
             }
         }
-
-        return true;
+        boolean isInAll = false;
+        for(Profile p: allProfiles){
+            if(p == profile){
+                isInAll = true;
+                break;
+            }
+        }
+        if(isInAll){
+            activeProfiles.add(profile);
+            setActiveProfiles(context, activeProfiles);
+            return true;
+        }
+        return false;
     }
 
-    public Boolean removeActiveProfile(Profile profile){
-        return activeProfiles.remove(profile);
+    public Boolean removeActiveProfile(Context context, Profile profile){
+        Vector<Profile> activeProfiles = getActiveProfiles(context);
+        if(activeProfiles.remove(profile)){
+            setActiveProfiles(context, activeProfiles);
+            return true;
+        }
+        return false;
     }
 
-    public Boolean createSchedule(String name, Vector<TimeBlock> timeBlocks, Boolean repeatWeekly){
+    public Boolean createSchedule(Context context, String name, Vector<TimeBlock> timeBlocks, Boolean repeatWeekly){
+        Vector<Schedule> schedules = getSchedules(context);
+
         Schedule schedule = new Schedule(name, timeBlocks, repeatWeekly);
         schedules.add(schedule);
 
+        setSchedules(context, schedules);
+
         return true;
     }
 
-    public Boolean modifySchedule(String name, TimeBlock timeBlocks, Boolean repeatWeekly){
+    public Boolean modifySchedule(Context context, String name, TimeBlock timeBlocks, Boolean repeatWeekly){
+        Vector<Schedule> schedules = getSchedules(context);
 
         for (int i = 0; i < schedules.size(); i++){
             if (schedules.get(i).getName() == name){
@@ -135,21 +245,31 @@ class Global {
 
             }
         }
+        setSchedules(context, schedules);
 
         return true;
     }
 
-    public Boolean removeSchedule(Schedule schedule){
-        return schedules.remove(schedule);
+    public Boolean removeSchedule(Context context, Schedule schedule){
+        Vector<Schedule> schedules = getSchedules(context);
+        if(schedules.remove(schedule)){
+            setSchedules(context, schedules);
+            return true;
+        }
+        return false;
     }
 
-    public Boolean createTimer(String name, Long initialDuration, Vector<Profile> timerProfiles){
-        Timer ttimer = new Timer(name, initialDuration, timerProfiles);
-        timers.add(ttimer);
+    public Boolean createTimer(Context context, String name, Long initialDuration, Vector<Profile> timerProfiles){
+        Vector<Timer> timers = getTimers(context);
+        Timer timer = new Timer(name, initialDuration, timerProfiles);
+        timers.add(timer);
+        setTimers(context, timers);
         return true;
     }
 
-    public Boolean modifyTimer(String name, Long initialDuration, Profile newProfile){
+    public Boolean modifyTimer(Context context, String name, Long initialDuration, Profile newProfile){
+        Vector<Timer> timers = getTimers(context);
+
         for (int i = 0; i < timers.size(); i++){
             if (timers.get(i).getName() == name){
                 timers.get(i).setInitialDuration(initialDuration);
@@ -157,47 +277,97 @@ class Global {
             }
         }
 
+        setTimers(context, timers);
         return true;
     }
 
-    public Boolean removeTimer(Timer timer){
-        return timers.remove(timer);
+    public Boolean removeTimer(Context context, Timer timer){
+        Vector<Timer> timers = getTimers(context);
+        if(timers.remove(timer)){
+            setTimers(context, timers);
+            return true;
+        }
+        return false;
     }
 
-    public Boolean createNotification(Vector<Profile> profiles, android.app.Notification notification){
+    public Boolean createNotification(Context context, Vector<Profile> profiles, android.app.Notification notification){
+        Vector<Notification> notifications = getNotifications(context);
         Notification not = new Notification(notification, profiles);
-        notifications.add(not);
-
-        return true;
+        if(notifications.add(not)) {
+            setNotifications(context, notifications);
+            return true;
+        }
+        return false;
     }
 
-    public Boolean removeNotification(Notification notification){
-        return notifications.remove(notification);
+    public Boolean removeNotification(Context context, Notification notification){
+        Vector<Notification> notifications = getNotifications(context);
+        if(notifications.remove(notification)){
+            setNotifications(context, notifications);
+            return true;
+        }
+        return false;
     }
 
 
-    public Vector<Notification> getNotifications() {
-        return notifications;
+    public Vector<Notification> getNotifications(Context context) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.NotificationsKey), "");
+        Vector<Notification> vec = new Vector<>();
+        Vector<Notification> obj = gson.fromJson(json, vec.getClass());
+
+        if(obj != null) {
+            Log.d("Global-popAllProf", "There are " + obj.size() + " active apps");
+            return obj;
+        } else {
+            return new Vector<Notification>();
+        }
     }
 
 
-    public void setAllProfiles(Vector<Profile> allProfiles) {
-        this.allProfiles = allProfiles;
+    public void setAllProfiles(Context context, Vector<Profile> allProfiles) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(allProfiles);
+        prefsEditor.putString(context.getString(R.string.AllProfileKey), json);
+        prefsEditor.commit();
     }
 
-    public void setActiveProfiles(Vector<Profile> activeProfiles) {
-        this.activeProfiles = activeProfiles;
+    public void setActiveProfiles(Context context, Vector<Profile> activeProfiles) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = mPrefs.getString(context.getString(R.string.ActiveProfilesKey), "");
+        prefsEditor.putString(context.getString(R.string.ActiveAppsKey), json);
+        prefsEditor.commit();
     }
 
-    public void setSchedules(Vector<Schedule> allSchedules) {
-        this.schedules = allSchedules;
+    public void setSchedules(Context context, Vector<Schedule> allSchedules) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(allSchedules);
+        prefsEditor.putString(context.getString(R.string.SchedulesKey), json);
+        prefsEditor.commit();
     }
 
-    public void setTimers(Vector<Timer> timers) {
-        this.timers = timers;
+    public void setTimers(Context context, Vector<Timer> timers) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(timers);
+        prefsEditor.putString(context.getString(R.string.TimersKey), json);
+        prefsEditor.commit();
     }
 
-    public void setNotifications(Vector<Notification> notifications) {
-        this.notifications = notifications;
+    public void setNotifications(Context context, Vector<Notification> notifications) {
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(notifications);
+        prefsEditor.putString(context.getString(R.string.NotificationsKey), json);
+        prefsEditor.commit();
     }
 }
