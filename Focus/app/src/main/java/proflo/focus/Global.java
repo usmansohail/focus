@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.Vector;
 
@@ -96,8 +99,8 @@ class Global {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         Gson gson = new Gson();
         String json = mPrefs.getString(context.getString(R.string.AppsKey), "");
-        Vector<ApplicationInfo> vec = new Vector<>();
-        Vector<ApplicationInfo> obj = gson.fromJson(json, vec.getClass());
+        Type typeOfVectorOfApplicationInfo = new TypeToken<Vector<ApplicationInfo>>(){}.getType();
+        Vector<ApplicationInfo> obj = gson.fromJson(json, typeOfVectorOfApplicationInfo);
 
         if(obj != null) {
             Log.d("Global-popAllProf", "There are " + obj.size() + " apps");
@@ -140,6 +143,14 @@ class Global {
             return true;
         }
         return false;
+    }
+
+    public void addProfile(Context context, Profile profile){
+
+        Vector<Profile> allProfiles = getAllProfiles(context);
+
+        allProfiles.add(profile);
+
     }
 
     public Boolean modifyProfile(Context context, String name, Vector<ApplicationInfo> apps){
