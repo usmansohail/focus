@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
     FrameLayout timerFrame;
     FrameLayout notificationsFrame;
 
-
-
     public static final String PROFILE_STATUS = "proflo.focus.profile_status";
     public static final String SCHEDULE_STATUS = "proflo.focus.schedule_status";
     public static final String TIMER_STATUS = "proflo.focus.timer_status";
@@ -137,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        //Populates global with data from SharedPreferences
+        DataManager.getInstance().populateGlobal(this);
 
         // assume the data was changed in order to repopulate stuff
         schedulesChanged = true;
@@ -168,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        DataManager.getInstance().saveGlobal(this);
+
         super.onStop();
     }
 

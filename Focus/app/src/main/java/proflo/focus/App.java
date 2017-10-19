@@ -1,20 +1,18 @@
 package proflo.focus;
 
 import android.app.Application;
-import android.content.Context;
-import android.util.Log;
 
 /**
  * Created by forre on 10/18/2017.
  */
 
 public class App extends Application{
-
-    public static Context get() { return this.getApplicationContext(); }
+    private static App instance;
+    public static App get() { return instance; }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Global.getInstance().storeContext(getApplicationContext());
+        instance = this;
     }
 }
