@@ -6,9 +6,11 @@ import android.app.Service;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,6 +23,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.provider.Settings;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 import android.util.*;
@@ -47,18 +50,24 @@ public class AppBlocker extends Service {
     private ServiceHandler mServiceHandler;
     private Handler mHandler;
     private ArrayList<String> mBlockedPackages;
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
+        }
+    };
+
     private Runnable mRunnableCode = new Runnable() {
         @Override
-        public void run() {
+        public synchronized void run() {
 
-            //needPermissionForBlocking(getApplicationContext());
             String currentApp = getCurrentApp(getApplicationContext());
-            //Toast.makeText(getApplicationContext(), test, Toast.LENGTH_SHORT).show();
+
             for(String blocked : mBlockedPackages){
                 if(blocked.equals(currentApp)){
                     String temp = "Blocked: " + currentApp;
                     Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
-                    //killAppByPackName(getApplicationContext(), currentApp);
                     StartApplication(getApplicationContext(), getPackageName());
                     break;
                 }
@@ -96,6 +105,9 @@ public class AppBlocker extends Service {
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
+
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mMessageReceiver,
+                new IntentFilter("AppBlockerUpdate"));
     }
 
     public ArrayList<String> ReturnBlockedApps(){
@@ -103,21 +115,17 @@ public class AppBlocker extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
-        mHandler.post(mRunnableCode);
+    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
 
-        /*for(String blocked : mBlockedPackages){
-            for(String packageName : mPackageNames){
-                if(blocked.equals(packageName)){
-                    Toast.makeText(this, "killing facebook?", Toast.LENGTH_SHORT).show();
-                    killAppByPackName(getApplicationContext(), blocked);
-                    break;
-                }
-            }
-        }*/
-        //killAppByPackName(getApplicationContext(), "com.facebook.android");
+        //If we have 'ORIGINAL_INTENT' then we're updating the data in this thread from the original intent.
+        if(intent.hasExtra("ORIGINAL_INTENT")){
+            Intent originalIntent = ((Intent)intent.getSerializableExtra("ORIGINAL_INTENT"));
+            mBlockedPackages = originalIntent.getStringArrayListExtra("mBlockedPackages");
+        } else {
+            Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+            mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
+            mHandler.post(mRunnableCode);
+        }
 
         // If we get killed, after returning from here, restart
         return START_STICKY;
