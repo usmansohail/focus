@@ -649,28 +649,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateAvailableApps(){
-        Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
-        int flags = PackageManager.GET_META_DATA |
-                PackageManager.GET_SHARED_LIBRARY_FILES;
-        PackageManager pm = getPackageManager();
-        List<ApplicationInfo> applications = pm.getInstalledApplications(flags);
-        for (ApplicationInfo appInfo : applications) {
-            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
-                //Android pre-installed app
-                if(appInfo.packageName.equals(ANDROID_EMAIL) || appInfo.packageName.equals(ANDROID_MESSAGING)){
-                    availableApps.add(appInfo);
-                }
-            }
-            else {
-                //User installed app
-                if(!appInfo.packageName.equals(ANDROID_GESTURE_BUILDER) && !appInfo.loadLabel(getPackageManager()).toString().equals(ANDROID_API_DEMOS)){
-                    availableApps.add(appInfo);
-                }
-            }
-        }
-        Global.getInstance().setAllApps(availableApps);
-    }
+
 
     public boolean checkPermissions(int usageMessage, int notificationsMessage){
         //dialog to turn on permissions appears if notification service has not yet been enabled
@@ -685,6 +664,8 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
+
 
     private boolean isNotificationServiceEnabled(){
         String pkgName = getPackageName();
@@ -748,4 +729,23 @@ public class MainActivity extends AppCompatActivity {
         }
         Global.getInstance().setAllApps(this, availableApps);
     }
+
+    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(int message){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.usage_permissions_title);
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+
 }
