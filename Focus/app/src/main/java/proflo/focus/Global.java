@@ -1,5 +1,8 @@
 package proflo.focus;
 
+import android.content.pm.ApplicationInfo;
+
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.Vector;
 
@@ -15,7 +18,8 @@ class Global {
     private Vector<Profile> allProfiles;
     private Vector<Profile> activeProfiles;
 
-    private Vector<String> activeApps;
+    private Vector<ApplicationInfo> activeApps;
+    private Vector<ApplicationInfo> allApps;
     private Vector<Schedule> schedules;
 
     //TODO What the fuck is this precisely
@@ -49,7 +53,15 @@ class Global {
         return timers;
     }
 
-    public Vector<Profile> getActiveProfilesForApp(String appID){
+    public Vector<ApplicationInfo> getAllApps() {
+        return allApps;
+    }
+
+    public void setAllApps(Vector<ApplicationInfo> apps){
+        allApps = apps;
+    }
+
+    public Vector<Profile> getActiveProfilesForApp(ApplicationInfo appID){
         Vector<Profile> activeprofiles = new Vector<Profile>();
 
         for (int i = 0; i < activeProfiles.size(); i++){
@@ -64,12 +76,12 @@ class Global {
     }
 
     //new profiles isActive set to false
-    public Boolean createProfile(String name, Vector<String> apps){
+    public Boolean createProfile(String name, Vector<ApplicationInfo> apps){
         Profile tprofile = new Profile(name, apps, false);
         return true;
     }
 
-    public Boolean modifyProfile(String name, Vector<String> apps){
+    public Boolean modifyProfile(String name, Vector<ApplicationInfo> apps){
 
         for (int i= 0; i < activeProfiles.size(); i++){
             if (activeProfiles.get(i).getName() == name ){
@@ -81,11 +93,11 @@ class Global {
     }
 
 
-    public Vector<String> getActiveApps() {
+    public Vector<ApplicationInfo> getActiveApps() {
         return activeApps;
     }
 
-    public void setActiveApps(Vector<String> activeApps) {
+    public void setActiveApps(Vector<ApplicationInfo> activeApps) {
         this.activeApps = activeApps;
     }
 

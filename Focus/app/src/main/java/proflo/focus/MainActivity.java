@@ -5,6 +5,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -30,6 +32,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Vector;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
@@ -52,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String TIMER_STATUS = "proflo.focus.timer_status";
     private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
+    private static final String ANDROID_MESSAGING = "com.android.messaging";
+    private static final String ANDROID_EMAIL = "com.android.email";
+    private static final String ANDROID_GESTURE_BUILDER = "com.android.gesture.builder";
+    private static final String ANDROID_API_DEMOS = "API Demos";
 
     // these booleans indicate which framelayout is active
     boolean profileActive;
@@ -202,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 Boolean newProfile = true;
                 intentProfile.putExtra(PROFILE_STATUS, newProfile);
                 startActivity(intentProfile);
+                updateAvailableApps();
                 return true;
 
             case R.id.add_schedule:
@@ -677,5 +685,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         return(alertDialogBuilder.create());
+    }
+
+    public void updateAvailableApps(){
+        Vector<ApplicationInfo> availableApps = new Vector<ApplicationInfo>();
+        int flags = PackageManager.GET_META_DATA |
+                PackageManager.GET_SHARED_LIBRARY_FILES;
+        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> applications = pm.getInstalledApplications(flags);
+        for (ApplicationInfo appInfo : applications) {
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
+                //Android pre-installed app
+                if(appInfo.packageName.equals(ANDROID_EMAIL) || appInfo.packageName.equals(ANDROID_MESSAGING)){
+                    availableApps.add(appInfo);
+                }
+            }
+            else {
+                //User installed app
+                if(!appInfo.packageName.equals(ANDROID_GESTURE_BUILDER) && !appInfo.loadLabel(getPackageManager()).toString().equals(ANDROID_API_DEMOS)){
+                    availableApps.add(appInfo);
+                }
+            }
+        }
+        Global.getInstance().setAllApps(availableApps);
     }
 }
