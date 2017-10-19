@@ -50,7 +50,7 @@ public class AppBlocker extends Service {
     private ArrayList<String> mBlockedPackages;
     private Runnable mRunnableCode = new Runnable() {
         @Override
-        public void run() {
+        public synchronized void run() {
 
             String currentApp = getCurrentApp(getApplicationContext());
             for(String blocked : mBlockedPackages){
@@ -115,21 +115,16 @@ public class AppBlocker extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public synchronized int onStartCommand(Intent intent, int flags, int startId) {
+
+        //If we have ORIGINAL_INENT
+        if(intent.hasExtra("ORIGINAL_INTENT")){
+
+        }
+
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
         mHandler.post(mRunnableCode);
-
-        /*for(String blocked : mBlockedPackages){
-            for(String packageName : mPackageNames){
-                if(blocked.equals(packageName)){
-                    Toast.makeText(this, "killing facebook?", Toast.LENGTH_SHORT).show();
-                    killAppByPackName(getApplicationContext(), blocked);
-                    break;
-                }
-            }
-        }*/
-        //killAppByPackName(getApplicationContext(), "com.facebook.android");
 
         // If we get killed, after returning from here, restart
         return START_STICKY;
