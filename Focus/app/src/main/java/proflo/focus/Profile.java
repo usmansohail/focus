@@ -1,5 +1,7 @@
 package proflo.focus;
 
+import android.content.pm.ApplicationInfo;
+
 import java.util.Vector;
 
 /**
@@ -9,11 +11,11 @@ import java.util.Vector;
 public class Profile {
 
     private String name;
-    private Vector<String> profileApps;
+    private Vector<ApplicationInfo> profileApps;
     private boolean isActive;
 
 
-    public Profile(String name, Vector<String> profileApps, boolean isActive) {
+    public Profile(String name, Vector<ApplicationInfo> profileApps, boolean isActive) {
         this.name = name;
         this.profileApps = profileApps;
         this.isActive = isActive;
@@ -27,15 +29,15 @@ public class Profile {
         this.name = name;
     }
 
-    public Vector<String> getProfileApps() {
+    public Vector<ApplicationInfo> getProfileApps() {
         return profileApps;
     }
 
-    public void setProfileApps(Vector<String> profileApps) {
+    public void setProfileApps(Vector<ApplicationInfo> profileApps) {
         this.profileApps = profileApps;
     }
 
-    public boolean addAppToProfile(String appID){
+    public boolean addAppToProfile(ApplicationInfo appID){
         profileApps.add(appID);
         return true;
     }

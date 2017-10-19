@@ -1,5 +1,7 @@
 package proflo.focus;
 
+import android.content.pm.ApplicationInfo;
+
 import java.sql.Time;
 import java.util.Calendar;
 import java.util.Vector;
@@ -8,17 +10,27 @@ import java.util.Vector;
  * Created by Cameron on 10/16/2017.
  */
 
-public class Global {
+class Global {
+    private static final Global instance = new Global();
+
+    static Global getInstance() { return instance; }
 
     private Vector<Profile> allProfiles;
     private Vector<Profile> activeProfiles;
-    private Vector<String> activeApps;
+
+    private Vector<ApplicationInfo> activeApps;
+    private Vector<ApplicationInfo> allApps;
     private Vector<Schedule> schedules;
+
+    //TODO What the fuck is this precisely
     private Calendar schedule;
+
     private Vector<Timer> timers;
     private Vector<Notification> notifications;
 
-    public Global() {
+    public boolean loaded = false;
+
+    private Global() {
     }
 
     public Vector<Profile> getAllProfiles() {
@@ -41,7 +53,15 @@ public class Global {
         return timers;
     }
 
-    public Vector<Profile> getActiveProfilesForApp(String appID){
+    public Vector<ApplicationInfo> getAllApps() {
+        return allApps;
+    }
+
+    public void setAllApps(Vector<ApplicationInfo> apps){
+        allApps = apps;
+    }
+
+    public Vector<Profile> getActiveProfilesForApp(ApplicationInfo appID){
         Vector<Profile> activeprofiles = new Vector<Profile>();
 
         for (int i = 0; i < activeProfiles.size(); i++){
@@ -56,12 +76,12 @@ public class Global {
     }
 
     //new profiles isActive set to false
-    public Boolean createProfile(String name, Vector<String> apps){
+    public Boolean createProfile(String name, Vector<ApplicationInfo> apps){
         Profile tprofile = new Profile(name, apps, false);
         return true;
     }
 
-    public Boolean modifyProfile(String name, Vector<String> apps){
+    public Boolean modifyProfile(String name, Vector<ApplicationInfo> apps){
 
         for (int i= 0; i < activeProfiles.size(); i++){
             if (activeProfiles.get(i).getName() == name ){
@@ -70,6 +90,15 @@ public class Global {
         }
 
         return true;
+    }
+
+
+    public Vector<ApplicationInfo> getActiveApps() {
+        return activeApps;
+    }
+
+    public void setActiveApps(Vector<ApplicationInfo> activeApps) {
+        this.activeApps = activeApps;
     }
 
     public Boolean removeProfile(Profile profile){
@@ -147,4 +176,28 @@ public class Global {
     }
 
 
+    public Vector<Notification> getNotifications() {
+        return notifications;
+    }
+
+
+    public void setAllProfiles(Vector<Profile> allProfiles) {
+        this.allProfiles = allProfiles;
+    }
+
+    public void setActiveProfiles(Vector<Profile> activeProfiles) {
+        this.activeProfiles = activeProfiles;
+    }
+
+    public void setSchedules(Vector<Schedule> allSchedules) {
+        this.schedules = allSchedules;
+    }
+
+    public void setTimers(Vector<Timer> timers) {
+        this.timers = timers;
+    }
+
+    public void setNotifications(Vector<Notification> notifications) {
+        this.notifications = notifications;
+    }
 }
