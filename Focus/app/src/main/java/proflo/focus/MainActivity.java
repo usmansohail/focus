@@ -710,7 +710,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialogBuilder.setPositiveButton(R.string.accept,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
                     }
                 });
         alertDialogBuilder.setNegativeButton(R.string.deny,
