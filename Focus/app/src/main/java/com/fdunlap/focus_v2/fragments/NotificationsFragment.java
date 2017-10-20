@@ -52,7 +52,6 @@ public class NotificationsFragment extends BaseFragment {
         expandMenuButton = largerMenuButton;
         clearButton = clearNotificationsButton;
 
-
         //TODO Implement NotificationListView
         mAdapter = new NotificationAdapter();
         notificationRecyclerView.setAdapter(mAdapter);

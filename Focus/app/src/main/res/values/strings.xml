@@ -12,4 +12,5 @@
     <string name="add_profile">Add Profile</string>
     <string name="create_schedule">Create Schedule</string>
     <string name="create_timer">Create Timer</string>
+    <string name="default_title_profile_adapter">Default Profile Title</string>
 </resources>

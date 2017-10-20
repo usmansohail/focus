@@ -24,11 +24,6 @@ public class ProfilesFragment extends BaseFragment {
     //RecyclerView Adapter
     ProfileAdapter mAdapter;
 
-    //Activity Toolbar
-    Toolbar toolbar;
-
-
-
     public ProfilesFragment() {
         // Required empty public constructor
     }
@@ -36,11 +31,6 @@ public class ProfilesFragment extends BaseFragment {
     public static ProfilesFragment newInstance() {
         ProfilesFragment fragment = new ProfilesFragment();
         return fragment;
-    }
-
-    public interface OnSwitchToModifyFragment {
-        public void onHideBottomBar();
-        public void onShowBottomBar();
     }
 
     @Override
@@ -78,7 +68,8 @@ public class ProfilesFragment extends BaseFragment {
         });
 
         //TODO Implement profilesListView based off of some global profiles class
-        mAdapter = new ProfileAdapter();
+        //TODO implement global to get access to this ArrayList<Profiles>
+        mAdapter = new ProfileAdapter(null);
         profilesRecyclerView.setAdapter(mAdapter);
 
         return layout;

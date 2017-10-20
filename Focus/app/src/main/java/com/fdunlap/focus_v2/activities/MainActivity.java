@@ -5,9 +5,7 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.fdunlap.focus_v2.R;
 import com.fdunlap.focus_v2.fragments.BaseFragment;
@@ -20,7 +18,7 @@ import com.roughike.bottombar.OnTabSelectListener;
 
 import java.util.Vector;
 
-public class MainActivity extends AppCompatActivity implements ProfilesFragment.OnSwitchToModifyFragment{
+public class MainActivity extends AppCompatActivity {
 
     //Layouts
     FrameLayout mainFrame;
@@ -129,18 +127,6 @@ public class MainActivity extends AppCompatActivity implements ProfilesFragment.
         } else {
             currentFragment = null;
         }
-    }
-
-
-    //These interfaces allow fragments to hide or show the bottombar - useful for modification-oriented fragments.
-    @Override
-    public void onHideBottomBar() {
-        bottomBar.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onShowBottomBar() {
-        bottomBar.setVisibility(View.VISIBLE);
     }
 
     @Override

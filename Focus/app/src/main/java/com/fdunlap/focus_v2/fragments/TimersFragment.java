@@ -1,7 +1,6 @@
 package com.fdunlap.focus_v2.fragments;
 
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.fdunlap.focus_v2.R;
 import com.fdunlap.focus_v2.adapters.TimerAdapter;

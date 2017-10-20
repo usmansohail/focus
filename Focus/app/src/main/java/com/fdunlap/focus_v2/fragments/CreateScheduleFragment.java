@@ -2,7 +2,6 @@ package com.fdunlap.focus_v2.fragments;
 
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
