@@ -1,28 +1,23 @@
 <resources>
-    <string name="app_name">Focus</string>
-    <string name="title_profiles">Profiles</string>
-    <string name="title_timers">Timers</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="title_schedules">Schedules</string>
-    <string name="profile_confirm">Please confirm that you would like to create this profile </string>
-    <string name="notification_block">Schedules</string>
-    <string name="notification_permissions_title">Allow Notification Access</string>
-    <string name="notification_permissions_message_profiles">You must also give Focus notification access permission before creating a profile.</string>
-    <string name="notification_permissions_message_schedules">You must also give Focus notification access permission before creating a schedule.</string>
-    <string name="notification_permissions_message_timers">You must also give Focus notification access permission before creating a timer.</string>
-    <string name="notification_permissions_message">Thank you for giving Focus usage access! You must also give Focus notification access permission.</string>
-    <string name="usage_permissions_title">Allow Usage Access</string>
-    <string name="usage_permissions_message">Welcome to Focus! You must first give Focus usage access permission.</string>
-    <string name="usage_permissions_message_profiles">You must also give Focus notification access permission before creating a profile.</string>
-    <string name="usage_permissions_message_schedules">You must also give Focus notification access permission before creating a schedule.</string>
-    <string name="usage_permissions_message_timers">You must also give Focus notification access permission before creating a timer.</string>
-    <string name="accept">Accept</string>
-    <string name="deny">Deny</string>
-    <string name="AllProfileKey">ALL_PROF_KEY</string>
-    <string name="ActiveProfilesKey">ACTIVE_PROFILES</string>
-    <string name="ActiveAppsKey">ACTIVE_APPS</string>
-    <string name="SchedulesKey">SCHEDULES_SP</string>
-    <string name="TimersKey">TIMERS_SP</string>
-    <string name="NotificationsKey">NOTIFICATIONS_SP</string>
+    <string name="app_name">Focus_V2</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="notifications_bottom_bar_tab_title">Notifications</string>
+    <string name="profiles_bottom_bar_tab_title">Profiles</string>
+    <string name="schedules_bottom_bar_tab_title">Schedules</string>
+    <string name="timer_bottom_bar_tab_title">Timers</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="confirmation_message">You pressed confirm!</string>
+    <string name="add_profile">Add Profile</string>
+    <string name="create_schedule">Create Schedule</string>
+    <string name="create_timer">Create Timer</string>
+    <string name="default_title_profile_adapter">Default Profile Title</string>
+    <string name="AllProfileKey">AllProfileKey</string>
+    <string name="ActiveProfilesKey">ActiveProfilesKey</string>
+    <string name="SchedulesKey">SchedulesKey</string>
+    <string name="TimersKey">TimersKey</string>
     <string name="AppsKey">AppsKey</string>
+    <string name="ActiveAppsKey">ActiveAppsKey</string>
+    <string name="profile_name">Profile Name</string>
 </resources>
