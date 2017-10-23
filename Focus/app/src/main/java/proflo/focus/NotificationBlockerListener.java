@@ -35,6 +35,7 @@ public class NotificationBlockerListener extends NotificationListenerService{
             cancelNotification(sbn.getKey());
             Vector<Profile> profiles = getNotificationProfiles();
             Notification notification = new Notification(sbn.getNotification(), profiles);
+            Global.getInstance().createNotification(this, profiles, sbn.getNotification());
             //will then add notification to vector of what a user missed during blocked profile
         }
     }
@@ -53,11 +54,11 @@ public class NotificationBlockerListener extends NotificationListenerService{
     }
 
     private Vector<Profile> getNotificationProfiles(){
-        //will return a vector of active profiles this app is in
-        return null;
+        Vector<Profile> profiles = new Vector<Profile>();
+        return profiles;
     }
 
     public void update(Vector<ApplicationInfo> ActiveAppsVector){
-
+        
     }
 }
