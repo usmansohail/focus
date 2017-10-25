@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.fdunlap.focus_v2.fragments.SchedulesFragment"
+    tools:context="com.proflow.focus_v2.fragments.SchedulesFragment"
     android:background="@color/primaryBackground">
 
     <LinearLayout
@@ -10,10 +10,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/schedule_recycler_view"
+        <ListView
+            android:id="@+id/schedule_list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+        </ListView>
 
     </LinearLayout>
 

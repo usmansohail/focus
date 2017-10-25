@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/primaryLightColor</item>
     </style>
 
+    <style name="SwitchCompatTheme">
+        <item name="trackTint">@drawable/switch_color</item>
+        <item name="thumbTint">@color/primaryColor</item>
+    </style>
+
+    <style name="TimeBlockText">
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/schedule_info_start_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/default_timeblock_start"
+            android:gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            style="@style/TimeBlockText"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/default_timeblock_to_symbol"
+            android:gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"/>
+
+        <TextView
+            android:id="@+id/schedule_info_end_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/default_timeblock_end"
+            android:gravity="center_vertical"
+            style="@style/TimeBlockText"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+
+        <ImageButton
+            android:id="@+id/schedule_info_delete_button"
+            android:layout_margin="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_delete_dark"
+            android:gravity="end"/>
+
+        <ImageButton
+            android:id="@+id/schedule_info_edit_button"
+            android:layout_margin="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_edit_dark"
+            android:gravity="end"/>
+
+
+
+</LinearLayout>

@@ -1,8 +1,85 @@
 <resources>
-    <string name="app_name">Focus_V2</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="hour_times">
+        <item>12</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+    </string-array>
+
+    <string-array name="minute_times">
+        <item>00</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
+        <item>07</item>
+        <item>08</item>
+        <item>09</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>27</item>
+        <item>28</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
+        <item>36</item>
+        <item>37</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>41</item>
+        <item>42</item>
+        <item>43</item>
+        <item>44</item>
+        <item>45</item>
+        <item>46</item>
+        <item>47</item>
+        <item>48</item>
+        <item>49</item>
+        <item>50</item>
+        <item>51</item>
+        <item>52</item>
+        <item>53</item>
+        <item>54</item>
+        <item>55</item>
+        <item>56</item>
+        <item>57</item>
+        <item>58</item>
+        <item>59</item>
+    </string-array>
+
+
+    <string name="app_name">Focus_V2</string>
     <string name="notifications_bottom_bar_tab_title">Notifications</string>
     <string name="profiles_bottom_bar_tab_title">Profiles</string>
     <string name="schedules_bottom_bar_tab_title">Schedules</string>
@@ -13,4 +90,41 @@
     <string name="create_schedule">Create Schedule</string>
     <string name="create_timer">Create Timer</string>
     <string name="default_title_profile_adapter">Default Profile Title</string>
+    <string name="AllProfileKey">AllProfileKey</string>
+    <string name="ActiveProfilesKey">ActiveProfilesKey</string>
+    <string name="SchedulesKey">SchedulesKey</string>
+    <string name="TimersKey">TimersKey</string>
+    <string name="AppsKey">AppsKey</string>
+    <string name="ActiveAppsKey">ActiveAppsKey</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="schedule_name_edit_text_hint">Schedule Name</string>
+    <string name="monday">Monday</string>
+    <string name="monday_single">M</string>
+    <string name="tuesday_single">T</string>
+    <string name="sunday_single">Su</string>
+    <string name="wednesday_single">W</string>
+    <string name="thursday_single">Th</string>
+    <string name="friday_single">F</string>
+    <string name="saturday_single">Sa</string>
+    <string name="time_block_list_label">Active Times</string>
+    <string name="schedule_repeats_weekly">Repeat Weekly?</string>
+    <string name="default_timeblock_start">Monday: 3:51 PM</string>
+    <string name="default_timeblock_to_symbol">-</string>
+    <string name="default_timeblock_end">Friday: 6:00PM</string>
+    <string name="endTimeKey">endTime</string>
+    <string name="end_time_key">endtimekey</string>
+    <string name="time_picker_end_title">Choose End Time</string>
+    <string name="time_picker_start_title">Choose Start Time</string>
+    <string name="add_time_block">Add Time Block</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="choose_day">Day of Week</string>
+    <string name="start_time">Start Time</string>
+    <string name="AM">AM</string>
+    <string name="PM">PM</string>
+    <string name="end_time">End Time</string>
+    <string name="colon">:</string>
+    <string name="ActiveProfiles">Active Profiles</string>
+    <string name="scheduleKey">ScheduleKey</string>
+    <string name="timeBlockKey">TimeBlockKey</string>
 </resources>

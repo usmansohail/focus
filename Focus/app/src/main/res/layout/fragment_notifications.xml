@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.fdunlap.focus_v2.fragments.NotificationsFragment"
+    tools:context="com.proflow.focus_v2.fragments.NotificationsFragment"
     android:background="@color/primaryBackground">
 
     <LinearLayout
