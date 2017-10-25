@@ -1,5 +1,6 @@
 package com.proflow.focus_v2.activities;
 
+import android.app.Notification;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -7,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.FrameLayout;
@@ -159,11 +162,11 @@ public class MainActivity extends AppCompatActivity {
 
         populateGlobalAppsList();
 
-        if(savedInstanceState != null){
-            return;
-        } else {
+        if(savedInstanceState == null){
             currentFragment = null;
         }
+
+        //Debuggnig for Notifications
     }
 
     private void populateGlobalAppsList() {

@@ -196,6 +196,7 @@
         </LinearLayout>
 
         <RadioGroup
+            android:id="@+id/time_block_start_time_radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -249,6 +250,7 @@
         </LinearLayout>
 
         <RadioGroup
+            android:id="@+id/time_block_end_time_radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"

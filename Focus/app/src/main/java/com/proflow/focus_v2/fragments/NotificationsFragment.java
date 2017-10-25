@@ -2,14 +2,17 @@ package com.proflow.focus_v2.fragments;
 
 
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.NotificationAdapter;
+import com.proflow.focus_v2.data.Global;
 
 public class NotificationsFragment extends BaseFragment {
     public NotificationsFragment() {
@@ -33,7 +36,7 @@ public class NotificationsFragment extends BaseFragment {
     }
 
     //Global views for fragment
-    RecyclerView notificationRecyclerView;
+    ListView notificationRecyclerView;
     ImageButton clearButton;
     ImageButton expandMenuButton;
 
@@ -51,8 +54,15 @@ public class NotificationsFragment extends BaseFragment {
         expandMenuButton = largerMenuButton;
         clearButton = clearNotificationsButton;
 
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getContext())
+                        .setSmallIcon(R.drawable.circle_button_active)
+                        .setContentTitle("My notification")
+                        .setContentText("Hello World!");
+        Global.getInstance().addNotification(getContext(), mBuilder.build());
+
         //TODO Implement NotificationListView
-        mAdapter = new NotificationAdapter();
+        mAdapter = new NotificationAdapter(getContext());
         notificationRecyclerView.setAdapter(mAdapter);
 
         //Actionbar Listeners

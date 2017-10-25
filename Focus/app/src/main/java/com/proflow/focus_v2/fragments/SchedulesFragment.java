@@ -2,6 +2,7 @@ package com.proflow.focus_v2.fragments;
 
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.ScheduleAdapter;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Schedule;
+import com.proflow.focus_v2.models.TimeBlock;
 
 import java.util.Vector;
 
@@ -69,8 +71,17 @@ public class SchedulesFragment extends BaseFragment {
         addScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Fragment frag = CreateScheduleFragment.newInstance();
+                Bundle args = new Bundle();
+                Schedule sched =
+                        new Schedule("ScheduleName", new Vector<TimeBlock>(), false);
+                Global.getInstance().addSchedule(getContext(), sched);
+                args.putInt(getString(R.string.scheduleKey), sched.getId());
+                args.putBoolean(getString(R.string.schedule_is_new), true);
+                frag.setArguments(args);
+
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.Main_Frame, CreateScheduleFragment.newInstance());
+                ft.replace(R.id.Main_Frame, frag);
                 ft.addToBackStack(null);
                 ft.commit();
             }

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.fragments.ModifyProfileFragment;
+import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
@@ -39,6 +40,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
     private Context mContext;
     Schedule mSchedule = null;
     Vector<Profile> checkedProfiles = new Vector<>();
+    boolean mTimer = false;
 
     //isGlobal is basically just a delimiter to determine whether or not changes in this diplay
     //can edit the globals. If mIsGlobal is false, profileAdapter must be asked which profiles are
@@ -60,7 +62,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             activeSwitch = (SwitchCompat) itemView.findViewById(R.id.profile_list_switch);
             checkBox = (CheckBox) itemView.findViewById(R.id.profile_list_checkbox);
 
-            if(mSchedule != null){
+            if(mSchedule != null || mTimer){
                 checkBox.setVisibility(View.VISIBLE);
                 activeSwitch.setVisibility(View.GONE);
                 editButton.setVisibility(View.GONE);
@@ -81,6 +83,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             mSchedule = new Schedule("New Schedule", new Vector<TimeBlock>(), false);
         }
         mSchedule = schedule;
+    }
+
+    public ProfileAdapter(List<Profile> profiles, Context context, boolean timer){
+        mContext = context;
+        mTimer = timer;
+        mProfiles = profiles;
     }
 
 
@@ -111,7 +119,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         });
 
         //Set the switch to the current indefiniteActive status of the profile.
-        if(mSchedule == null) {
+        if(mSchedule == null && !mTimer) {
             holder.activeSwitch.setChecked(getIndefiniteActive(currentProfile));
             holder.activeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -124,7 +132,11 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 }
             });
         } else {
-            holder.checkBox.setChecked(mSchedule.getProfiles().contains(currentProfile));
+            if(mTimer){
+                holder.checkBox.setChecked(false);
+            } else {
+                holder.checkBox.setChecked(mSchedule.getProfiles().contains(currentProfile));
+            }
             holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

@@ -40,11 +40,6 @@ public class Schedule implements Serializable {
     //Checks that the TimeBlock you're trying to add doesn't overlap any existing TimeBlocks,
     //and if not, attempts to add it.
     public boolean addTimeBlock(TimeBlock block){
-        for(TimeBlock tb : mTimeBlocks){
-            if(tb.overlaps(block)){
-                return false;
-            }
-        }
         return mTimeBlocks.add(block);
     }
 

@@ -2,6 +2,8 @@ package com.proflow.focus_v2.models;
 
 import android.content.pm.PackageInfo;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 /**
@@ -24,6 +26,12 @@ public class FocusTimer {
     private Long mCurrentDuration;
     private Long startTime;
 
+    private boolean paused = true;
+
+    static Timer mTimer = new Timer(true);
+
+    int mPeriod = 1000;
+
     private boolean isActive;
     private Vector<PackageInfo> bucket;
 
@@ -34,5 +42,48 @@ public class FocusTimer {
 
         isActive = false;
         bucket = new Vector<>();
+
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if(!paused){
+                    if(mCurrentDuration <= 0){
+                        //TODO Implement timer finished condition - will interact with service
+                    }
+                    mCurrentDuration -= mPeriod;
+                }
+            }
+        }, 0, mPeriod);
+    }
+
+    public String getRemainingTimeString(){
+        long hours = (mCurrentDuration/1000) / 3600;
+        long minutes = ((mCurrentDuration / 1000)  / 60) % 60;
+        long seconds = (mCurrentDuration / 1000) % 60;
+
+        String retString = "";
+        if(hours > 0){
+            retString += "" + hours + ":";
+        }
+        if(minutes < 10){
+            retString += "0" + minutes + ":";
+        } else {
+            retString += minutes + ":";
+        }
+        if(seconds < 10){
+            retString += "0" + seconds;
+        } else {
+            retString += "" + seconds;
+        }
+
+        return retString;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void togglePause(){
+        paused = !paused;
     }
 }

@@ -1,5 +1,6 @@
 package com.proflow.focus_v2.data;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -30,12 +31,13 @@ public class Global {
 
     public static Global getInstance() { return instance; }
 
-    static Vector<PackageInfo> packageList = new Vector<>();
-    static Vector<Profile> profileList = new Vector<>();
-    static Vector<Profile> activeProfiles = new Vector<>();
-    static Vector<Schedule> scheduleList = new Vector<>();
-    static Vector<FocusTimer> timerList = new Vector<>();
-    static Vector<PackageInfo> activeApps = new Vector<>();
+    private static Vector<PackageInfo> packageList = new Vector<>();
+    private static Vector<Profile> profileList = new Vector<>();
+    private static Vector<Profile> activeProfiles = new Vector<>();
+    private static Vector<Schedule> scheduleList = new Vector<>();
+    private static Vector<FocusTimer> timerList = new Vector<>();
+    private static Vector<PackageInfo> activeApps = new Vector<>();
+    private static Vector<Notification> notifications = new Vector<>();
 
     private Global() {
     }
@@ -278,27 +280,20 @@ public class Global {
         return false;
     }
 
-    public Boolean createTimer(Context context, String name, Long initialDuration, Vector<Profile> timerProfiles){
+    public Boolean addTimer(Context context, FocusTimer ft){
         Vector<FocusTimer> timers = getTimers(context);
-        FocusTimer timer = new FocusTimer(name, initialDuration, timerProfiles);
-        timers.add(timer);
+        timers.add(ft);
         setTimers(context, timers);
         return true;
     }
 
     //TODO Implement timers... Yay
-//    public Boolean modifyTimer(Context context, String name, Long initialDuration, Profile newProfile){
-//        Vector<FocusTimer> timers = getTimers(context);
+//    public Boolean modifyTimer(Context context, FocusTimer ft){
+//        for(FocusTimer f: getTimers(context)){
+//            if(f.equals(ft)){
 //
-//        for (int i = 0; i < timers.size(); i++){
-//            if (timers.get(i).getName() == name){
-//                timers.get(i).setInitialDuration(initialDuration);
-//                timers.get(i).addProfile(newProfile);
 //            }
 //        }
-//
-//        setTimers(context, timers);
-//        return true;
 //    }
 
     public Boolean removeTimer(Context context, FocusTimer timer){
@@ -309,41 +304,18 @@ public class Global {
         }
         return false;
     }
-//
-//    public Boolean createNotification(Context context, Vector<Profile> profiles, android.app.Notification notification){
-//        Vector<Notification> notifications = getNotifications(context);
-//        Notification not = new Notification(notification, profiles);
-//        if(notifications.add(not)) {
-//            setNotifications(context, notifications);
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    public Boolean removeNotification(Context context, Notification notification){
-//        Vector<Notification> notifications = getNotifications(context);
-//        if(notifications.remove(notification)){
-//            setNotifications(context, notifications);
-//            return true;
-//        }
-//        return false;
-//    }
 
+    public Boolean addNotification(Context context, Notification notification){
+        return notifications.add(notification);
+    }
 
-//    public Vector<Notification> getNotifications(Context context) {
-//        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-//        Gson gson = new Gson();
-//        String json = mPrefs.getString(context.getString(R.string.NotificationsKey), "");
-//        Type typeOfVector = new TypeToken<Vector<Notification>>(){}.getType();
-//        Vector<Notification> obj = gson.fromJson(json, typeOfVector);
-//
-//        if(obj != null) {
-//            Log.d("Global-popAllProf", "There are " + obj.size() + " active apps");
-//            return obj;
-//        } else {
-//            return new Vector<Notification>();
-//        }
-//    }
+    public Boolean removeNotification(Context context, Notification notification){
+        return notifications.remove(notification);
+    }
+
+    public Vector<Notification> getNotifications(Context context) {
+        return notifications;
+    }
 
 
     public void setAllProfiles(Context context, Vector<Profile> allProfiles) {
@@ -359,27 +331,14 @@ public class Global {
     public void setSchedules(Context context, Vector<Schedule> allSchedules) {
 
         scheduleList = allSchedules;
-
-//        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-//        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-//        Gson gson = new Gson();
-//        String json = gson.toJson(allSchedules);
-//        prefsEditor.putString(context.getString(R.string.SchedulesKey), json);
-//        prefsEditor.commit();
     }
 
     public void setTimers(Context context, Vector<FocusTimer> timers) {
         Global.timerList = timers;
     }
 
-//    public void setNotifications(Context context, Vector<Notification> notifications) {
-//        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-//        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-//        Gson gson = new Gson();
-//        String json = gson.toJson(notifications);
-//        prefsEditor.putString(context.getString(R.string.NotificationsKey), json);
-//        prefsEditor.commit();
-//    }
+    public void setNotifications(Context context, Vector<Notification> notifications) {
+    }
 
 
     //This could almost certainly be optimized, but it works... So...
@@ -411,5 +370,14 @@ public class Global {
             possibleId = new Random().nextInt();
         }
         return possibleId;
+    }
+
+    public Schedule getScheduleById(int schedID) {
+        for(int i = 0; i < scheduleList.size(); i++){
+            if(scheduleList.get(i).getId() == schedID){
+                return scheduleList.get(i);
+            }
+        }
+        return null;
     }
 }

@@ -73,7 +73,8 @@ public class ScheduleAdapter extends BaseAdapter {
                         FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
 
                         Bundle args = new Bundle();
-                        args.putInt(mContext.getString(R.string.scheduleKey), i);
+                        args.putInt(mContext.getString(R.string.scheduleKey), mSchedules.get(i).getId());
+                        args.putBoolean(mContext.getString(R.string.schedule_is_new), false);
 
                         CreateScheduleFragment frag = CreateScheduleFragment.newInstance();
                         frag.setArguments(args);

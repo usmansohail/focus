@@ -1,6 +1,9 @@
 package com.proflow.focus_v2.adapters;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.activities.MainActivity;
+import com.proflow.focus_v2.data.Global;
+import com.proflow.focus_v2.fragments.CreateScheduleFragment;
+import com.proflow.focus_v2.fragments.CreateTimeBlockFragment;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 
@@ -46,7 +53,7 @@ public class TimeBlockAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
         final TimeBlock timeBlock = mSchedule.getTimeBlocks().get(i);
 
         if(view == null){
@@ -65,14 +72,24 @@ public class TimeBlockAdapter extends BaseAdapter {
         mEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext, "Tapped timeblock edit", Toast.LENGTH_SHORT).show();
+                Fragment frag = CreateTimeBlockFragment.newInstance();
+                Bundle args = new Bundle();
+                Global.getInstance().modifySchedule(mContext, mSchedule);
+
+                args.putInt(mContext.getString(R.string.scheduleKey), mSchedule.getId());
+                args.putInt(mContext.getString(R.string.timeBlockIndex), i);
+                frag.setArguments(args);
+                FragmentTransaction ft = ((MainActivity)mContext).getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.Main_Frame, frag);
+                ft.commit();
             }
         });
 
         mDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext, "Tapped timeblock delete", Toast.LENGTH_SHORT).show();
+                mSchedule.removeTimeBlock(timeBlock);
+                notifyDataSetChanged();
             }
         });
 

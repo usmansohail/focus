@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ListView;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.TimerAdapter;
@@ -32,12 +33,14 @@ public class TimersFragment extends BaseFragment {
         showAddButton(true);
     }
 
-    RecyclerView timerRecyclerView;
+    ListView timerListView;
     ImageButton addTimerButton;
 
     //RecyclerView Adapter
     TimerAdapter mAdapter;
 
+    //updater runnable
+    timerUpdaterRunnable mRunnable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,12 +48,23 @@ public class TimersFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_timers, container, false);
 
-        timerRecyclerView = layout.findViewById(R.id.timer_recycler_view);
+        timerListView = layout.findViewById(R.id.timer_list_view);
         addTimerButton = addItemButton;
 
         //TODO implement timerListView
-        mAdapter = new TimerAdapter();
-        timerRecyclerView.setAdapter(mAdapter);
+        mAdapter = new TimerAdapter(getContext());
+        timerListView.setAdapter(mAdapter);
+
+        final long delayLoop = 500;
+
+        mRunnable = new timerUpdaterRunnable();
+        mRunnable.adapter = mAdapter;
+        mRunnable.list = timerListView;
+        mRunnable.delay = (int)delayLoop;
+
+        timerListView.postDelayed(mRunnable, delayLoop);
+
+
 
         addTimerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,4 +79,39 @@ public class TimersFragment extends BaseFragment {
         return layout;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mRunnable.stop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mRunnable.start();
+    }
+}
+
+class timerUpdaterRunnable implements Runnable {
+
+    boolean running = true;
+    public TimerAdapter adapter;
+    public int delay;
+    public ListView list;
+
+    @Override
+    public void run() {
+        adapter.notifyDataSetChanged();
+        if(running)
+            list.postDelayed(this, delay);
+    }
+
+    public void stop(){
+        running = false;
+    }
+
+    public void start(){
+        running = true;
+        run();
+    }
 }
