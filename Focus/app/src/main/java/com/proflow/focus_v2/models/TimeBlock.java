@@ -16,7 +16,47 @@ public class TimeBlock implements Serializable {
         THURSDAY,
         FRIDAY,
         SATURDAY,
-        SUNDAY
+        SUNDAY;
+
+        public static day fromInteger(int x){
+            switch(x){
+                case 1:
+                    return MONDAY;
+                case 2:
+                    return TUESDAY;
+                case 3:
+                    return WEDNESDAY;
+                case 4:
+                    return THURSDAY;
+                case 5:
+                    return FRIDAY;
+                case 6:
+                    return SATURDAY;
+                case 0:
+                    return SUNDAY;
+            }
+            return null;
+        }
+
+        public static int toInteger(day Day){
+            switch(Day){
+                case MONDAY:
+                    return 1;
+                case TUESDAY:
+                    return 2;
+                case WEDNESDAY:
+                    return 3;
+                case THURSDAY:
+                    return 4;
+                case FRIDAY:
+                    return 5;
+                case SATURDAY:
+                    return 6;
+                case SUNDAY:
+                    return 0;
+            }
+            return -1;
+        }
     }
 
     time mStartTime;

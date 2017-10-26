@@ -40,5 +40,9 @@ public class time implements Serializable{
     public boolean equals(time otherTime){
         return this.hour == otherTime.hour && this.minute == otherTime.minute;
     }
+
+    public boolean isBetween(time startTime, time endTime){
+        return(this.isBefore(endTime) && this.isAfter(startTime));
+    }
 }
 

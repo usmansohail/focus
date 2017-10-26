@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,14 +121,15 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
         //Set the switch to the current indefiniteActive status of the profile.
         if(mSchedule == null && !mTimer) {
-            holder.activeSwitch.setChecked(getIndefiniteActive(currentProfile));
+            Log.d("ProfileAdapter", "Setting timer to :" +currentProfile.isActive());
+            holder.activeSwitch.setChecked(currentProfile.isActive());
             holder.activeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
-                        holder.thisProfile.activate();
+                        holder.thisProfile.activate(mContext);
                     } else {
-                        holder.thisProfile.deactivate();
+                        holder.thisProfile.deactivate(mContext);
                     }
                 }
             });

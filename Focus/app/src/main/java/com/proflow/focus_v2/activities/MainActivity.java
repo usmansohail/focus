@@ -1,16 +1,22 @@
 package com.proflow.focus_v2.activities;
 
 import android.app.Notification;
+import android.content.ComponentName;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.FrameLayout;
 
@@ -22,6 +28,11 @@ import com.proflow.focus_v2.fragments.NotificationsFragment;
 import com.proflow.focus_v2.fragments.ProfilesFragment;
 import com.proflow.focus_v2.fragments.SchedulesFragment;
 import com.proflow.focus_v2.fragments.TimersFragment;
+import com.proflow.focus_v2.models.Profile;
+import com.proflow.focus_v2.models.Schedule;
+import com.proflow.focus_v2.models.TimeBlock;
+import com.proflow.focus_v2.models.time;
+import com.proflow.focus_v2.services.AppBlocker;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -29,11 +40,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "MainActivity";
+    boolean debug = false;
 
     //Layouts
     FrameLayout mainFrame;
@@ -43,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
     ProfilesFragment profilesFragment;
     SchedulesFragment schedulesFragment;
     TimersFragment timersFragment;
+
+    private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
+    private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
+    private AlertDialog enableNotificationListenerAlertDialog;
+
 
     public static Vector<PackageInfo> packageList1;
 
@@ -84,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(!isNotificationServiceEnabled()){
+            enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
+            enableNotificationListenerAlertDialog.show();
+        }
 
         //Set up globals from IDs
             //mainFrame = Fragment frame
@@ -141,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                     case(R.id.tab_schedules):
+                        Log.d(TAG, "Switching to schedules tab...");
                         if(currentFragment != fragmentType.SCHEDULES){
                             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                             transaction.replace(R.id.Main_Frame, schedulesFragment);
@@ -167,10 +191,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Debuggnig for Notifications
+        if(!AppBlocker.running){
+            Intent intent = new Intent(this, AppBlocker.class);
+            startService(intent);
+        }
+
     }
 
     private void populateGlobalAppsList() {
+        if(debug) {
+            Global.getInstance().clearPreferences(getApplicationContext());
+        }
+
         PackageManager packageManager = getPackageManager();
+
         List<PackageInfo> packageList = packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS);
 
         packageList1 = new Vector<>();
@@ -179,22 +213,85 @@ public class MainActivity extends AppCompatActivity {
             if ((!isSystemPackage(pi) ||  systemPackageExceptions.contains(pi.packageName) )
                     && (!label.equals("") && !label.isEmpty())
                     && !pi.applicationInfo.loadLabel(getPackageManager()).toString().contains(".")) {
-                Log.d(TAG, "Added " + pi.applicationInfo.loadLabel(getPackageManager()) + " to allApps vector.");
                 packageList1.add(pi);
-            } else {
-                Log.e(TAG, pi.packageName + " was not added as it is a systemPackage.");
             }
         }
 
         Collections.sort(packageList1, new PackageInfoComparator(getApplicationContext()));
 
+        Global.getInstance().setAllApps(getApplicationContext(), new Vector<PackageInfo>());
+        Global.getInstance().setAllApps(this, packageList1);
+        Global.getInstance().synchAll(getApplicationContext());
+
+        //FOR DEBUGGING - note done after apps.
+        if(debug) {
+            populateFakeData();
+        }
+    }
+
+    private void populateFakeData() {
+        Random rand = new Random();
+
+        //Random profiles!
+        for(int i = 0; i < 10; i++){
+            Vector<PackageInfo> apps = new Vector<>();
+            Vector<PackageInfo> allApps = Global.getInstance().getAllApps(getApplicationContext());
 
 
-        for(PackageInfo pi : packageList1){
-            Log.d(TAG, "App: " + pi.applicationInfo.loadLabel(getPackageManager()));
+            int numActiveApps = rand.nextInt(15);
+            Vector<Integer> selected = new Vector<>();
+            for(int j = 0; j < numActiveApps; j++){
+                int appIndex = rand.nextInt(allApps.size());
+                while(selected.contains(appIndex)){
+                    appIndex = rand.nextInt(allApps.size());
+                }
+                apps.add(allApps.get(appIndex));
+                selected.add(appIndex);
+            }
+
+            Profile p = new Profile("Profile " + i, apps, i);
+            Global.getInstance().addProfile(getApplicationContext(), p);
         }
 
-        Global.getInstance().setAllApps(this, packageList1);
+        //Random schedules!
+        for(int i = 0; i < 10; i++){
+            String sName = "Schedule " + i;
+
+            int numTimeBlocks = rand.nextInt(5) + 5;
+            Vector<TimeBlock> tbVec = new Vector<>();
+
+            for(int j = 0; j < numTimeBlocks; j++) {
+                int startHour = rand.nextInt(12);
+                int startMinute = rand.nextInt(60);
+                int endHour = rand.nextInt(12) + 12;
+                int endMinute = rand.nextInt(60);
+
+                time start = new time(startHour, startMinute);
+                time end = new time(endHour, endMinute);
+                TimeBlock.day day = TimeBlock.day.fromInteger(rand.nextInt(7));
+
+
+                tbVec.add(new TimeBlock(start, end, day));
+            }
+
+            //now add a random assortment of a few profiles
+            Vector<Profile> pVec = new Vector<>();
+            int numProfiles = rand.nextInt(5);
+            Vector<Integer> selected = new Vector<>();
+            for(int j = 0; j < numProfiles; j++){
+                int profileIndex = rand.nextInt(10);
+                while(selected.contains(profileIndex)){
+                    profileIndex = rand.nextInt(5);
+                }
+                pVec.add(Global.getInstance().getProfileByID(getApplicationContext(), profileIndex));
+            }
+            boolean mRepeat = false;
+            if(rand.nextInt() % 2 == 0){
+                mRepeat = true;
+            }
+
+            Global.getInstance().addSchedule(getApplicationContext(), new Schedule(sName, tbVec, pVec, mRepeat, i));
+        }
 
     }
 
@@ -221,4 +318,43 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
     }
+
+    private boolean isNotificationServiceEnabled(){
+        String pkgName = getPackageName();
+        final String flat = Settings.Secure.getString(getContentResolver(),
+                ENABLED_NOTIFICATION_LISTENERS);
+        if (!TextUtils.isEmpty(flat)) {
+            final String[] names = flat.split(":");
+            for (int i = 0; i < names.length; i++) {
+                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
+                if (cn != null) {
+                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private AlertDialog buildNotificationServiceAlertDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.notfication_blocker_service);
+        alertDialogBuilder.setMessage(R.string.notification_listener_service_explanation);
+        alertDialogBuilder.setPositiveButton(R.string.yes,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.no,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // If you choose to not enable the notification listener
+                        // the app. will not work as expected
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+
 }

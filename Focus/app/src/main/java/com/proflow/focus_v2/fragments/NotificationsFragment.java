@@ -13,6 +13,7 @@ import android.widget.ListView;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.NotificationAdapter;
 import com.proflow.focus_v2.data.Global;
+import com.proflow.focus_v2.models.Notification;
 
 public class NotificationsFragment extends BaseFragment {
     public NotificationsFragment() {
@@ -59,7 +60,7 @@ public class NotificationsFragment extends BaseFragment {
                         .setSmallIcon(R.drawable.circle_button_active)
                         .setContentTitle("My notification")
                         .setContentText("Hello World!");
-        Global.getInstance().addNotification(getContext(), mBuilder.build());
+        Global.getInstance().addNotification(getContext(), new Notification(mBuilder.build(), null));
 
         //TODO Implement NotificationListView
         mAdapter = new NotificationAdapter(getContext());

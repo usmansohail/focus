@@ -70,6 +70,7 @@ public class CreateScheduleFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         if(getArguments() != null){
             if(getArguments().containsKey(getString(R.string.scheduleKey))) {
+                Log.d(TAG, "Attempting to get Schedule by ID");
                 int schedID = getArguments().getInt(getString(R.string.scheduleKey));
                 mSchedule = Global.getInstance().getScheduleById(schedID);
             }

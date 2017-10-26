@@ -1,5 +1,6 @@
 package com.proflow.focus_v2.models;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Parcelable;
 
@@ -28,6 +29,12 @@ public class Profile {
         setUniqueId();
     }
 
+    public Profile(String name, Vector<PackageInfo> packageIds, int _id){
+        mName = name;
+        mPackages = packageIds;
+        id = _id;
+    }
+
     public String getName(){
         return mName;
     }
@@ -44,19 +51,25 @@ public class Profile {
         mPackages = apps;
     }
 
-    public void activate(){
+    public void activate(Context context){
         /*
         TODO Add profile to indefinite list? Not sure this is strictly necessary. We could have a setting
         such that a profile is indefinitely active if we call activate? Yeah. I'm gonna go off of that
         assumption.
          */
         mIsActive = true;
+        update(context);
     }
 
-    public void deactivate(){
+    public void deactivate(Context context){
         //TODO As activate() remove profile from service indefinite active list. Safely.
         //(Possible issues w/ respect to active schedules that contain this profile. Iterative check)
         mIsActive = false;
+        update(context);
+    }
+
+    public void setActive(boolean active){
+        mIsActive = active;
     }
 
     public boolean isActive(){
@@ -71,4 +84,7 @@ public class Profile {
         id = Global.getInstance().getProfileUniqueID();
     }
 
+    private void update(Context context){
+        Global.getInstance().modifyProfile(context, this);
+    }
 }

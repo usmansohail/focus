@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,7 @@ public class ScheduleAdapter extends BaseAdapter {
 
                         ft.replace(R.id.Main_Frame, frag);
                         ft.addToBackStack(null);
+
                         ft.commit();
                     }
                 });
@@ -94,9 +96,9 @@ public class ScheduleAdapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
-                    currentSchedule.start();
+                    currentSchedule.start(mContext);
                 } else {
-                    currentSchedule.stop();
+                    currentSchedule.stop(mContext);
                 }
             }
         });

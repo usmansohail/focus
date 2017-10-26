@@ -238,4 +238,11 @@
     <string name="hour_string">Hour</string>
     <string name="minute_string">Minute</string>
     <string name="second_string">Second</string>
+    <string name="service_name">NotificationBlockerService</string>
+    <string name="accept">Accept</string>
+    <string name="notfication_blocker_service">Notification Blocker Service</string>
+    <string name="notification_listener_service_explanation">"For the the app. to work you need to enable the Notification Listener Service. Enable it now?"</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
 </resources>

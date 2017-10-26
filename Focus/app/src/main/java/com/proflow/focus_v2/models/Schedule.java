@@ -1,11 +1,16 @@
 package com.proflow.focus_v2.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.proflow.focus_v2.data.Global;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 
 /**
@@ -16,7 +21,6 @@ public class Schedule implements Serializable {
 
     private String mName;
     private Vector<TimeBlock> mTimeBlocks;
-
     private Vector<Profile> mProfiles = new Vector<>();
 
     private boolean mRepeatWeekly;
@@ -31,7 +35,13 @@ public class Schedule implements Serializable {
         setUniqueId();
     }
 
-
+    public Schedule(String name, Vector<TimeBlock> timeBlocks, Vector<Profile> profiles ,boolean repeatWeekly, int id){
+        mName = name;
+        mTimeBlocks = timeBlocks;
+        mRepeatWeekly = repeatWeekly;
+        mProfiles = profiles;
+        this.id = id;
+    }
 
     /*
     MODIFIERS
@@ -80,18 +90,27 @@ public class Schedule implements Serializable {
     //Start and stop are where we tell the updater service that we need to worry about THIS profile
     //Basically, we need to have some background service telling the profiles when to run and when
     //not to run, and also which apps are being blocked, etc.
-    public boolean start(){
+    public boolean start(Context context){
         //TODO Add a start_profile(Profile p) to the "running thread" or utilize global activeProfiles?
         //Issue is with how we store/get data. If the phone is randomly pulling data over the network
         //we're going to see random hickups in performance whenever the user does something that
         //calls our onEvent listener (due to network checks.) So we need a file, or similar, to check
         //Yeah, file I/O is slow, but it's lightning relative to a network connection.
+        isActive = true;
+
+        update(context);
         return false;
     }
 
-    public boolean stop(){
+    public boolean stop(Context context){
         //TODO Add a stop_profile(Profile p) to the "running thread" -- see above.
+        isActive = false;
+        update(context);
         return false;
+    }
+
+    private void update(Context context) {
+        Global.getInstance().modifySchedule(context, this);
     }
 
     /*
@@ -142,5 +161,23 @@ public class Schedule implements Serializable {
 
     public Integer getId() {
         return id;
+    }
+
+    public boolean isBlocking() {
+        if(isActive) {
+            GregorianCalendar gc = new GregorianCalendar();
+            Log.d("Schedule", "IsActive");
+            for (TimeBlock tb : mTimeBlocks) {
+                int calendarDay = TimeBlock.day.toInteger(tb.getDay()) + 1;
+                Log.d("Schedule", "calendarDay" + calendarDay);
+                if (calendarDay == gc.get(Calendar.DAY_OF_WEEK)) {
+                    time ct = new time(gc.get(Calendar.HOUR_OF_DAY), gc.get(Calendar.MINUTE));
+                    if (ct.isBetween(tb.getStartTime(), tb.getEndTime())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

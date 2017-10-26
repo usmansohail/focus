@@ -14,10 +14,14 @@ import android.widget.EditText;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.AppAdapter;
+import com.proflow.focus_v2.comparators.PackageInfoComparator;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Profile;
 
+import java.util.Collections;
 import java.util.Vector;
+
+import static android.content.ContentValues.TAG;
 
 public class ModifyProfileFragment extends BaseFragment {
 
@@ -66,7 +70,7 @@ public class ModifyProfileFragment extends BaseFragment {
         }
 
         final Profile currentProfile = Global.getInstance().getAllProfiles(getContext()).get(profileIndex);
-
+        Collections.sort(apps, new PackageInfoComparator(getContext()));
         mAdapter = new AppAdapter(currentProfile, apps, getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mAppRecyclerView.setLayoutManager(mLayoutManager);
@@ -82,7 +86,10 @@ public class ModifyProfileFragment extends BaseFragment {
                 //TODO implement confirmation & validation of input.
                 currentProfile.setName(mProfileNameEditText.getText().toString());
                 currentProfile.setApps(getSelectedPackages());
-                Global.getInstance().modifyProfile(getContext(), currentProfile);
+                boolean found = Global.getInstance().modifyProfile(getContext(), currentProfile);
+                if(!found){
+                    Log.d(TAG, "MPF: profile not found");
+                }
                 getActivity().onBackPressed();
             }
         });

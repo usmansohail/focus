@@ -14,9 +14,11 @@ import android.widget.EditText;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.AppAdapter;
+import com.proflow.focus_v2.comparators.PackageInfoComparator;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Profile;
 
+import java.util.Collections;
 import java.util.Vector;
 
 public class CreateProfileFragment extends BaseFragment {
@@ -58,6 +60,7 @@ public class CreateProfileFragment extends BaseFragment {
         mProfileNameEditText = layout.findViewById(R.id.profile_name_edit_text);
 
         Vector<PackageInfo> apps = Global.getInstance().getAllApps(getContext());
+
         for(PackageInfo pi: apps){
             Log.d("CreateProfileFragment", "Name: " + pi.applicationInfo.name);
             if(pi.applicationInfo.name == null){
@@ -66,6 +69,7 @@ public class CreateProfileFragment extends BaseFragment {
         }
 
 
+        Collections.sort(apps, new PackageInfoComparator(getContext()));
         mAdapter = new AppAdapter(apps, getContext());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         mAppRecyclerView.setLayoutManager(mLayoutManager);

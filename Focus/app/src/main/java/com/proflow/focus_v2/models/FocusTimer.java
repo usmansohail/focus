@@ -2,6 +2,8 @@ package com.proflow.focus_v2.models;
 
 import android.content.pm.PackageInfo;
 
+import com.proflow.focus_v2.data.Global;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -24,24 +26,20 @@ public class FocusTimer {
 
     private Long mInitialDuration;
     private Long mCurrentDuration;
-    private Long startTime;
+    private int id;
 
     private boolean paused = true;
 
     static Timer mTimer = new Timer(true);
 
-    int mPeriod = 1000;
+    public int mPeriod = 1000;
 
-    private boolean isActive;
-    private Vector<PackageInfo> bucket;
+    private Vector<Profile> mProfiles;
 
     public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles){
         mName = name;
         mInitialDuration = initialDuration;
         mCurrentDuration = initialDuration;
-
-        isActive = false;
-        bucket = new Vector<>();
 
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -54,6 +52,30 @@ public class FocusTimer {
                 }
             }
         }, 0, mPeriod);
+
+        id = Global.getInstance().getUniqueTimerID();
+        mProfiles = timerProfiles;
+    }
+
+    public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles,long currentDuration, int id){
+        mName = name;
+        mInitialDuration = initialDuration;
+        mCurrentDuration = currentDuration;
+
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if(!paused){
+                    if(mCurrentDuration <= 0){
+                        //TODO Implement timer finished condition - will interact with service
+                    }
+                    mCurrentDuration -= mPeriod;
+                }
+            }
+        }, 0, mPeriod);
+
+        id = Global.getInstance().getUniqueTimerID();
+        mProfiles = timerProfiles;
     }
 
     public String getRemainingTimeString(){
@@ -85,5 +107,38 @@ public class FocusTimer {
 
     public void togglePause(){
         paused = !paused;
+    }
+
+    public Vector<Profile> getProfiles() {
+        return mProfiles;
+    }
+
+    public Vector<String> getApps(){
+        Vector<String> appBucket = new Vector<>();
+
+        for(Profile p : mProfiles){
+            for(PackageInfo pi : p.getApps()){
+                if(!appBucket.contains(pi.packageName)){
+                    appBucket.add(pi.packageName);
+                }
+            }
+        }
+        return appBucket;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public long getCurrentDuration() {
+        return mCurrentDuration;
+    }
+
+    public long getInitialDuration() {
+        return mInitialDuration;
     }
 }

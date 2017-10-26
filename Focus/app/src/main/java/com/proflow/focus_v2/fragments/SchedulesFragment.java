@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,10 +61,10 @@ public class SchedulesFragment extends BaseFragment {
         scheduleListView = layout.findViewById(R.id.schedule_list_view);
         addScheduleButton = addItemButton;
 
-        //TODO Implement schedulesRecyclerView
-
+        Log.d("SchedulesFragment", "starting global getSchedules");
         schedules = Global.getInstance().getSchedules(getActivity());
 
+        Log.d("SchedulesFragment", "Creating new Schedule Adapter");
         mAdapter = new ScheduleAdapter(getActivity(), schedules);
         // attach the adapter to the expandable list view
         scheduleListView.setAdapter(mAdapter);
@@ -71,11 +72,14 @@ public class SchedulesFragment extends BaseFragment {
         addScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Global.getInstance().synchAll(getContext());
                 Fragment frag = CreateScheduleFragment.newInstance();
                 Bundle args = new Bundle();
                 Schedule sched =
                         new Schedule("ScheduleName", new Vector<TimeBlock>(), false);
                 Global.getInstance().addSchedule(getContext(), sched);
+                Global.getInstance().synchSchedules(getContext());
+                Log.d("SchedulesFragment", "Adding scheduleID: " + sched.getId() + " to args");
                 args.putInt(getString(R.string.scheduleKey), sched.getId());
                 args.putBoolean(getString(R.string.schedule_is_new), true);
                 frag.setArguments(args);

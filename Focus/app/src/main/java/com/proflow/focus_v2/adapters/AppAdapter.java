@@ -31,7 +31,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
     private static final String TAG = "AppAdapter";
     private final List<PackageInfo> mApps;
     private Context mContext;
-    private Vector<PackageInfo> selectedApps = new Vector<>();
+    private Vector<String> selectedApps = new Vector<>();
 
     public class AppViewHolder extends RecyclerView.ViewHolder {
 
@@ -40,7 +40,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
         TextView appTitle;
         ImageView appIcon;
         public AppCompatCheckBox appCheckbox;
-        public PackageInfo thisPackage;
+        public String thisPackage;
 
         AppViewHolder(View itemView) {
             super(itemView);
@@ -51,17 +51,22 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
             appCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-
-                    String currentAppTitle = thisPackage.applicationInfo.loadLabel(mContext.getApplicationContext().getPackageManager()).toString();
-                    Log.d(TAG, "CheckedChanged, State: " + b);
                     if(b){
-                        Log.d(TAG, "Added app: " + currentAppTitle);
-                        selectedApps.add(thisPackage);
+                        boolean alreadyContains = false;
+                        for(String s : selectedApps){
+                            if(s.compareToIgnoreCase(thisPackage) == 0){
+                                alreadyContains = true;
+                                break;
+                            }
+                        }
+                        if(!alreadyContains){
+                            selectedApps.add(thisPackage);
+                        }
                     } else {
-                        Log.d(TAG, "Attempting to remove: " + currentAppTitle);
-                        if(selectedApps.contains(thisPackage)){
-                            Log.d(TAG, "Removed: " + currentAppTitle);
-                            selectedApps.remove(thisPackage);
+                        for(int i = 0; i < selectedApps.size(); i++){
+                            if(selectedApps.get(i).compareToIgnoreCase(thisPackage) == 0){
+                                selectedApps.remove(i);
+                            }
                         }
                     }
                 }
@@ -96,10 +101,10 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
 
         for(PackageInfo pi : selectedAppPackages){
             if(pi != null) {
-                Log.d(TAG, "PI name: " + pi.applicationInfo.name);
-                selectedApps.add(pi);
+//                Log.d(TAG, "PI name: " + pi.applicationInfo.name);
+                selectedApps.add(pi.packageName);
             }
-
+            Log.d(TAG, "PI name: " + pi.applicationInfo.name);
         }
     }
 
@@ -111,17 +116,16 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(AppViewHolder holder, int position) {
+    public void onBindViewHolder(final AppViewHolder holder, int position) {
         PackageInfo app = mApps.get(position);
 
         PackageManager pm = mContext.getApplicationContext().getPackageManager();
 
         if(app.applicationInfo.loadLabel(pm) != null && holder != null && holder.appTitle != null) {
-            holder.thisPackage = app;
+            holder.thisPackage = app.packageName;
             holder.appTitle.setText(app.applicationInfo.loadLabel(pm));
             holder.appIcon.setImageDrawable(app.applicationInfo.loadIcon(pm));
-            holder.appCheckbox.setChecked(getAppStatus(app));
-            holder.thisPackage = app;
+            holder.appCheckbox.setChecked(getAppStatus(app.packageName));
             Log.d(TAG, app.packageName);
         }
 
@@ -129,15 +133,35 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
             Log.d(TAG, "Holder has default app name. Package: " + app.packageName);
             holder.itemView.setVisibility(View.GONE);
         }
+
+        Log.d(TAG, "-----");
+        for(String pName : selectedApps){
+            Log.d(TAG, pName);
+        }
+        Log.d(TAG, "-----");
+
     }
 
-    private boolean getAppStatus(PackageInfo pi) {
+    private boolean getAppStatus(String piName) {
 
-        return selectedApps.contains(pi);
+        for(String pName : selectedApps){
+            if(pName.compareTo(piName) == 0){
+                return true;
+            }
+        }
+        return false;
     }
 
     public Vector<PackageInfo> getSelectedApps() {
-        return selectedApps;
+        Vector<PackageInfo> sApps = new Vector<>();
+        for(String pName : selectedApps){
+            try {
+                sApps.add(mContext.getPackageManager().getPackageInfo(pName, 0));
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return sApps;
     }
 
     @Override

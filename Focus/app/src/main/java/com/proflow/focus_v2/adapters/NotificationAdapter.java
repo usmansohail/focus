@@ -29,7 +29,7 @@ public class NotificationAdapter extends BaseAdapter {
 
     @Override
     public Notification getItem(int i) {
-        return Global.getInstance().getNotifications(mContext).get(i);
+        return null;
     }
 
     @Override

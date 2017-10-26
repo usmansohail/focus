@@ -25,9 +25,6 @@ public class PackageInfoComparator implements Comparator<PackageInfo> {
         String pi1Label = pi1.applicationInfo.loadLabel(mContext.getPackageManager()).toString();
         String pi2Label = pi2.applicationInfo.loadLabel(mContext.getPackageManager()).toString();
 
-        int toReturn = pi1Label.compareToIgnoreCase(pi2Label);
-
-        Log.d(TAG, "Return val: " + toReturn + " given A: " + pi1Label + " B: " + pi2Label);
-        return toReturn;
+        return pi1Label.compareToIgnoreCase(pi2Label);
     }
 }
