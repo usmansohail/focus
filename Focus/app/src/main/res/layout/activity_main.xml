@@ -2,86 +2,102 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/primaryBackground"
     android:orientation="vertical"
-    android:textAlignment="center"
-    tools:context="proflo.focus.MainActivity">
+    tools:context="com.proflow.focus_v2.activities.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:elevation="4dp"
-        />
-
-
-    <FrameLayout
-        android:id="@+id/profiles"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/profile_table">
-
-        </TableLayout>
-
-    </FrameLayout>
-    <FrameLayout
-        android:id="@+id/schedules"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/schedules_table">
-
-        </TableLayout>
-
-    </FrameLayout>
-    <FrameLayout
-        android:id="@+id/timers"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/timer_table">
-
-        </TableLayout>
-    </FrameLayout>
-    <FrameLayout
-        android:id="@+id/notifications"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/notification_table">
-
-        </TableLayout>
-
-    </FrameLayout>
-
-
-
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@color/colorPrimary"
-        app:menu="@menu/navigation" />
+        android:background="@color/primaryColor">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/toolbar_nav_back_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_arrow_back_white"
+                android:scaleX="1.5"
+                android:scaleY="1.5"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/actionbar_focus_logo"
+            android:layout_gravity="center"
+            android:scaleY="1.5"
+            android:scaleX="1.5"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="end"
+            android:layout_marginEnd="8dp"
+            >
+
+            <ImageButton
+                android:id="@+id/toolbar_clear_notifications"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_clear_white"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"/>
+
+            <ImageButton
+                android:id="@+id/toolbar_add_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_plus_white"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"/>
+
+            <ImageButton
+                android:id="@+id/toolbar_more_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_more_horiz"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"/>
+
+            <ImageButton
+                android:id="@+id/toolbar_confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_checkmark_white"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"
+                android:scaleX="1.5"
+                android:scaleY="1.5"/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <FrameLayout
+        android:id="@+id/Main_Frame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.roughike.bottombar.BottomBar
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/primaryLightColor"
+        app:bb_activeTabColor="@color/primaryTextColor"
+        app:bb_inActiveTabColor="@color/secondaryTextColor"
+        app:bb_tabXmlResource="@xml/bottombar_tabs" />
 </LinearLayout>
+
