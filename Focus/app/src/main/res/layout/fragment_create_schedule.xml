@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/schedule_name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:hint="@string/schedule_name_edit_text_hint"
+        android:layout_margin="12dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/time_block_list_label"/>
+
+    <android.support.v7.widget.ListViewCompat
+        android:id="@+id/schedule_time_block_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"/>
+
+    <Button
+        android:id="@+id/schedule_add_time_block"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="@string/add_time_block"
+        android:layout_gravity="center_horizontal"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="start|center_vertical"
+            android:layout_marginStart="12dp"
+            android:text="@string/schedule_repeats_weekly"
+            android:layout_weight="1"/>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/schedule_repeat_weekly_radio"
+            android:layout_gravity="end"
+            android:layout_marginEnd="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ActiveProfiles"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/create_schedule_profile_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
+
+
+</LinearLayout>

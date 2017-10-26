@@ -1,16 +1,20 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
     </style>
 
-    <style name="TimePickerMode">
-        <item name="android:timePickerMode">clock</item>
+    <style name="SwitchCompatTheme">
+        <item name="trackTint">@drawable/switch_color</item>
+        <item name="thumbTint">@color/primaryColor</item>
+    </style>
 
+    <style name="TimeBlockText">
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>
