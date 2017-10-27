@@ -1,7 +1,10 @@
 package com.proflow.focus_v2.activities;
 
+import android.Manifest;
+import android.app.AppOpsManager;
 import android.app.Notification;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -14,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -42,6 +46,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+
+import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
+import static android.app.AppOpsManager.MODE_ALLOWED;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -103,10 +110,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(!isNotificationServiceEnabled()){
-            enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
-            enableNotificationListenerAlertDialog.show();
-        }
+        checkPermissions();
 
         //Set up globals from IDs
             //mainFrame = Fragment frame
@@ -146,41 +150,43 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
-                switch(tabId){
-                    case(R.id.tab_notifications):
-                        if(currentFragment != fragmentType.NOTIFICATIONS){
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.Main_Frame, notificationsFragment);
-                            transaction.commit();
-                            currentFragment = fragmentType.NOTIFICATIONS;
-                        }
-                        break;
-                    case(R.id.tab_profiles):
-                        if(currentFragment != fragmentType.PROFILES){
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.Main_Frame, profilesFragment);
-                            transaction.commit();
-                            currentFragment = fragmentType.PROFILES;
-                        }
-                        break;
-                    case(R.id.tab_schedules):
-                        Log.d(TAG, "Switching to schedules tab...");
-                        if(currentFragment != fragmentType.SCHEDULES){
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.Main_Frame, schedulesFragment);
-                            transaction.commit();
-                            currentFragment = fragmentType.SCHEDULES;
-                        }
-                        break;
-                    case(R.id.tab_timers):
-                        if(currentFragment != fragmentType.TIMERS){
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.replace(R.id.Main_Frame, timersFragment);
-                            transaction.commit();
-                            currentFragment = fragmentType.TIMERS;
-                        }
-                        break;
-                }
+                //if(checkPermissions()){
+                    switch(tabId) {
+                        case (R.id.tab_notifications):
+                            if (currentFragment != fragmentType.NOTIFICATIONS) {
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.Main_Frame, notificationsFragment);
+                                transaction.commit();
+                                currentFragment = fragmentType.NOTIFICATIONS;
+                            }
+                            break;
+                        case (R.id.tab_profiles):
+                            if (currentFragment != fragmentType.PROFILES) {
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.Main_Frame, profilesFragment);
+                                transaction.commit();
+                                currentFragment = fragmentType.PROFILES;
+                            }
+                            break;
+                        case (R.id.tab_schedules):
+                            Log.d(TAG, "Switching to schedules tab...");
+                            if (currentFragment != fragmentType.SCHEDULES) {
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.Main_Frame, schedulesFragment);
+                                transaction.commit();
+                                currentFragment = fragmentType.SCHEDULES;
+                            }
+                            break;
+                        case (R.id.tab_timers):
+                            if (currentFragment != fragmentType.TIMERS) {
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.replace(R.id.Main_Frame, timersFragment);
+                                transaction.commit();
+                                currentFragment = fragmentType.TIMERS;
+                            }
+                            break;
+                    }
+                //}
             }
         });
 
@@ -319,6 +325,20 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public boolean checkPermissions(){
+        //dialog to turn on permissions appears if notification service has not yet been enabled
+        if(!isUsageAccessEnabled(getApplicationContext())){
+            buildUsageAccessPermissionsAlertDialog().show();
+        }
+        if(!isNotificationServiceEnabled() && isUsageAccessEnabled(getApplicationContext())) {
+            buildNotificationPermissionsAlertDialog().show();
+        }
+        if(!isNotificationServiceEnabled() || !isUsageAccessEnabled(getApplicationContext())){
+            return false;
+        }
+        return true;
+    }
+
     private boolean isNotificationServiceEnabled(){
         String pkgName = getPackageName();
         final String flat = Settings.Secure.getString(getContentResolver(),
@@ -336,22 +356,48 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+    private boolean isUsageAccessEnabled(Context context) {
 
-    private AlertDialog buildNotificationServiceAlertDialog(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.notfication_blocker_service);
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), context.getPackageName());
+        return mode == MODE_ALLOWED;
+    }
+
+    private android.app.AlertDialog buildNotificationPermissionsAlertDialog(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.notification_permissions_title);
         alertDialogBuilder.setMessage(R.string.notification_listener_service_explanation);
-        alertDialogBuilder.setPositiveButton(R.string.yes,
+        alertDialogBuilder.setPositiveButton(R.string.accept,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         startActivity(new Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS));
+                        dialog.dismiss();
                     }
                 });
-        alertDialogBuilder.setNegativeButton(R.string.no,
+        alertDialogBuilder.setNegativeButton(R.string.deny,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // If you choose to not enable the notification listener
-                        // the app. will not work as expected
+                        dialog.dismiss();
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+
+    private android.app.AlertDialog buildUsageAccessPermissionsAlertDialog(){
+        final android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.usage_permissions_title);
+        alertDialogBuilder.setMessage(R.string.usage_access_service_explanation);
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                        dialog.dismiss();
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(R.string.deny,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
                     }
                 });
         return(alertDialogBuilder.create());
