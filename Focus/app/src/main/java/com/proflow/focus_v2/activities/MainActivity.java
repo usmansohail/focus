@@ -150,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
-                //if(checkPermissions()){
                     switch(tabId) {
                         case (R.id.tab_notifications):
                             if (currentFragment != fragmentType.NOTIFICATIONS) {
@@ -186,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                     }
-                //}
             }
         });
 
@@ -351,10 +349,20 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
     private boolean isUsageAccessEnabled(Context context) {
+        try {
+            PackageManager packageManager = getPackageManager();
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getPackageName(), 0);
+            AppOpsManager appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+            int mode = 0;
+            if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.KITKAT) {
+                mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                        applicationInfo.uid, applicationInfo.packageName);
+            }
+            return (mode == AppOpsManager.MODE_ALLOWED);
 
-        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), context.getPackageName());
-        return mode == MODE_ALLOWED;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     private android.app.AlertDialog buildNotificationPermissionsAlertDialog(){
@@ -372,6 +380,8 @@ public class MainActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(1);
                     }
                 });
         return(alertDialogBuilder.create());
@@ -386,12 +396,17 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
                         dialog.dismiss();
+                        if(!isNotificationServiceEnabled()) {
+                            buildNotificationPermissionsAlertDialog().show();
+                        }
                     }
                 });
         alertDialogBuilder.setNegativeButton(R.string.deny,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                        System.exit(1);
                     }
                 });
         return(alertDialogBuilder.create());
