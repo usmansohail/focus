@@ -18,20 +18,14 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
-import com.proflow.focus_v2.data.Global;
-import com.proflow.focus_v2.models.FocusTimer;
-import com.proflow.focus_v2.models.Profile;
-import com.proflow.focus_v2.models.Schedule;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
@@ -42,32 +36,17 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 public class AppBlocker extends Service {
 
-    private final String TAG = "APPBLOCKER";
-
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private Handler mHandler;
-
-    public static boolean running = false;
-
+    private ArrayList<String> mBlockedPackages;
     private Runnable mRunnableCode = new Runnable() {
         @Override
         public synchronized void run() {
-            running = true;
-            Vector<String> blockedPackageNames = getBlockedPackageNames();
 
-            ActivityManager mActivityManager =(ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-            String mPackageName = getPackageName();
-            Log.d(TAG, "CURRENT APP NAME: " + mPackageName);
-
-//            mPackageName = mActivityManager.getRunningAppProcesses().get(0).processName;
-//            Log.d(TAG, "CURRENT APP PROCESS NAME: " + mPackageName);
-//            mPackageName = mActivityManager.getRunningTasks(1).get(0).topActivity.getPackageName();
-//            Log.d(TAG, "CURRENT APP DEPRECATED NAME: " + mPackageName);
-
-
-            for(String blocked : blockedPackageNames){
-                if(mPackageName.compareToIgnoreCase(blocked) == 0){
+            String currentApp = getCurrentApp(getApplicationContext());
+            for(String blocked : mBlockedPackages){
+                if(blocked.equals(currentApp)){
                     StartApplication(getApplicationContext(), getPackageName());
                     BlockedApplicationAlert().show();
                     break;
@@ -76,38 +55,6 @@ public class AppBlocker extends Service {
             mHandler.postDelayed(this, 300);
         }
     };
-
-    //Yes, I know this is gross - FDunlap
-    private Vector<String> getBlockedPackageNames() {
-        Vector<String> blockedPackages = new Vector<>();
-
-        Vector<Profile> profiles = Global.getInstance().getAllProfiles(getApplicationContext());
-        Vector<Schedule> schedules = Global.getInstance().getSchedules(getApplicationContext());
-        Vector<FocusTimer> timers = Global.getInstance().getTimers(getApplicationContext());
-
-        for(Profile p : profiles){
-            if(p.isActive()){
-                for(PackageInfo pi : p.getApps()){
-                    blockedPackages.add(pi.packageName);
-                }
-            }
-        }
-        for(Schedule s : schedules){
-            if(s.isBlocking()){
-                for(Profile p : s.getProfiles()){
-                    for(PackageInfo pi : p.getApps()){
-                        blockedPackages.add(pi.packageName);
-                    }
-                }
-            }
-        }
-        for(FocusTimer timer : timers){
-            if(!timer.isPaused()){
-                blockedPackages.addAll(timer.getApps());
-            }
-        }
-        return blockedPackages;
-    }
 
     private android.app.AlertDialog BlockedApplicationAlert(){
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
@@ -153,17 +100,20 @@ public class AppBlocker extends Service {
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
 
+    public ArrayList<String> ReturnBlockedApps(){
+        return mBlockedPackages;
+    }
+
     @Override
     public synchronized int onStartCommand(Intent intent, int flags, int startId) {
 
         //If we have ORIGINAL_INENT
-        if(intent != null) {
-            if (intent.hasExtra("ORIGINAL_INTENT")) {
+        if(intent.hasExtra("ORIGINAL_INTENT")){
 
-            }
         }
 
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+        mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
         mHandler.post(mRunnableCode);
 
         // If we get killed, after returning from here, restart
@@ -178,10 +128,7 @@ public class AppBlocker extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        running = false;
         Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
-        sendBroadcast(new Intent("YouWillNeverKillMe"));
     }
 
     public void killAppByPermission (Context context, String permissionToKill)
@@ -222,6 +169,7 @@ public class AppBlocker extends Service {
                 {
                     android.os.Process.sendSignal(runningAppProcessInfo.pid, android.os.Process.SIGNAL_KILL);
                     actvityManager.killBackgroundProcesses(packageToKill);
+                    //Log.e("killed", "!!! killed "+ packageToKill);
                 }
             }
         }
@@ -281,7 +229,7 @@ public class AppBlocker extends Service {
                         topPackageName =  mySortedMap.get(mySortedMap.lastKey()).getPackageName();
                     }
                 }
-                Toast.makeText(this, topPackageName, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, topPackageName, Toast.LENGTH_SHORT).show();
             }
 
         } else {
