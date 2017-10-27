@@ -196,12 +196,6 @@ public class MainActivity extends AppCompatActivity {
             currentFragment = null;
         }
 
-        //Debuggnig for Notifications
-        if(!AppBlocker.running){
-            Intent intent = new Intent(this, AppBlocker.class);
-            startService(intent);
-        }
-
     }
 
     private void populateGlobalAppsList() {
