@@ -27,7 +27,7 @@
         </service>
         <service android:name=".services.AppBlocker" android:enabled="true" android:exported="false"
             android:permission="android.permission.GET_TASKS">
-        </service>>
+        </service>
         <receiver android:name=".services.RestartServiceReceiver" >
             <intent-filter>
                 <action android:name="YouWillNeverKillMe" >
