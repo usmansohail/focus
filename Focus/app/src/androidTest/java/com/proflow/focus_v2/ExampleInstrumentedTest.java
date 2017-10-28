@@ -22,5 +22,7 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("com.fdunlap.focus_v2", appContext.getPackageName());
+
+
     }
 }
