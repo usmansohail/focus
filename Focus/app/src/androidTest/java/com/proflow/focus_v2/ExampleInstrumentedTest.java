@@ -2,11 +2,13 @@ package com.proflow.focus_v2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.onView;
 import static org.junit.Assert.*;
 
 /**
@@ -22,5 +24,12 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("com.fdunlap.focus_v2", appContext.getPackageName());
+
+    }
+
+    @Test
+    public void test2() throws Exception {
+        onView(ViewMatchers.withId(R.id.toolbar));
+
     }
 }
