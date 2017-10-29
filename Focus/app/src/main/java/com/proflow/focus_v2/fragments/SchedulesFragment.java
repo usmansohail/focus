@@ -69,6 +69,8 @@ public class SchedulesFragment extends BaseFragment {
         // attach the adapter to the expandable list view
         scheduleListView.setAdapter(mAdapter);
 
+
+
         addScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,6 +90,7 @@ public class SchedulesFragment extends BaseFragment {
                 ft.replace(R.id.Main_Frame, frag);
                 ft.addToBackStack(null);
                 ft.commit();
+
             }
         });
 

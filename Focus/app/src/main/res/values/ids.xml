@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="confirm_create_profile" type="id"></item>
+    <item name="create_profile" type="id"></item>
+    <item name="create_schedule" type="id"></item>
+</resources>

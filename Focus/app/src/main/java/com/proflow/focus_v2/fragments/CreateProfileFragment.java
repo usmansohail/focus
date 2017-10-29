@@ -59,6 +59,9 @@ public class CreateProfileFragment extends BaseFragment {
         mAppRecyclerView = layout.findViewById(R.id.create_profile_recycler_view);
         mProfileNameEditText = layout.findViewById(R.id.profile_name_edit_text);
 
+        confirmButton.generateViewId();
+        confirmButton.setId(R.id.confirm_create_profile);
+
         Vector<PackageInfo> apps = Global.getInstance().getAllApps(getContext());
 
         for(PackageInfo pi: apps){
