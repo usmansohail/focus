@@ -29,6 +29,14 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+        <service android:name=".services.AppBlocker" android:enabled="true" android:exported="false">
+        </service>
+        <receiver android:name=".services.RestartServiceReceiver" >
+            <intent-filter>
+                <action android:name="YouWillNeverKillMe" >
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

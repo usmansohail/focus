@@ -23,7 +23,16 @@ import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.proflow.focus_v2.models.time;
 
+import java.util.ArrayList;
 import java.util.Vector;
+
+import static com.proflow.focus_v2.models.TimeBlock.day.FRIDAY;
+import static com.proflow.focus_v2.models.TimeBlock.day.MONDAY;
+import static com.proflow.focus_v2.models.TimeBlock.day.SATURDAY;
+import static com.proflow.focus_v2.models.TimeBlock.day.SUNDAY;
+import static com.proflow.focus_v2.models.TimeBlock.day.THURSDAY;
+import static com.proflow.focus_v2.models.TimeBlock.day.TUESDAY;
+import static com.proflow.focus_v2.models.TimeBlock.day.WEDNESDAY;
 
 /**
  * Created by forre on 10/23/2017.
@@ -57,20 +66,12 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
     ArrayAdapter<CharSequence> endHourAdapter;
     ArrayAdapter<CharSequence> endMinuteAdapter;
 
-    int mStartHour = 12;
-    int mStartMinute = 0;
-    boolean mStartAM = true;
-
-    int mEndHour = 12;
-    int mEndMinute = 0;
-    boolean mEndAM = true;
+    boolean afterSetup = false;
 
     RadioGroup mStartRadioGroup;
     RadioGroup mEndRadioGroup;
 
     Schedule mSchedule = null;
-
-    TimeBlock.day mDay = TimeBlock.day.MONDAY;
 
     TimeBlock mTimeBlock = null;
 
@@ -100,9 +101,6 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
 
 
         if(getArguments() != null){
-            if (getArguments().containsKey(getString(R.string.timeBlockKey))) {
-                //Get timeblock and initiate values from it.
-            }
             if(getArguments().containsKey(getString(R.string.scheduleKey))){
                 int lookingForId = getArguments().getInt(getString(R.string.scheduleKey));
 
@@ -120,6 +118,8 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
 
         //Literally the next 60+ lines are instantiation of spinners and objects...
 
+
+        //Should have set these in XML... Oops....
         mMondayButton = layout.findViewById(R.id.monday_button);
         mMondayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,51 +222,44 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
         endMinuteAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
         startHour.setAdapter(startHourAdapter);
-        startHour.setOnItemSelectedListener(this);
 
         startMinute.setAdapter(startMinuteAdapter);
-        startMinute.setOnItemSelectedListener(this);
 
         endHour.setAdapter(endHourAdapter);
-        endHour.setOnItemSelectedListener(this);
 
         endMinute.setAdapter(endMinuteAdapter);
-        endMinute.setOnItemSelectedListener(this);
 
         mStartRadioGroup = layout.findViewById(R.id.time_block_start_time_radio_group);
         mEndRadioGroup = layout.findViewById(R.id.time_block_end_time_radio_group);
 
-        if(mTimeBlock != null){
-            setupValues();
+        if(mTimeBlock == null){
+            mTimeBlock = new TimeBlock(new time(0,0), new time(0,0), new Vector<TimeBlock.day>());
         }
-
+        setupValues();
+        afterSetup = true;
 
         startAM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mStartAM = true;
-                if(mStartHour > 11) mStartHour -= 12;
+                if(mTimeBlock.getStartTime().hour > 11) mTimeBlock.getStartTime().hour -= 12;
             }
         });
         startPM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mStartAM = false;
-                if(mStartHour < 12) mStartHour += 12;
+                if(mTimeBlock.getStartTime().hour < 12) mTimeBlock.getStartTime().hour += 12;
             }
         });
         endAM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mEndAM = true;
-                if(mEndHour > 11) mEndHour -= 12;
+                if(mTimeBlock.getEndTime().hour > 11) mTimeBlock.getEndTime().hour -= 12;
             }
         });
         endPM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mEndAM = false;
-                if(mEndHour < 12) mEndHour += 12;
+                if(mTimeBlock.getEndTime().hour < 12) mTimeBlock.getEndTime().hour += 12;
             }
         });
 
@@ -275,24 +268,15 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
             public void onClick(View view) {
                 //TODO implement confirmation in CreateTimeBlockFragment
                 if(validate()) {
-                    time start = new time(mStartHour, mStartMinute);
-                    time end = new time(mEndHour, mEndMinute);
-
-                    if (mTimeBlock == null){
-                    mSchedule.addTimeBlock(new TimeBlock(start, end, mDay));
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
-                    } else {
-                        int tbIndex = getArguments().getInt(getString(R.string.timeBlockIndex));
-                        mSchedule.getTimeBlocks().get(tbIndex).setStartTime(start);
-                        mSchedule.getTimeBlocks().get(tbIndex).setEndTime(end);
-                        mSchedule.getTimeBlocks().get(tbIndex).setDays(mDay);
-                        Global.getInstance().modifySchedule(getContext(), mSchedule);
-                    }
+
                     Bundle args = new Bundle();
                     args.putInt(getString(R.string.scheduleKey), mSchedule.getId());
 
                     Fragment frag = CreateScheduleFragment.newInstance();
                     frag.setArguments(args);
+
+                    getActivity().getSupportFragmentManager().popBackStack();
 
                     FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                     ft.replace(R.id.Main_Frame, frag);
@@ -304,9 +288,17 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
         navBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle args = new Bundle();
+                args.putInt(getString(R.string.scheduleKey), mSchedule.getId());
 
-                //TODO intercept backPressed and point.
-                getActivity().onBackPressed();
+                Fragment frag = CreateScheduleFragment.newInstance();
+                frag.setArguments(args);
+
+                getActivity().getSupportFragmentManager().popBackStack();
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.Main_Frame, frag);
+                ft.commit();
             }
         });
 
@@ -316,45 +308,32 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
     }
 
     private void setupValues() {
-        mDay = mTimeBlock.getDay();
-        switch(mDay){
-            case MONDAY:
-                mMondayButton.setSelected(true);
-                mMondayButton.callOnClick();
-                break;
-            case TUESDAY:
-                mTuesdayButton.setSelected(true);
-                mTuesdayButton.callOnClick();
-                break;
-            case WEDNESDAY:
-                mWednesdayButton.setSelected(true);
-                mWednesdayButton.callOnClick();
-                break;
-            case THURSDAY:
-                mThursdayButton.setSelected(true);
-                mThursdayButton.callOnClick();
-                break;
-            case FRIDAY:
-                mFridayButton.setSelected(true);
-                mFridayButton.callOnClick();
-                break;
-            case SATURDAY:
-                mSaturdayButton.setSelected(true);
-                mSaturdayButton.callOnClick();
-                break;
-            case SUNDAY:
-                mSundayButton.setSelected(true);
-                mSundayButton.callOnClick();
-                break;
+        //Then, if the time block has the day, select it.
+        if(mTimeBlock.hasDay(MONDAY)) {
+            setButton(mMondayButton, true);
         }
+        if(mTimeBlock.hasDay(TUESDAY)) {
+            setButton(mTuesdayButton, true);
+        }
+        if(mTimeBlock.hasDay(WEDNESDAY)){
+            setButton(mWednesdayButton, true);
+        }
+        if(mTimeBlock.hasDay(THURSDAY)){
+            setButton(mThursdayButton, true);
+        }
+        if(mTimeBlock.hasDay(FRIDAY)){
+            setButton(mFridayButton, true);
+        }
+        if(mTimeBlock.hasDay(SATURDAY)){
+            setButton(mSaturdayButton, true);
+        }
+        if(mTimeBlock.hasDay(SUNDAY)){
+            setButton(mSundayButton, true);
+        }
+
 
         time startTime = mTimeBlock.getStartTime();
         time endTime = mTimeBlock.getEndTime();
-
-        mStartHour = startTime.hour;
-        mStartMinute = startTime.minute;
-        mEndHour = endTime.hour;
-        mEndMinute = endTime.minute;
 
         startHour.setSelection(startTime.hour % 12);
         startMinute.setSelection(startTime.minute);
@@ -364,12 +343,11 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
             startPM.setChecked(true);
         }
 
-
         int endHourIndex;
         if(endTime.hour == 12){
             endHourIndex = 0;
         } else {
-            endHourIndex = (endTime.hour - 12);
+            endHourIndex = endTime.hour % 12;
         }
 
         endHour.setSelection(endHourIndex);
@@ -380,13 +358,16 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
             endPM.setChecked(true);
         }
 
+
+        startHour.setOnItemSelectedListener(this);
+        startMinute.setOnItemSelectedListener(this);
+        endHour.setOnItemSelectedListener(this);
+        endMinute.setOnItemSelectedListener(this);
+
     }
 
     private boolean validate() {
-        time start = new time(mStartHour, mStartMinute);
-        time end = new time(mEndHour, mEndMinute);
-
-        if(!start.isBefore(end)){
+        if(!mTimeBlock.getStartTime().isBefore(mTimeBlock.getEndTime())){
             Toast.makeText(getContext(), "INVALID: start time is after end", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -395,30 +376,32 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int i, long l) {
-        if(parent.getId() == startHour.getId()){
-            mStartHour = Integer.parseInt(startHour.getSelectedItem().toString());
+        if(afterSetup) {
+            if (parent.getId() == startHour.getId()) {
+                int start = startHour.getSelectedItemPosition();
 
-            if(mStartHour == 12) mStartHour = 0;
+                if (startPM.isChecked()) {
+                    start += 12;
+                }
 
-            if(!mStartAM){
-                mStartHour += 12;
+                mTimeBlock.getStartTime().hour = start;
+                Log.d(TAG, "Set start hour to: " + start);
+            } else if (parent.getId() == startMinute.getId()) {
+                mTimeBlock.getStartTime().minute = startMinute.getSelectedItemPosition();
+                Log.d(TAG, "Set start minute to: " + mTimeBlock.getStartTime().minute);
+            } else if (parent.getId() == endHour.getId()) {
+                int end = endHour.getSelectedItemPosition();
+
+                if (endPM.isChecked()) {
+                    end += 12;
+                }
+
+                mTimeBlock.getEndTime().hour = end;
+                Log.d(TAG, "Set end hour to: " + end);
+            } else if (parent.getId() == endMinute.getId()) {
+                mTimeBlock.getEndTime().minute = endMinute.getSelectedItemPosition();
+                Log.d(TAG, "Set end minute to: " + mTimeBlock.getEndTime().minute);
             }
-            Log.d(TAG, "Set start hour to: " + mStartHour);
-        } else if(parent.getId() == startMinute.getId()){
-            mStartMinute = Integer.parseInt(startMinute.getSelectedItem().toString());
-            Log.d(TAG, "Set start minute to: " + mStartMinute);
-        } else if(parent.getId() == endHour.getId()){
-            mEndHour = Integer.parseInt(endHour.getSelectedItem().toString());
-
-            if(mEndHour == 12) mEndHour = 0;
-
-            if(!mEndAM){
-                mEndHour += 12;
-            }
-            Log.d(TAG, "Set end hour to: " + mEndHour);
-        } else if(parent.getId() == endMinute.getId()){
-            mEndMinute = Integer.parseInt(endMinute.getSelectedItem().toString());
-            Log.d(TAG, "Set end minute to: " + mEndMinute);
         }
     }
 
@@ -428,26 +411,43 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
     }
 
     public void onDayClicked(View v){
-        for(ImageButton b : mDayButtons){
-            if(b.getId() != v.getId()){
-                b.setBackground(getContext().getDrawable(R.drawable.circle_button));
-            }
+        final int vId = v.getId();
+        TimeBlock.day day;
+
+        if(vId == mMondayButton.getId()){
+            day = MONDAY;
+        } else if(vId == mTuesdayButton.getId()){
+            day = TUESDAY;
+        } else if(vId == mWednesdayButton.getId()){
+            day = WEDNESDAY;
+        } else if(vId == mThursdayButton.getId()){
+            day = THURSDAY;
+        } else if(vId == mFridayButton.getId()){
+            day = FRIDAY;
+        } else if(vId == mSaturdayButton.getId()){
+            day = SATURDAY;
+        } else {
+            day = SUNDAY;
         }
-        ((ImageButton)v).setBackground(getContext().getDrawable(R.drawable.circle_button_active));
-        if(v.getId() == mMondayButton.getId()){
-            mDay = TimeBlock.day.MONDAY;
-        } else if(v.getId() == mTuesdayButton.getId()){
-            mDay = TimeBlock.day.TUESDAY;
-        } else if(v.getId() == mWednesdayButton.getId()){
-            mDay = TimeBlock.day.WEDNESDAY;
-        } else if(v.getId() == mThursdayButton.getId()){
-            mDay = TimeBlock.day.THURSDAY;
-        } else if(v.getId() == mFridayButton.getId()){
-            mDay = TimeBlock.day.FRIDAY;
-        } else if(v.getId() == mSaturdayButton.getId()){
-            mDay = TimeBlock.day.SATURDAY;
-        } else if(v.getId() == mSundayButton.getId()){
-            mDay = TimeBlock.day.SUNDAY;
+
+        if(mTimeBlock.hasDay(day)){
+            mTimeBlock.removeDay(day);
+            setButton((ImageButton)v, false);
+        } else {
+            mTimeBlock.addDay(day);
+            setButton((ImageButton) v, true);
         }
+    }
+
+    private void setButton(ImageButton v, boolean active) {
+        if(active){
+            v.setBackground(getContext().getDrawable(R.drawable.circle_button_active));
+        } else {
+            v.setBackground(getContext().getDrawable(R.drawable.circle_button));
+        }
+    }
+
+    public int getScheduleId(){
+        return mSchedule.getId();
     }
 }

@@ -245,6 +245,8 @@
     <string name="usage_access_service_explanation">"For the the app to work you need to enable the Usage Access Permission. Enable it now?"</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="default_notification_title">Default Notification</string>
+    <string name="default_notification_description">This is a notifications, and it notifies you of things.</string>
     <string name="notification_permissions_title">Allow Notification Access</string>
     <string name="usage_permissions_title">Allow Usage Access</string>
     <string name="deny">Deny</string>

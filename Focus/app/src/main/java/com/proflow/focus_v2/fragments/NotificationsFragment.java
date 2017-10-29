@@ -3,7 +3,7 @@ package com.proflow.focus_v2.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.widget.RecyclerView;
+import android.view.FocusFinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +13,9 @@ import android.widget.ListView;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.NotificationAdapter;
 import com.proflow.focus_v2.data.Global;
-import com.proflow.focus_v2.models.Notification;
+import com.proflow.focus_v2.models.FocusNotification;
+
+import java.util.Vector;
 
 public class NotificationsFragment extends BaseFragment {
     public NotificationsFragment() {
@@ -50,17 +52,11 @@ public class NotificationsFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_notifications, container, false);
 
+        resetToolbar();
         //Global view assignment
         notificationRecyclerView = layout.findViewById(R.id.notification_recycler_view);
         expandMenuButton = largerMenuButton;
         clearButton = clearNotificationsButton;
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getContext())
-                        .setSmallIcon(R.drawable.circle_button_active)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
-        Global.getInstance().addNotification(getContext(), new Notification(mBuilder.build(), null));
 
         //TODO Implement NotificationListView
         mAdapter = new NotificationAdapter(getContext());
@@ -70,10 +66,12 @@ public class NotificationsFragment extends BaseFragment {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO Clear notifications (Likely just a clear of the global object, however that's implemented)
+                mAdapter.clearAll();
             }
         });
 
+        //TODO
+        expandMenuButton.setVisibility(View.GONE);
         expandMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
