@@ -137,7 +137,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             if(mTimer){
                 holder.checkBox.setChecked(false);
             } else {
-                holder.checkBox.setChecked(mSchedule.getProfiles().contains(currentProfile));
+                for(Profile p : mSchedule.getProfiles()){
+                    if(p.getId() == currentProfile.getId()){
+                        holder.checkBox.setChecked(true);
+                        break;
+                    }
+                }
             }
             holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

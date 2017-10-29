@@ -24,6 +24,8 @@ import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.fragments.BaseFragment;
+import com.proflow.focus_v2.fragments.CreateScheduleFragment;
+import com.proflow.focus_v2.fragments.CreateTimeBlockFragment;
 import com.proflow.focus_v2.fragments.NotificationsFragment;
 import com.proflow.focus_v2.fragments.ProfilesFragment;
 import com.proflow.focus_v2.fragments.SchedulesFragment;
@@ -218,9 +220,9 @@ public class MainActivity extends AppCompatActivity {
         Global.getInstance().synchAll(getApplicationContext());
 
         //FOR DEBUGGING - note done after apps.
-        if(debug) {
-            populateFakeData();
-        }
+//        if(debug) {
+//            populateFakeData();
+//        }
     }
 
     private void populateFakeData() {
@@ -295,15 +297,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
         Fragment frag = getSupportFragmentManager().findFragmentById(R.id.Main_Frame);
 
-        if(frag == notificationsFragment || frag == profilesFragment || frag == schedulesFragment
-                || frag == timersFragment){
-            ((BaseFragment) frag).resetToolbar();
-        }
+        if(frag instanceof CreateTimeBlockFragment){
+            int schedID = ((CreateTimeBlockFragment)frag).getScheduleId();
 
+            Bundle args = new Bundle();
+            args.putInt(getString(R.string.scheduleKey), schedID);
+
+            getSupportFragmentManager().popBackStack();
+
+            CreateScheduleFragment switchInto = CreateScheduleFragment.newInstance();
+            switchInto.setArguments(args);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.Main_Frame, switchInto);
+            ft.commit();
+        } else {
+
+            super.onBackPressed();
+
+            if (frag == notificationsFragment || frag == profilesFragment || frag == schedulesFragment
+                    || frag == timersFragment) {
+                ((BaseFragment) frag).resetToolbar();
+            }
+        }
     }
 
     public void switchContent(Fragment fragment) {

@@ -168,9 +168,12 @@ public class Schedule implements Serializable {
             GregorianCalendar gc = new GregorianCalendar();
             Log.d("Schedule", "IsActive");
             for (TimeBlock tb : mTimeBlocks) {
-                int calendarDay = TimeBlock.day.toInteger(tb.getDay()) + 1;
-                Log.d("Schedule", "calendarDay" + calendarDay);
-                if (calendarDay == gc.get(Calendar.DAY_OF_WEEK)) {
+
+                Vector<Integer> days = new Vector<>();
+                for(TimeBlock.day d : tb.getDays()){
+                    days.add(TimeBlock.day.toInteger(d) + 1);
+                }
+                if(days.contains(gc.get(Calendar.DAY_OF_WEEK))) {
                     time ct = new time(gc.get(Calendar.HOUR_OF_DAY), gc.get(Calendar.MINUTE));
                     if (ct.isBetween(tb.getStartTime(), tb.getEndTime())) {
                         return true;

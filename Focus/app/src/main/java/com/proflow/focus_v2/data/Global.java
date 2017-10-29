@@ -13,6 +13,8 @@ import com.proflow.focus_v2.models.TimeBlock;
 import com.proflow.focus_v2.models.time;
 import com.proflow.focus_v2.models.Notification;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -365,13 +367,23 @@ public class Global {
                 int endHour = sp.getInt(id + "_timeBlock_" + j + "_endHour", 0);
                 int endMinute = sp.getInt(id + "_timeBlock_" + j + "_endMinute", 0);
 
-                int dayInt = sp.getInt(id + "_timeBlock_" + j + "_dayInt", 0);
+                ArrayList<String> dayIntStrings =
+                        new ArrayList<>(Arrays.asList(sp.getString(id + "_timeBlock_" + j + "_dayString", "").split("\\s*,\\s*")));
+
+                Vector<TimeBlock.day> days = new Vector<>();
+
+                for(String dayInt : dayIntStrings){
+                    if(!dayInt.isEmpty()) {
+                        int d = Integer.parseInt(dayInt);
+                        days.add(TimeBlock.day.fromInteger(d));
+                    }
+                }
 
                 timeBlocks.add(
                         new TimeBlock(
                                 new time(startHour, startMinute),
                                 new time(endHour, endMinute),
-                                TimeBlock.day.fromInteger(dayInt)
+                                days
                         )
                 );
             }
@@ -441,14 +453,20 @@ public class Global {
                 int startHour = tb.getStartTime().hour;
                 int startMinute = tb.getStartTime().minute;
                 int endHour = tb.getEndTime().hour;
-                int endMinute = tb.getEndTime().hour;
+                int endMinute = tb.getEndTime().minute;
 
                 editor.putInt(id + "_timeBlock_" + i + "_startHour", startHour);
                 editor.putInt(id + "_timeBlock_" + i + "_startMinute", startMinute);
                 editor.putInt(id + "_timeBlock_" + i + "_endHour", endHour);
                 editor.putInt(id + "_timeBlock_" + i + "_endMinute", endMinute);
 
-                editor.putInt(id + "_timeBlock_" + i + "_dayInt", TimeBlock.day.toInteger(tb.getDay()));
+                StringBuilder sb = new StringBuilder();
+                for(TimeBlock.day day : tb.getDays()){
+                    sb.append(TimeBlock.day.toInteger(day)).append(",");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+
+                editor.putString(id + "_timeBlock_" + i + "_dayString", sb.toString());
             }
             editor.commit();
         }
@@ -484,12 +502,15 @@ public class Global {
 
     public Boolean modifySchedule(Context context, Schedule s) {
 
+        Log.d(TAG, "Modifying Schedule:" + s.getName());
+
         Vector<Schedule> allSchedules = getSchedules(context);
         boolean found = false;
 
+        Log.d(TAG, "Number of schedules to check in modifySchedule: " + allSchedules.size());
         for (int i = 0; i < allSchedules.size(); i++) {
-            if (allSchedules.get(i).getId() == s.getId()) {
-
+            if (allSchedules.get(i).getId().equals(s.getId())) {
+                Log.d(TAG, "Found schedule: " + s.getName() + " ID: " + s.getId());
                 //Note - you HAVE to pass in a COPY of the Schedule you modified for this to work.
                 //This is due to ID matching, and allows you to change the name.
                 //FURTHER: Note that the profile's id doesn't change.
@@ -502,6 +523,9 @@ public class Global {
                 break;
             }
         }
+        if(!found){
+            Log.d(TAG, "Schedule not found: " + s.getName() + " ID: " + s.getId());
+        }
 
         return found;
     }
@@ -512,7 +536,7 @@ public class Global {
         boolean found = false;
 
         for (int i = 0; i < allSchedules.size(); i++) {
-            if (allSchedules.get(i).getId() == id) {
+            if (allSchedules.get(i).getId().equals(id)) {
 
                 //Note - you HAVE to pass in a COPY of the profile you modified for this to work.
                 //This is due to ID matching, and allows you to change the name.
@@ -743,11 +767,13 @@ public class Global {
                 context.getSharedPreferences(apps_file_name, 0).getStringSet(apps_file_name, null);
 
 //        Log.d(TAG, "synchApps: Raw set has " + appNameSet.size() + " entries.");
-        for (String s : appNameSet) {
-            try {
-                packageList.add(context.getPackageManager().getPackageInfo(s, 0));
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
+        if(appNameSet != null) {
+            for (String s : appNameSet) {
+                try {
+                    packageList.add(context.getPackageManager().getPackageInfo(s, 0));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -825,5 +851,49 @@ public class Global {
     public void synchNotifications(Context context) {
         //TODO read in Notifications from SP
 
+    }
+
+    public boolean appIsBlocked(Context context, String packageName) {
+        Vector<PackageInfo> activeApps = new Vector<>();
+
+        Log.d("NBL", "looking for: " + packageName);
+
+        Vector<Profile> profiles = getAllProfiles(context);
+        Vector<Schedule> schedules = getSchedules(context);
+        Vector<FocusTimer> timers = getTimers(context);
+
+        //Do this first cause it should be relatively quick.
+        for(FocusTimer t : timers){
+            if(!t.isPaused()){
+                for(String pName : t.getApps()){
+                    if(pName.compareToIgnoreCase(packageName) == 0){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        for(Profile p : profiles){
+            if(p.isActive()){
+                activeApps.addAll(p.getApps());
+            }
+        }
+
+        for(Schedule s: schedules){
+            if(s.isBlocking()){
+                for(Profile p : s.getProfiles()){
+                    activeApps.addAll(p.getApps());
+                }
+            }
+        }
+
+        for(PackageInfo pi : activeApps){
+            Log.d("NBL", "Found: " + pi.packageName);
+            if(pi.packageName.compareToIgnoreCase(packageName) == 0){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

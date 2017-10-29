@@ -73,6 +73,8 @@ public class CreateScheduleFragment extends BaseFragment {
                 Log.d(TAG, "Attempting to get Schedule by ID");
                 int schedID = getArguments().getInt(getString(R.string.scheduleKey));
                 mSchedule = Global.getInstance().getScheduleById(schedID);
+                Log.d(TAG, "Schedule Stats: Num TimeBlocks: " + mSchedule.getTimeBlocks().size()
+                + " RepeatWeekly: " + mSchedule.repeatWeekly() + " Num Profiles: " + mSchedule.getProfiles().size());
             }
             if(getArguments().containsKey(getString(R.string.schedule_is_new))){
                 mIsNew = getArguments().getBoolean(getString(R.string.schedule_is_new));
@@ -89,7 +91,9 @@ public class CreateScheduleFragment extends BaseFragment {
         mTimeBlockList = layout.findViewById(R.id.schedule_time_block_list_view);
 
         mRepeatWeeklyButton = layout.findViewById(R.id.schedule_repeat_weekly_radio);
-        mRepeatWeeklyButton.setChecked(mSchedule.repeatWeekly());
+        if(mSchedule != null){
+            mRepeatWeeklyButton.setChecked(mSchedule.repeatWeekly());
+        }
 
         mTimeBlockAdapter = new TimeBlockAdapter(getContext(), mSchedule);
         Button footer = layout.findViewById(R.id.schedule_add_time_block);
@@ -110,6 +114,7 @@ public class CreateScheduleFragment extends BaseFragment {
                 frag.setArguments(args);
                 FragmentTransaction ft = ((MainActivity)getActivity()).getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.Main_Frame, frag);
+                ft.addToBackStack(null);
                 ft.commit();
             }
         });
@@ -146,7 +151,7 @@ public class CreateScheduleFragment extends BaseFragment {
 
                     //tell schedule to modify sched if it exists, and if not - add it.
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
-
+                    Global.getInstance().synchAll(getContext());
                     getActivity().onBackPressed();
                 }
             }

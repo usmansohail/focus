@@ -25,8 +25,7 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
-        <service android:name=".services.AppBlocker" android:enabled="true" android:exported="false"
-            android:permission="android.permission.GET_TASKS">
+        <service android:name=".services.AppBlocker" android:enabled="true" android:exported="false">
         </service>
         <receiver android:name=".services.RestartServiceReceiver" >
             <intent-filter>

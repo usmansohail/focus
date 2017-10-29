@@ -10,6 +10,7 @@ import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
 import com.proflow.focus_v2.data.Global;
+import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.Notification;
@@ -41,7 +42,7 @@ public class NotificationBlockerListener extends NotificationListenerService{
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn){
-        if(appIsBlocked(sbn.getPackageName())) {
+        if(Global.getInstance().appIsBlocked(getApplicationContext(), sbn.getPackageName())) {
             cancelNotification(sbn.getKey());
             Vector<Profile> profiles = getNotificationProfiles();
             Notification notification = new Notification(sbn.getNotification(), profiles);
@@ -50,39 +51,7 @@ public class NotificationBlockerListener extends NotificationListenerService{
         }
     }
 
-    private boolean appIsBlocked(String packageName) {
-        Vector<PackageInfo> activeApps = new Vector<>();
 
-        Log.d("NBL", "looking for: " + packageName);
-
-        Vector<Profile> profiles = Global.getInstance().getAllProfiles(getApplicationContext());
-        Vector<Schedule> schedules = Global.getInstance().getSchedules(getApplicationContext());
-
-        for(Profile p : profiles){
-            if(p.isActive()){
-                activeApps.addAll(p.getApps());
-            }
-        }
-
-        for(Schedule s: schedules){
-            if(s.isBlocking()){
-                for(Profile p : s.getProfiles()){
-                    activeApps.addAll(p.getApps());
-                }
-            }
-        }
-
-        //todo timers
-
-        for(PackageInfo pi : activeApps){
-            Log.d("NBL", "Found: " + pi.packageName);
-            if(pi.packageName.compareToIgnoreCase(packageName) == 0){
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private Vector<Profile> getNotificationProfiles(){
         //will return a vector of active profiles this app is in

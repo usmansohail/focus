@@ -30,7 +30,7 @@ public class FocusTimer {
 
     private boolean paused = true;
 
-    static Timer mTimer = new Timer(true);
+    Timer mTimer = new Timer(true);
 
     public int mPeriod = 1000;
 

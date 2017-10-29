@@ -62,10 +62,9 @@ public class SchedulesFragment extends BaseFragment {
         addScheduleButton = addItemButton;
 
         Log.d("SchedulesFragment", "starting global getSchedules");
-        schedules = Global.getInstance().getSchedules(getActivity());
 
         Log.d("SchedulesFragment", "Creating new Schedule Adapter");
-        mAdapter = new ScheduleAdapter(getActivity(), schedules);
+        mAdapter = new ScheduleAdapter(getActivity());
         // attach the adapter to the expandable list view
         scheduleListView.setAdapter(mAdapter);
 
