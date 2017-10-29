@@ -19,6 +19,8 @@ import java.util.Vector;
 
 public class Schedule implements Serializable {
 
+    private static final String TAG = "Schedule";
+
     private String mName;
     private Vector<TimeBlock> mTimeBlocks;
     private Vector<Profile> mProfiles = new Vector<>();
@@ -136,6 +138,11 @@ public class Schedule implements Serializable {
         id = Global.getInstance().getUniqueScheduleID();
     }
 
+    public void setActive(boolean active){
+        isActive = active;
+    }
+
+
     /*
      GETTERS
      */
@@ -166,21 +173,34 @@ public class Schedule implements Serializable {
     public boolean isBlocking() {
         if(isActive) {
             GregorianCalendar gc = new GregorianCalendar();
-            Log.d("Schedule", "IsActive");
+            Log.d(TAG, getName() + ": IsActive");
             for (TimeBlock tb : mTimeBlocks) {
 
                 Vector<Integer> days = new Vector<>();
                 for(TimeBlock.day d : tb.getDays()){
-                    days.add(TimeBlock.day.toInteger(d) + 1);
+                    int dayInt =TimeBlock.day.toInteger(d) + 1;
+                    days.add(dayInt);
+                    Log.d(TAG, "Added " + dayInt);
                 }
-                if(days.contains(gc.get(Calendar.DAY_OF_WEEK))) {
-                    time ct = new time(gc.get(Calendar.HOUR_OF_DAY), gc.get(Calendar.MINUTE));
+                int gcDay = gc.get(Calendar.DAY_OF_WEEK);
+
+                Log.d(TAG, "Looking for gcDay: " + gcDay);
+
+                if(days.contains(gcDay)) {
+                    int currentHour = gc.get(Calendar.HOUR_OF_DAY);
+                    int currentMinute = gc.get(Calendar.MINUTE);
+
+                    Log.d(TAG, "CurrentHour: " + currentHour + " CurrentMinute: " + currentMinute);
+
+                    time ct = new time(currentHour, currentMinute);
                     if (ct.isBetween(tb.getStartTime(), tb.getEndTime())) {
+                        Log.d(TAG, "Block Notification!");
                         return true;
                     }
                 }
             }
         }
+        Log.d(TAG, "DONT Block Notification!");
         return false;
     }
 }

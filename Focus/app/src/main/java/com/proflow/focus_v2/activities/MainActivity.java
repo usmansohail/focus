@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.proflow.focus_v2.R;
@@ -309,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
 
             CreateScheduleFragment switchInto = CreateScheduleFragment.newInstance();
             switchInto.setArguments(args);
+
+            bottomBar.setVisibility(View.VISIBLE);
 
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.Main_Frame, switchInto);

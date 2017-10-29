@@ -143,6 +143,10 @@ public class CreateScheduleFragment extends BaseFragment {
                     Boolean repeat = mRepeatWeeklyButton.isSelected();
                     Vector<Profile> checkedProfiles = mProfileAdapter.getCheckedProfiles();
 
+                    for(int i = 0; i < checkedProfiles.size(); i++){
+                        Log.d(TAG, "Adding profile \"" + checkedProfiles.get(i).getName() + "\" to schedule");
+                    }
+
                     //Set associated values in sched
                     mSchedule.setProfiles(checkedProfiles);
                     mSchedule.setName(scheduleName);

@@ -57,6 +57,8 @@ public class SchedulesFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_schedules, container, false);
 
+        resetToolbar();
+
         //instantiate global views
         scheduleListView = layout.findViewById(R.id.schedule_list_view);
         addScheduleButton = addItemButton;

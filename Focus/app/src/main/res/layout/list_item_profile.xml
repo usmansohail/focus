@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:buttonTint="@android:color/white"
-            android:checked="true" />
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/profile_list_title"

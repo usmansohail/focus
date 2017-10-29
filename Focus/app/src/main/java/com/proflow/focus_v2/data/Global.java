@@ -11,7 +11,7 @@ import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.proflow.focus_v2.models.time;
-import com.proflow.focus_v2.models.Notification;
+import com.proflow.focus_v2.models.FocusNotification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +37,7 @@ public class Global {
     public static final String profiles_file_name = "PROFILES";
     public static final String schedules_file_name = "SCHEDULES";
     public static final String timers_file_name = "TIMERS";
+    public static final String notifications_file_name = "NOTIFICATIONS";
 
     public void clearPreferences(Context context) {
         context.getSharedPreferences(apps_file_name, 0).edit().clear().commit();
@@ -48,7 +49,7 @@ public class Global {
     private static Vector<Profile> profileList = new Vector<>();
     private static Vector<Schedule> scheduleList = new Vector<>();
     private static Vector<FocusTimer> timerList = new Vector<>();
-    private static Vector<Notification> notifications = new Vector<>();
+    private static Vector<FocusNotification> notifications = new Vector<>();
 
     private Global() {
     }
@@ -76,7 +77,7 @@ public class Global {
         timersValid = false;
     }
 
-    public void invalidateNotifications() {
+    public void invalidateFocusNotifications() {
         notificationsValid = false;
     }
 
@@ -100,7 +101,7 @@ public class Global {
             synchTimers(context);
         }
         if (!notificationsValid) {
-            synchNotifications(context);
+            synchFocusNotifications(context);
         }
     }
 
@@ -119,6 +120,7 @@ public class Global {
             profileIDs.add(id);
 
             SharedPreferences.Editor editor = sp.edit();
+            editor.clear();
             editor.putBoolean("" + id + "_isActive", p.isActive());
             editor.putString("" + id + "_name", p.getName());
 
@@ -337,25 +339,13 @@ public class Global {
 
             int numProfiles = sp.getInt(id + "_numProfiles", 0);
             for (int j = 0; j < numProfiles; j++) {
-                //So once again, grab dos primatives.
-                boolean pIsActive = sp.getBoolean(id + "_profile_" + j + "_isActive", false);
-                String pName = sp.getString(id + "_profile_" + j + "_name", null);
-                int pId = sp.getInt(id + "_profile_" + j + "_id", 0);
 
-                Vector<PackageInfo> pApps = new Vector<>();
+                int pID = sp.getInt(id + "_profile_" + j, 0);
+                boolean pIsActive = sp.getBoolean(id + "_profile_" + pID + "_isActive", false);
 
-                int numApps = sp.getInt(id + "_profile_" + j + "_size", 0);
-                for (int k = 0; k < numApps; k++) {
-                    String aName = sp.getString(id + "_profile_" + j + "_app_" + k, null);
-                    try {
-                        pApps.add(pm.getPackageInfo(aName, 0));
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
+                Profile p = getProfileByID(context, pID);
+                Log.d(TAG, "Found profile: " + p.getId() + " while populating schedule " + sName);
 
-                Profile p = new Profile(pName, pApps, pId);
-                p.setActive(pIsActive);
                 sProfiles.add(p);
             }
             //Now on to reconstructing timeblocks!
@@ -389,6 +379,8 @@ public class Global {
             }
 
             Schedule schedule = new Schedule(sName, timeBlocks, sProfiles, sRepeat, id);
+            schedule.setActive(sIsActive);
+
             allSchedules.add(schedule);
         }
         scheduleList = allSchedules;
@@ -412,6 +404,7 @@ public class Global {
             scheduleIDs.add(id);
             //open editor
             SharedPreferences.Editor editor = sp.edit();
+            editor.clear();
             //put primitives in sp associated with id:
             editor.putString(id + "_name", schedule.getName());
             editor.putBoolean(id + "_repeatWeekly", schedule.repeatWeekly());
@@ -426,20 +419,9 @@ public class Global {
             editor.putInt(id + "_numProfiles", numProfiles);
             for (int i = 0; i < numProfiles; i++) {
                 Profile p = sProfiles.get(i);
-
-                editor.putBoolean(id + "_profile_" + i + "_isActive", p.isActive());
-                editor.putString(id + "_profile_" + i + "_name", p.getName());
-
-                //Store the number of apps associated with the profile (Holy shit...)
-                editor.putInt(id + "_profile_" + i + "_size", p.getApps().size());
-                editor.putInt(id + "_profile_" + i + "_id", p.getId());
-
-                //And then: this schedule (id)'s profile(i)'s app (j)
-                //Hoe - Lee - Shyt
-                for (int j = 0; i < p.getApps().size(); i++) {
-                    String name = p.getApps().get(i).packageName;
-                    editor.putString(id + "_profile_" + i + "_app_" + j, name);
-                }
+                int pID = p.getId();
+                editor.putInt(id + "_profile_" + i, pID);
+                editor.putBoolean(id + "_profile_" + pID + "_isActive", p.isActive());
             }
 
             //BUT WAIT THERE'S MORE!
@@ -631,25 +613,8 @@ public class Global {
 
             int numProfiles = sp.getInt(id + "_numProfiles", 0);
             for (int j = 0; j < numProfiles; j++) {
-                //So once again, grab dos primatives.
-                boolean pIsActive = sp.getBoolean(id + "_profile_" + j + "_isActive", false);
-                String pName = sp.getString(id + "_profile_" + j + "_name", null);
-                int pId = sp.getInt(id + "_profile_" + j + "_id", 0);
-
-                Vector<PackageInfo> pApps = new Vector<>();
-
-                int numApps = sp.getInt(id + "_profile_" + j + "_size", 0);
-                for (int k = 0; k < numApps; k++) {
-                    String aName = sp.getString(id + "_profile_" + j + "_app_" + k, null);
-                    try {
-                        pApps.add(pm.getPackageInfo(aName, 0));
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                Profile p = new Profile(pName, pApps, pId);
-                p.setActive(pIsActive);
+                int profileID = sp.getInt(id + "_profile_" + j, 0);
+                Profile p = getProfileByID(context, profileID);
                 tProfiles.add(p);
             }
 
@@ -686,13 +651,13 @@ public class Global {
     public void setTimers(Context context, Vector<FocusTimer> timers) {
         SharedPreferences sp = context.getSharedPreferences(timers_file_name, 0);
         Vector<Integer> timerIDs = new Vector<>();
-
         for (FocusTimer t : timers) {
             //store ids so we can write a list of ids
             int id = t.getId();
             timerIDs.add(id);
             //open editor
             SharedPreferences.Editor editor = sp.edit();
+            editor.clear();
             //put primitives in sp associated with id:
             editor.putString(id + "_name", t.getName());
             editor.putLong(id + "_currentDuration", t.getCurrentDuration());
@@ -709,20 +674,7 @@ public class Global {
             editor.putInt(id + "_numProfiles", numProfiles);
             for (int i = 0; i < numProfiles; i++) {
                 Profile p = tProfiles.get(i);
-
-                editor.putBoolean(id + "_profile_" + i + "_isActive", p.isActive());
-                editor.putString(id + "_profile_" + i + "_name", p.getName());
-
-                //Store the number of apps associated with the profile (Holy shit...)
-                editor.putInt(id + "_profile_" + i + "_size", p.getApps().size());
-                editor.putInt(id + "_profile_" + i + "_id", p.getId());
-
-                //And then: this timer (id)'s profile(i)'s app (j)
-                //Hoe - Lee - Shyt
-                for (int j = 0; i < p.getApps().size(); i++) {
-                    String name = p.getApps().get(i).packageName;
-                    editor.putString(id + "_profile_" + i + "_app_" + j, name);
-                }
+                editor.putInt(id + "_profile_" + i, p.getId());
             }
             editor.commit();
         }
@@ -765,6 +717,8 @@ public class Global {
 
         Set<String> appNameSet =
                 context.getSharedPreferences(apps_file_name, 0).getStringSet(apps_file_name, null);
+
+        packageList.clear();
 
 //        Log.d(TAG, "synchApps: Raw set has " + appNameSet.size() + " entries.");
         if(appNameSet != null) {
@@ -814,43 +768,73 @@ public class Global {
     NOTIFICATIONS
     */
 
-    public Boolean addNotification(Context context, Notification notification) {
-        Vector<Notification> nots = getNotifications(context);
+    public Boolean addFocusNotification(Context context, FocusNotification notification) {
+        Vector<FocusNotification> nots = getFocusNotifications(context);
         if (nots.add(notification)) {
-            setNotifications(context, nots);
+            setFocusNotifications(context, nots);
             return true;
         } else {
             return false;
         }
     }
 
-    public Boolean removeNotification(Context context, Notification notification) {
-        Vector<Notification> nots = getNotifications(context);
-        if (nots.remove(notification)) {
-            setNotifications(context, nots);
-            return true;
-        } else {
-            return false;
+    public Boolean removeFocusNotification(Context context, FocusNotification notification) {
+        Vector<FocusNotification> nots = getFocusNotifications(context);
+
+        for(FocusNotification fn : nots){
+            if(fn.getDescription().compareToIgnoreCase(notification.getDescription()) == 0){
+                nots.remove(fn);
+                return true;
+            }
         }
+        return false;
     }
 
-    public Vector<Notification> getNotifications(Context context) {
+    public Vector<FocusNotification> getFocusNotifications(Context context) {
         if (!notificationsValid) {
-            //todo getNotifications from SP
-            return notifications;
-        } else {
-            return notifications;
+            Log.d(TAG, "getFocusNotifications: notes invalid - begining synch");
+            synchApps(context);
         }
+        Log.d(TAG, "getFocusNotifications: returning notes. numApps: " + notifications.size());
+        return notifications;
     }
 
-    public void setNotifications(Context context, Vector<Notification> notifications) {
-        //TODO write notifications to SP
-        invalidateNotifications();
+    public void setFocusNotifications(Context context, Vector<FocusNotification> notifications) {
+
+        int numNotes = notifications.size();
+        SharedPreferences sp = context.getSharedPreferences(notifications_file_name, 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.clear();
+        editor.putInt("numNotifications", numNotes);
+        for(int i = 0; i < numNotes; i++){
+            FocusNotification currentNotification = notifications.get(i);
+
+            editor.putString(i+"_packageName", currentNotification.getPackageName());
+            editor.putString(i + "_description", currentNotification.getDescription());
+            editor.putString(i+"_name", currentNotification.getName());
+        }
+
+        editor.commit();
+
+        invalidateFocusNotifications();
     }
 
-    public void synchNotifications(Context context) {
-        //TODO read in Notifications from SP
+    public void synchFocusNotifications(Context context) {
 
+        SharedPreferences sp = context.getSharedPreferences(notifications_file_name, 0);
+
+        notifications.clear();
+
+        int numNotes = sp.getInt("numNotifications", 0);
+        for(int i = 0; i < numNotes; i++){
+            String notePackage = sp.getString(i+"_packageName", null);
+            String noteDescription = sp.getString(i+"_description", null);
+            String noteName = sp.getString(i+"_name", null);
+
+            notifications.add(new FocusNotification(notePackage, noteName, noteDescription));
+        }
+
+        notificationsValid = true;
     }
 
     public boolean appIsBlocked(Context context, String packageName) {
@@ -881,7 +865,9 @@ public class Global {
 
         for(Schedule s: schedules){
             if(s.isBlocking()){
+                Log.d(TAG, "Blocking. Num Profiles:" + s.getProfiles().size());
                 for(Profile p : s.getProfiles()){
+                    Log.d(TAG, "Adding apps from profile: " + p.getName());
                     activeApps.addAll(p.getApps());
                 }
             }
@@ -895,5 +881,9 @@ public class Global {
         }
 
         return false;
+    }
+
+    public void clearNotifications(Context context) {
+        context.getSharedPreferences(notifications_file_name,0).edit().clear().commit();
     }
 }

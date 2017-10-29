@@ -2,6 +2,7 @@ package com.proflow.focus_v2.adapters;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -28,6 +29,8 @@ import java.util.Vector;
  */
 
 public class ScheduleAdapter extends BaseAdapter {
+
+    private static final String TAG = "ScheduleAdapter";
 
     Context mContext;
 
@@ -91,6 +94,7 @@ public class ScheduleAdapter extends BaseAdapter {
         SwitchCompat activeSwitch = view.findViewById(R.id.schedule_active_switch);
 
         activeSwitch.setChecked(currentSchedule.isActive());
+        Log.d(TAG, "Set active switch to: " + currentSchedule.isActive());
         activeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

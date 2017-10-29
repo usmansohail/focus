@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
+import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.fragments.ModifyProfileFragment;
 import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
