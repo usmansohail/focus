@@ -56,6 +56,7 @@ public class ProfilesFragment extends BaseFragment {
         View layout = inflater.inflate(R.layout.fragment_profiles, container, false);
         profilesRecyclerView = layout.findViewById(R.id.profile_recycler_view);
 
+        resetToolbar();
         //Gotta love the builtins for the BaseFragment
         addProfileButton = addItemButton;
         addProfileButton.setOnClickListener(new View.OnClickListener() {

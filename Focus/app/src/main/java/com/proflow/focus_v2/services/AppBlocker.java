@@ -21,6 +21,7 @@ import android.os.Process;
 import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.data.Global;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +45,11 @@ public class AppBlocker extends Service {
         @Override
         public synchronized void run() {
 
+            //Added global method for checking if app is blocked.
             String currentApp = getCurrentApp(getApplicationContext());
-            for(String blocked : mBlockedPackages){
-                if(blocked.equals(currentApp)){
-                    StartApplication(getApplicationContext(), getPackageName());
-                    BlockedApplicationAlert().show();
-                    break;
-                }
+            if(Global.getInstance().appIsBlocked(getApplicationContext(), currentApp)){
+                StartApplication(getApplicationContext(), getPackageName());
+                BlockedApplicationAlert().show();
             }
             mHandler.postDelayed(this, 300);
         }

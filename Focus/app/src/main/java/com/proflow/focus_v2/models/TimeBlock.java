@@ -57,16 +57,46 @@ public class TimeBlock implements Serializable {
             }
             return -1;
         }
+
+        //Technically shouldn't use strings b/c localization. Issue for later.
+        public String getShortString() {
+            switch(this){
+                case SUNDAY:
+                    return "Su";
+                case MONDAY:
+                    return "M";
+                case TUESDAY:
+                    return "T";
+                case WEDNESDAY:
+                    return "W";
+                case THURSDAY:
+                    return "Th";
+                case FRIDAY:
+                    return "F";
+                case SATURDAY:
+                    return "Sa";
+                default:
+                    return "NA?";
+            }
+        }
     }
 
-    time mStartTime;
-    time mEndTime;
-    day mDay;
+    private time mStartTime;
+    private time mEndTime;
+    private Vector<day> mDays;
 
+    @Deprecated
     public TimeBlock(time startTime, time endTime, day day){
         mStartTime = startTime;
         mEndTime = endTime;
-        mDay = day;
+        mDays = new Vector<>();
+        mDays.add(day);
+    }
+
+    public TimeBlock(time startTime, time endTime, Vector<day> day){
+        mStartTime = startTime;
+        mEndTime = endTime;
+        mDays = day;
     }
 
 
@@ -85,8 +115,8 @@ public class TimeBlock implements Serializable {
         }
     }
 
-    public void setDays(day Day) {
-        this.mDay = Day;
+    public void setDays(Vector<day> days) {
+        mDays = days;
     }
 
     /*
@@ -101,9 +131,15 @@ public class TimeBlock implements Serializable {
         return mEndTime;
     }
 
-    public day getDay() {
-        return mDay;
+    public boolean hasDay(day d){
+        return mDays.contains(d);
     }
+
+    public Vector<day> getDays(){
+        return mDays;
+    }
+
+
 
     /*
     COMPARATORS/OVERLOADS
@@ -123,22 +159,56 @@ public class TimeBlock implements Serializable {
         } else {
             TimeBlock other = (TimeBlock) obj;
 
-            return (other.getDay() == this.getDay())
-                    && other.getStartTime().equals(this.getStartTime())
-                    && other.getEndTime().equals(this.getEndTime());
+            for(day day : other.getDays()){
+                if(!mDays.contains(day)){
+                    return false;
+                }
+            }
+
+            return (other.getStartTime().equals(this.getStartTime())
+                    && other.getEndTime().equals(this.getEndTime()));
         }
     }
 
     public String getStartString() {
-        String ret = getDay().toString().substring(0,1) + getDay().toString().substring(1);
-        ret += " " + getStartTime().hour + ":" +getStartTime().minute;
+        StringBuilder sb = new StringBuilder();
 
-        return ret;
+        for(day day: getDays()){
+            sb.append(day.getShortString());
+            sb.append(", ");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(sb.length()-1);
+        sb.append(" " + getStartTime().toString());
+        return sb.toString();
     }
 
     public String getEndString(){
-        String ret = getDay().toString().substring(0,1) + getDay().toString().substring(1);
-        ret += " " + getEndTime().hour + ":" +getEndTime().minute;
-        return ret;
+        StringBuilder sb = new StringBuilder();
+
+        for(day day: getDays()){
+            sb.append(day.getShortString());
+            sb.append(", ");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(sb.length()-1);
+        sb.append(" " + getEndTime().toString());
+        return sb.toString();
+    }
+
+    //Returns false if the days vector doesn't contain the day, or if it fails to remove.
+    public boolean removeDay(day day){
+        if(mDays.contains(day)){
+            return mDays.remove(day);
+        }
+        return false;
+    }
+
+    //Returns false if the vector failed to add, or the day is already in the mDays vector
+    public boolean addDay(day day){
+        if(!mDays.contains(day)){
+            return mDays.add(day);
+        }
+        return false;
     }
 }
