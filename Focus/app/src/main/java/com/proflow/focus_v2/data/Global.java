@@ -120,7 +120,6 @@ public class Global {
             profileIDs.add(id);
 
             SharedPreferences.Editor editor = sp.edit();
-            editor.clear();
             editor.putBoolean("" + id + "_isActive", p.isActive());
             editor.putString("" + id + "_name", p.getName());
 
@@ -168,6 +167,9 @@ public class Global {
         for (int i = 0; i < profileIDSize; i++) {
             int id = profileIDs.get(i);
             String pName = sp.getString("" + id + "_name", "");
+
+            Log.d(TAG, "Found profile: " + pName);
+
             boolean pIsActive = sp.getBoolean("" + id + "_isActive", false);
             int numApps = sp.getInt("" + id + "_size", 0);
 
@@ -255,14 +257,28 @@ public class Global {
         return found;
     }
 
-    public boolean removeProfile(Context context, Profile profile) {
+    public boolean removeProfile(Context context, Profile p) {
+
         Vector<Profile> allProfiles = getAllProfiles(context);
-        if (allProfiles.remove(profile)) {
-            setProfiles(context, allProfiles);
-            return true;
-        } else {
-            return false;
+        boolean found = false;
+
+        for (int i = 0; i < allProfiles.size(); i++) {
+            if (allProfiles.get(i).getId() == p.getId()) {
+
+                //Note - you HAVE to pass in a COPY of the profile you modified for this to work.
+                //This is due to ID matching, and allows you to change the name.
+                //FURTHER: Note that the profile's id doesn't change.
+
+                Log.d(TAG, "FOUND PROFILE IN REMOVE PROFILE");
+
+                allProfiles.remove(i);
+                setProfiles(context, allProfiles);
+                found = true;
+                break;
+            }
         }
+
+        return found;
     }
 
     //This could almost certainly be optimized, but it works... So...
@@ -404,7 +420,6 @@ public class Global {
             scheduleIDs.add(id);
             //open editor
             SharedPreferences.Editor editor = sp.edit();
-            editor.clear();
             //put primitives in sp associated with id:
             editor.putString(id + "_name", schedule.getName());
             editor.putBoolean(id + "_repeatWeekly", schedule.repeatWeekly());

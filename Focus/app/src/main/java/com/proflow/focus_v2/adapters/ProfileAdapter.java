@@ -74,7 +74,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     public ProfileAdapter(List<Profile> profiles, Context context){
         mContext = context;
-        this.mProfiles = profiles;
+        this.mProfiles = Global.getInstance().getAllProfiles(context);
     }
 
 

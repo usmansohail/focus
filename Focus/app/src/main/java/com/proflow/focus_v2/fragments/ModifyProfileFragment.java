@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.proflow.focus_v2.R;
@@ -21,13 +22,14 @@ import com.proflow.focus_v2.models.Profile;
 import java.util.Collections;
 import java.util.Vector;
 
-import static android.content.ContentValues.TAG;
-
 public class ModifyProfileFragment extends BaseFragment {
+
+    private static final String TAG = "ModifyProfileFragment";
 
     private AppAdapter mAdapter;
     private RecyclerView mAppRecyclerView;
     private EditText mProfileNameEditText;
+    private Button mDeleteProfileButton;
 
     public ModifyProfileFragment() {
         // Required empty public constructor
@@ -78,6 +80,14 @@ public class ModifyProfileFragment extends BaseFragment {
         mAppRecyclerView.setAdapter(mAdapter);
         mProfileNameEditText.setText(currentProfile.getName());
 
+        mDeleteProfileButton = layout.findViewById(R.id.create_profile_delete_button);
+        mDeleteProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Global.getInstance().removeProfile(getContext(), currentProfile);
+                getActivity().onBackPressed();
+            }
+        });
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
