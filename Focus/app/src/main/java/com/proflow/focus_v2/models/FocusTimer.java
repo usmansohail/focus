@@ -74,7 +74,8 @@ public class FocusTimer {
             }
         }, 0, mPeriod);
 
-        id = Global.getInstance().getUniqueTimerID();
+        //id = Global.getInstance().getUniqueTimerID();
+        this.id = id;
         mProfiles = timerProfiles;
     }
 
