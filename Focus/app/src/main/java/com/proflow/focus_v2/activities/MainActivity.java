@@ -1,8 +1,6 @@
 package com.proflow.focus_v2.activities;
 
-import android.Manifest;
 import android.app.AppOpsManager;
-import android.app.Notification;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,15 +9,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,12 +29,10 @@ import com.proflow.focus_v2.fragments.NotificationsFragment;
 import com.proflow.focus_v2.fragments.ProfilesFragment;
 import com.proflow.focus_v2.fragments.SchedulesFragment;
 import com.proflow.focus_v2.fragments.TimersFragment;
-import com.proflow.focus_v2.helpers.NotificationUtils;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.proflow.focus_v2.models.time;
-import com.proflow.focus_v2.services.AppBlocker;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -51,9 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
-
-import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
-import static android.app.AppOpsManager.MODE_ALLOWED;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,9 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
     private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
-    private static final String NOTIF_TEST = "test";
-    private AlertDialog enableNotificationListenerAlertDialog;
-
 
     public static Vector<PackageInfo> packageList1;
 
@@ -199,26 +184,6 @@ public class MainActivity extends AppCompatActivity {
         if(savedInstanceState == null){
             currentFragment = null;
         }
-
-//        Button buttonIos = (Button) findViewById(R.id.notif_test);
-//        buttonIos.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                new CountDownTimer(10000, 1000) {
-//
-//                    public void onTick(long millisUntilFinished) {
-//                        //mTextField.setText("seconds remaining: " + millisUntilFinished / 1000);
-//                    }
-//
-//                    public void onFinish() {
-//                        mNotificationUtils = new NotificationUtils(MainActivity.this);
-//                        Notification.Builder nb = mNotificationUtils.
-//                                getNotification("TEST", "By " + "ALEXINA");
-//                        mNotificationUtils.notify(101, nb);
-//                    }
-//                }.start();
-//            }
-//        });
 
     }
 
