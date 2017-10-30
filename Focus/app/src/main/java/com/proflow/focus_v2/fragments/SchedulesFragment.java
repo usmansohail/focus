@@ -77,7 +77,7 @@ public class SchedulesFragment extends BaseFragment {
                 Fragment frag = CreateScheduleFragment.newInstance();
                 Bundle args = new Bundle();
                 Schedule sched =
-                        new Schedule("ScheduleName", new Vector<TimeBlock>(), false);
+                        new Schedule("", new Vector<TimeBlock>(), false);
                 Global.getInstance().addSchedule(getContext(), sched);
                 Global.getInstance().synchSchedules(getContext());
                 Log.d("SchedulesFragment", "Adding scheduleID: " + sched.getId() + " to args");
