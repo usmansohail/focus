@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,12 +30,15 @@ import java.util.zip.Inflater;
 
 public class TimeBlockAdapter extends BaseAdapter {
 
+    private static final String TAG = "TimeBlockAdapter";
+
     Context mContext;
     Schedule mSchedule;
 
     public TimeBlockAdapter(Context context, Schedule schedule){
         mContext = context;
         mSchedule = schedule;
+        Log.d(TAG, "STATS: NumTimeBlocks: " + mSchedule.getTimeBlocks().size());
     }
 
     @Override
@@ -55,6 +59,10 @@ public class TimeBlockAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         final TimeBlock timeBlock = mSchedule.getTimeBlocks().get(i);
+
+        Log.d(TAG, "TimeBlock " + i +
+                " stats: StartTime: " + timeBlock.getStartTime().hour + ":" + timeBlock.getStartTime().minute
+                + " EndTime: " + timeBlock.getEndTime().hour + ":" + timeBlock.getEndTime().minute);
 
         if(view == null){
             LayoutInflater inf = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -81,6 +89,7 @@ public class TimeBlockAdapter extends BaseAdapter {
                 frag.setArguments(args);
                 FragmentTransaction ft = ((MainActivity)mContext).getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.Main_Frame, frag);
+                ft.addToBackStack(null);
                 ft.commit();
             }
         });

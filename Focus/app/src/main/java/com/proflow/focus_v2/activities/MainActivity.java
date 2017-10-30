@@ -1,8 +1,6 @@
 package com.proflow.focus_v2.activities;
 
-import android.Manifest;
 import android.app.AppOpsManager;
-import android.app.Notification;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,19 +13,18 @@ import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.fragments.BaseFragment;
+import com.proflow.focus_v2.fragments.CreateScheduleFragment;
+import com.proflow.focus_v2.fragments.CreateTimeBlockFragment;
 import com.proflow.focus_v2.fragments.NotificationsFragment;
 import com.proflow.focus_v2.fragments.ProfilesFragment;
 import com.proflow.focus_v2.fragments.SchedulesFragment;
@@ -36,7 +33,6 @@ import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.proflow.focus_v2.models.time;
-import com.proflow.focus_v2.services.AppBlocker;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -46,9 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
-
-import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
-import static android.app.AppOpsManager.MODE_ALLOWED;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -66,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
     private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
-    private AlertDialog enableNotificationListenerAlertDialog;
-
 
     public static Vector<PackageInfo> packageList1;
 
@@ -222,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
         Global.getInstance().synchAll(getApplicationContext());
 
         //FOR DEBUGGING - note done after apps.
-        if(debug) {
-            populateFakeData();
-        }
+//        if(debug) {
+//            populateFakeData();
+//        }
     }
 
     private void populateFakeData() {
@@ -299,15 +290,33 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
         Fragment frag = getSupportFragmentManager().findFragmentById(R.id.Main_Frame);
 
-        if(frag == notificationsFragment || frag == profilesFragment || frag == schedulesFragment
-                || frag == timersFragment){
-            ((BaseFragment) frag).resetToolbar();
-        }
+        if(frag instanceof CreateTimeBlockFragment){
+            int schedID = ((CreateTimeBlockFragment)frag).getScheduleId();
 
+            Bundle args = new Bundle();
+            args.putInt(getString(R.string.scheduleKey), schedID);
+
+            getSupportFragmentManager().popBackStack();
+
+            CreateScheduleFragment switchInto = CreateScheduleFragment.newInstance();
+            switchInto.setArguments(args);
+
+            bottomBar.setVisibility(View.VISIBLE);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.Main_Frame, switchInto);
+            ft.commit();
+        } else {
+
+            super.onBackPressed();
+
+            if (frag == notificationsFragment || frag == profilesFragment || frag == schedulesFragment
+                    || frag == timersFragment) {
+                ((BaseFragment) frag).resetToolbar();
+            }
+        }
     }
 
     public void switchContent(Fragment fragment) {

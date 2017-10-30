@@ -13,7 +13,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name="com.proflow.focus_v2.activities.ContextActivity">
         <activity android:name="com.proflow.focus_v2.activities.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -29,6 +30,14 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+        <service android:name=".services.AppBlocker" android:enabled="true" android:exported="false">
+        </service>
+        <receiver android:name=".services.RestartServiceReceiver" >
+            <intent-filter>
+                <action android:name="YouWillNeverKillMe" >
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

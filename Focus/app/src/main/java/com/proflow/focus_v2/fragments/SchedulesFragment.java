@@ -57,15 +57,16 @@ public class SchedulesFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_schedules, container, false);
 
+        resetToolbar();
+
         //instantiate global views
         scheduleListView = layout.findViewById(R.id.schedule_list_view);
         addScheduleButton = addItemButton;
 
         Log.d("SchedulesFragment", "starting global getSchedules");
-        schedules = Global.getInstance().getSchedules(getActivity());
 
         Log.d("SchedulesFragment", "Creating new Schedule Adapter");
-        mAdapter = new ScheduleAdapter(getActivity(), schedules);
+        mAdapter = new ScheduleAdapter(getActivity());
         // attach the adapter to the expandable list view
         scheduleListView.setAdapter(mAdapter);
 
@@ -76,7 +77,7 @@ public class SchedulesFragment extends BaseFragment {
                 Fragment frag = CreateScheduleFragment.newInstance();
                 Bundle args = new Bundle();
                 Schedule sched =
-                        new Schedule("ScheduleName", new Vector<TimeBlock>(), false);
+                        new Schedule("", new Vector<TimeBlock>(), false);
                 Global.getInstance().addSchedule(getContext(), sched);
                 Global.getInstance().synchSchedules(getContext());
                 Log.d("SchedulesFragment", "Adding scheduleID: " + sched.getId() + " to args");

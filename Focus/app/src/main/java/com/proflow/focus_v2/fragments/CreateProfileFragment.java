@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.proflow.focus_v2.R;
@@ -28,6 +29,7 @@ public class CreateProfileFragment extends BaseFragment {
     private AppAdapter mAdapter;
     private RecyclerView mAppRecyclerView;
     private EditText mProfileNameEditText;
+    private Button mDeleteButton;
 
     public CreateProfileFragment() {
         // Required empty public constructor
@@ -58,6 +60,8 @@ public class CreateProfileFragment extends BaseFragment {
 
         mAppRecyclerView = layout.findViewById(R.id.create_profile_recycler_view);
         mProfileNameEditText = layout.findViewById(R.id.profile_name_edit_text);
+        mDeleteButton = layout.findViewById(R.id.create_profile_delete_button);
+        mDeleteButton.setVisibility(View.GONE);
 
         Vector<PackageInfo> apps = Global.getInstance().getAllApps(getContext());
 

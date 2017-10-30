@@ -2,6 +2,7 @@ package com.proflow.focus_v2.adapters;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
+import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.fragments.CreateScheduleFragment;
 import com.proflow.focus_v2.models.Schedule;
 
@@ -28,22 +30,22 @@ import java.util.Vector;
 
 public class ScheduleAdapter extends BaseAdapter {
 
-    Vector<Schedule> mSchedules;
+    private static final String TAG = "ScheduleAdapter";
+
     Context mContext;
 
-    public ScheduleAdapter(Context context, Vector<Schedule> schedules){
+    public ScheduleAdapter(Context context){
         mContext = context;
-        mSchedules = schedules;
     }
 
     @Override
     public int getCount() {
-        return mSchedules.size();
+        return Global.getInstance().getSchedules(mContext).size();
     }
 
     @Override
-    public Object getItem(int i) {
-        return mSchedules.get(i);
+    public Schedule getItem(int i) {
+        return Global.getInstance().getSchedules().get(i);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class ScheduleAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
-        final Schedule currentSchedule = mSchedules.get(i);
+        final Schedule currentSchedule = getItem(i);
 
         if(view == null){
             LayoutInflater inf = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -74,7 +76,7 @@ public class ScheduleAdapter extends BaseAdapter {
                         FragmentTransaction ft = main.getSupportFragmentManager().beginTransaction();
 
                         Bundle args = new Bundle();
-                        args.putInt(mContext.getString(R.string.scheduleKey), mSchedules.get(i).getId());
+                        args.putInt(mContext.getString(R.string.scheduleKey), currentSchedule.getId());
                         args.putBoolean(mContext.getString(R.string.schedule_is_new), false);
 
                         CreateScheduleFragment frag = CreateScheduleFragment.newInstance();
@@ -92,6 +94,7 @@ public class ScheduleAdapter extends BaseAdapter {
         SwitchCompat activeSwitch = view.findViewById(R.id.schedule_active_switch);
 
         activeSwitch.setChecked(currentSchedule.isActive());
+        Log.d(TAG, "Set active switch to: " + currentSchedule.isActive());
         activeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

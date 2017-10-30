@@ -3,18 +3,18 @@ package com.proflow.focus_v2.services;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 
 import com.proflow.focus_v2.data.Global;
+import com.proflow.focus_v2.models.FocusNotification;
 import com.proflow.focus_v2.models.Profile;
-import com.proflow.focus_v2.models.Schedule;
-import com.proflow.focus_v2.models.Notification;
 
 import java.util.Vector;
+
+import static android.app.Notification.EXTRA_TEXT;
 
 public class NotificationBlockerListener extends NotificationListenerService{
 
@@ -41,50 +41,31 @@ public class NotificationBlockerListener extends NotificationListenerService{
 
     @Override
     public void onNotificationPosted(StatusBarNotification sbn){
-        if(appIsBlocked(sbn.getPackageName())) {
+
+        String packageName = sbn.getPackageName();
+
+        PackageManager pm = getPackageManager();
+
+        if(Global.getInstance().appIsBlocked(getApplicationContext(), packageName)) {
             cancelNotification(sbn.getKey());
             Vector<Profile> profiles = getNotificationProfiles();
-            Notification notification = new Notification(sbn.getNotification(), profiles);
+            FocusNotification fn = null;
+            try {
+                fn = new FocusNotification(packageName,
+                        pm.getPackageInfo(sbn.getPackageName(),0).applicationInfo.loadLabel(pm).toString() ,
+                        sbn.getNotification().extras.getString(EXTRA_TEXT));
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
             //will then add notification to vector of what a user missed during blocked profile
-            Global.getInstance().addNotification(getApplicationContext(), notification);
+            Global.getInstance().addFocusNotification(getApplicationContext(), fn);
         }
     }
 
-    private boolean appIsBlocked(String packageName) {
-        Vector<PackageInfo> activeApps = new Vector<>();
 
-        Log.d("NBL", "looking for: " + packageName);
-
-        Vector<Profile> profiles = Global.getInstance().getAllProfiles(getApplicationContext());
-        Vector<Schedule> schedules = Global.getInstance().getSchedules(getApplicationContext());
-
-        for(Profile p : profiles){
-            if(p.isActive()){
-                activeApps.addAll(p.getApps());
-            }
-        }
-
-        for(Schedule s: schedules){
-            if(s.isBlocking()){
-                for(Profile p : s.getProfiles()){
-                    activeApps.addAll(p.getApps());
-                }
-            }
-        }
-
-        //todo timers
-
-        for(PackageInfo pi : activeApps){
-            Log.d("NBL", "Found: " + pi.packageName);
-            if(pi.packageName.compareToIgnoreCase(packageName) == 0){
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private Vector<Profile> getNotificationProfiles(){
+        //TODO Add notification profile functionality -- currently just shows the notification itself
         //will return a vector of active profiles this app is in
         return null;
     }

@@ -51,6 +51,7 @@ public class TimersFragment extends BaseFragment {
         timerListView = layout.findViewById(R.id.timer_list_view);
         addTimerButton = addItemButton;
 
+        resetToolbar();
         //TODO implement timerListView
         mAdapter = new TimerAdapter(getContext());
         timerListView.setAdapter(mAdapter);
