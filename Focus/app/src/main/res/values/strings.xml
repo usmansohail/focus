@@ -250,5 +250,6 @@
     <string name="notification_permissions_title">Allow Notification Access</string>
     <string name="usage_permissions_title">Allow Usage Access</string>
     <string name="deny">Deny</string>
+    <string name="delete">Delete Profile</string>
 
 </resources>
