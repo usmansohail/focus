@@ -608,6 +608,7 @@ public class Global {
             long initialDuration = sp.getLong(id + "_initialDuration", 10000);
             boolean isPaused = sp.getBoolean(id + "_paused", true);
             int period = sp.getInt(id + "_mPeriod", 1000);
+            boolean isFinished = sp.getBoolean(id + "_finished", false);
 
             Vector<Profile> tProfiles = new Vector<>();
 
@@ -663,6 +664,7 @@ public class Global {
             editor.putLong(id + "_currentDuration", t.getCurrentDuration());
             editor.putLong(id + "_initialDuration", t.getInitialDuration());
             editor.putBoolean(id + "_paused", t.isPaused());
+            editor.putBoolean(id + "_finished", t.isFinished());
             editor.putInt(id + "_mPeriod", t.mPeriod);
 
             //Now parse the list of profiles associated with a schedule

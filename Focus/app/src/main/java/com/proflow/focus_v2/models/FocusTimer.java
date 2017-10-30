@@ -29,6 +29,7 @@ public class FocusTimer {
     private int id;
 
     private boolean paused = true;
+    private boolean finished = false;
 
     Timer mTimer = new Timer(true);
 
@@ -46,7 +47,9 @@ public class FocusTimer {
             public void run() {
                 if(!paused){
                     if(mCurrentDuration <= 0){
-                        //TODO Implement timer finished condition - will interact with service
+                        mCurrentDuration = (long)0;
+                        finished = true;
+
                     }
                     mCurrentDuration -= mPeriod;
                 }
@@ -65,9 +68,11 @@ public class FocusTimer {
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(!paused){
+                if(!paused && ! finished){
                     if(mCurrentDuration <= 0){
-                        //TODO Implement timer finished condition - will interact with service
+                        togglePause();
+                        finished = true;
+
                     }
                     mCurrentDuration -= mPeriod;
                 }
@@ -140,5 +145,13 @@ public class FocusTimer {
 
     public long getInitialDuration() {
         return mInitialDuration;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished){
+        this.finished = finished;
     }
 }
