@@ -2,6 +2,7 @@ package com.proflow.focus_v2;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.support.test.InstrumentationRegistry;
 import android.test.mock.MockContext;
 import android.util.Log;
@@ -16,6 +17,7 @@ import com.proflow.focus_v2.models.TimeBlock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Vector;
 
 import static android.content.ContentValues.TAG;
@@ -212,6 +214,18 @@ public class WhiteBoxUnitTest {
         assertTrue(changed);
 
     }
-    
+
+    @Test
+    public void check_blocked_app() throws Exception {
+        Vector<PackageInfo> temp = new Vector<PackageInfo>();
+        PackageManager packageManager = context.getPackageManager();
+        List<PackageInfo> packageList = packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS);
+        PackageInfo tempPackage = packageList.get(0);
+        temp.add(tempPackage);
+        Profile newProfile = new Profile("Test", temp, 1000);
+        newProfile.setActive(true);
+        Global.getInstance().addProfile(context, newProfile);
+        assertTrue(Global.getInstance().appIsBlocked(context, tempPackage.packageName));
+    }
 
 }
