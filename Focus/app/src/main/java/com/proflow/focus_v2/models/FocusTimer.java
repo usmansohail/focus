@@ -60,7 +60,9 @@ public class FocusTimer {
                                 getNotification("Timer Ended", mNotifMessage);
                         mNotificationUtils.notify(101, nb);
                     }
-                    mCurrentDuration -= mPeriod;
+                    else{
+                        mCurrentDuration -= mPeriod;
+                    }
                 }
             }
         }, 0, mPeriod);
@@ -87,7 +89,9 @@ public class FocusTimer {
                                 getNotification("Timer Ended", mNotifMessage);
                         mNotificationUtils.notify(101, nb);
                     }
-                    mCurrentDuration -= mPeriod;
+                    else{
+                        mCurrentDuration -= mPeriod;
+                    }
                 }
             }
         }, 0, mPeriod);
