@@ -30,7 +30,7 @@ public class FocusTimer {
 
     private boolean paused = true;
 
-    static Timer mTimer = new Timer(true);
+    Timer mTimer = new Timer(true);
 
     public int mPeriod = 1000;
 
@@ -46,7 +46,6 @@ public class FocusTimer {
             public void run() {
                 if(!paused){
                     if(mCurrentDuration <= 0){
-                        //TODO Implement timer finished condition - will interact with service
                     }
                     mCurrentDuration -= mPeriod;
                 }
@@ -68,6 +67,7 @@ public class FocusTimer {
                 if(!paused){
                     if(mCurrentDuration <= 0){
                         //TODO Implement timer finished condition - will interact with service
+                        String peace = "peace";
                     }
                     mCurrentDuration -= mPeriod;
                 }
