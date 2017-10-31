@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
@@ -125,13 +126,18 @@ public class CreateTimerFragment extends BaseFragment {
     }
 
     private boolean validate() {
-        return (!mProfileAdapter.getCheckedProfiles().isEmpty() && !allZero());
+
+        if(mProfileAdapter.getCheckedProfiles().isEmpty()){
+            Toast.makeText(getContext(), getString(R.string.timerNoSelectedProfiles), Toast.LENGTH_SHORT).show();
+        } else if(!allZero()){
+            Toast.makeText(getContext(), getString(R.string.timerAllValuesZero), Toast.LENGTH_SHORT).show();
+        }
+
+        return (!mProfileAdapter.getCheckedProfiles().isEmpty() && allZero());
     }
 
     private boolean allZero() {
-        return mHourSpinner.getSelectedItemPosition() == 0 &&
-                mMinuteSpinner.getSelectedItemPosition() == 0 &&
-                mSecondSpinner.getSelectedItemPosition() == 0;
+        return getDuration() > 10*1000;
     }
 
 }
