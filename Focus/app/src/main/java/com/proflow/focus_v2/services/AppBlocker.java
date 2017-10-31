@@ -40,10 +40,9 @@ public class AppBlocker extends Service {
 
     private final static String TAG = "AppBlocker";
 
-    public static boolean running = false;
 
     private Looper mServiceLooper;
-    private final static String TAG = "AppBlocker";
+
     public static boolean running = false;
     public static boolean blocked = false;
     private ServiceHandler mServiceHandler;
