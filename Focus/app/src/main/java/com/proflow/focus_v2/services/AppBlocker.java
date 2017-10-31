@@ -2,6 +2,7 @@ package com.proflow.focus_v2.services;
 
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
+import android.app.Notification;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -23,11 +24,14 @@ import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.data.Global;
+import com.proflow.focus_v2.helpers.NotificationUtils;
+import com.proflow.focus_v2.models.Schedule;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
@@ -50,6 +54,8 @@ public class AppBlocker extends Service {
         @Override
         public synchronized void run() {
 
+            checkScheduleNotificationFlags();
+
             //Added global method for checking if app is blocked.
             String currentApp = getCurrentApp(getApplicationContext());
             if(Global.getInstance().appIsBlocked(getApplicationContext(), currentApp)){
@@ -59,6 +65,38 @@ public class AppBlocker extends Service {
             mHandler.postDelayed(this, 300);
         }
     };
+
+    private void checkScheduleNotificationFlags(){
+        Vector<Boolean> newBlockingProfiles = new Vector<Boolean>();
+        Vector<Boolean> oldBlockingProfiles = Global.getInstance().getNotificationFlags(getApplicationContext());
+        Vector<Schedule> schedules = Global.getInstance().getSchedules();
+        for(int i=0; i<schedules.size(); i++){
+            newBlockingProfiles.add(schedules.get(i).isBlocking());
+        }
+
+        for(int i=0; i<oldBlockingProfiles.size(); i++){
+            if(oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true){
+                sendScheduleStartNotif();
+            }else if(oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false){
+                sendScheduleEndNotif();
+            }
+        }
+        Global.getInstance().setScheduleFlags(getApplicationContext(), newBlockingProfiles);
+    }
+
+    private void sendScheduleStartNotif(){
+            NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
+    Notification.Builder nb = mNotificationUtils.
+            getNotification("Schedule Started blocking", "");
+                        mNotificationUtils.notify(101, nb);
+    }
+
+    private void sendScheduleEndNotif(){
+    NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
+    Notification.Builder nb = mNotificationUtils.
+            getNotification("Schedule Ended Blocking", "");
+                        mNotificationUtils.notify(101, nb);
+    }
 
     private android.app.AlertDialog BlockedApplicationAlert(){
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
