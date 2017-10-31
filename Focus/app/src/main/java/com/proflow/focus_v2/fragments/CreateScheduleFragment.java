@@ -95,7 +95,7 @@ public class CreateScheduleFragment extends BaseFragment {
             mRepeatWeeklyButton.setChecked(mSchedule.repeatWeekly());
         }
 
-        mTimeBlockAdapter = new TimeBlockAdapter(getContext(), mSchedule);
+        mTimeBlockAdapter = new TimeBlockAdapter(getContext(), mSchedule, mIsNew);
         Button footer = layout.findViewById(R.id.schedule_add_time_block);
 
         footer.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +111,7 @@ public class CreateScheduleFragment extends BaseFragment {
                 Global.getInstance().modifySchedule(getContext(), mSchedule);
 
                 args.putInt(getString(R.string.scheduleKey), mSchedule.getId());
+                args.putBoolean(getString(R.string.schedule_is_new), mIsNew);
                 frag.setArguments(args);
                 FragmentTransaction ft = ((MainActivity)getActivity()).getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.Main_Frame, frag);
@@ -131,6 +132,20 @@ public class CreateScheduleFragment extends BaseFragment {
         mProfileRecycler.setItemAnimator(new DefaultItemAnimator());
         mProfileRecycler.setAdapter(mProfileAdapter);
 
+        Button mDeleteButton = layout.findViewById(R.id.create_schedule_delete_button);
+        if (!mIsNew){
+            mDeleteButton.setVisibility(View.VISIBLE);
+            mDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Global.getInstance().removeSchedule(getContext(), mSchedule);
+                    getActivity().onBackPressed();
+                }
+            });
+        } else {
+            mDeleteButton.setVisibility(View.GONE);
+        }
+
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,7 +155,7 @@ public class CreateScheduleFragment extends BaseFragment {
                     //Get values from fragment
                     String scheduleName = mNameEditText.getText().toString();
                     Vector<TimeBlock> timeBlocks = mTimeBlockAdapter.getTimeBlocks();
-                    Boolean repeat = mRepeatWeeklyButton.isSelected();
+                    Boolean repeat = mRepeatWeeklyButton.isChecked();
                     Vector<Profile> checkedProfiles = mProfileAdapter.getCheckedProfiles();
 
                     for(int i = 0; i < checkedProfiles.size(); i++){
@@ -174,6 +189,10 @@ public class CreateScheduleFragment extends BaseFragment {
         if(getArguments() != null && getArguments().get(getString(R.string.timeBlockKey)) != null){
             TimeBlock newTimeBlock = (TimeBlock) getArguments().get(getString(R.string.timeBlockKey));
             mSchedule.addTimeBlock(newTimeBlock);
+        }
+
+
+        if(!mIsNew){
         }
 
 

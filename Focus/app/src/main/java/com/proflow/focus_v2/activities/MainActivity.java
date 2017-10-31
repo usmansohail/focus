@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
             BlockedApplicationAlert().show();
             AppBlocker.blocked = false;
         }
-
     }
 
     private void populateGlobalAppsList() {

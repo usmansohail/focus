@@ -71,6 +71,8 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
     RadioGroup mStartRadioGroup;
     RadioGroup mEndRadioGroup;
 
+    boolean mIsNew = false;
+
     Schedule mSchedule = null;
 
     TimeBlock mTimeBlock = null;
@@ -110,6 +112,9 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
                 mTimeBlock = mSchedule.getTimeBlocks().get(
                         getArguments().getInt(getString(R.string.timeBlockIndex))
                 );
+            }
+            if(getArguments().containsKey(getString(R.string.schedule_is_new))){
+                mIsNew = getArguments().getBoolean(getString(R.string.schedule_is_new));
             }
         }
 
@@ -268,10 +273,21 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
             public void onClick(View view) {
                 //TODO implement confirmation in CreateTimeBlockFragment
                 if(validate()) {
+
+                    if(!getArguments().containsKey(getString(R.string.timeBlockIndex))){
+                        mSchedule.addTimeBlock(mTimeBlock);
+                    } else {
+                        int tbIndex = getArguments().getInt(getString(R.string.timeBlockIndex), 0);
+                        mSchedule.getTimeBlocks().get(tbIndex).setStartTime(mTimeBlock.getStartTime());
+                        mSchedule.getTimeBlocks().get(tbIndex).setEndTime(mTimeBlock.getEndTime());
+                        mSchedule.getTimeBlocks().get(tbIndex).setDays(mTimeBlock.getDays());
+                    }
+
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
 
                     Bundle args = new Bundle();
                     args.putInt(getString(R.string.scheduleKey), mSchedule.getId());
+                    args.putBoolean(getString(R.string.schedule_is_new), mIsNew);
 
                     Fragment frag = CreateScheduleFragment.newInstance();
                     frag.setArguments(args);
@@ -290,6 +306,7 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
             public void onClick(View view) {
                 Bundle args = new Bundle();
                 args.putInt(getString(R.string.scheduleKey), mSchedule.getId());
+                args.putBoolean(getString(R.string.schedule_is_new), mIsNew);
 
                 Fragment frag = CreateScheduleFragment.newInstance();
                 frag.setArguments(args);
@@ -396,7 +413,7 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
                     end += 12;
                 }
 
-                mTimeBlock.getEndTime().hour = end;
+                mTimeBlock.setEndTime(new time(end, mTimeBlock.getEndTime().hour));
                 Log.d(TAG, "Set end hour to: " + end);
             } else if (parent.getId() == endMinute.getId()) {
                 mTimeBlock.getEndTime().minute = endMinute.getSelectedItemPosition();
