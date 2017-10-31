@@ -259,7 +259,7 @@ public class AppBlocker extends Service {
     }
 
     private void checkScheduleNotificationFlags(){
-        Vector<Boolean> newBlockingProfiles = new Vector<Boolean>();
+        Vector<Boolean> newBlockingProfiles = new Vector<>();
         Vector<Boolean> oldBlockingProfiles = Global.getInstance().getNotificationFlags(getApplicationContext());
         Vector<Schedule> schedules = Global.getInstance().getSchedules();
         for(int i=0; i<schedules.size(); i++){
@@ -268,25 +268,25 @@ public class AppBlocker extends Service {
 
         for(int i=0; i<oldBlockingProfiles.size(); i++){
             if(oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true){
-                sendScheduleStartNotif();
+                sendScheduleStartNotif(i);
             }else if(oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false){
-                sendScheduleEndNotif();
+                sendScheduleEndNotif(i);
             }
         }
         Global.getInstance().setScheduleFlags(getApplicationContext(), newBlockingProfiles);
     }
 
-    private void sendScheduleStartNotif(){
+    private void sendScheduleStartNotif(int i){
             NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
     Notification.Builder nb = mNotificationUtils.
-            getNotification("Schedule Started blocking", "");
+            getNotification("Schedule Started Blocking", "The schedule "+Global.getInstance().getSchedules().get(i).getName()+ " is currently blocking apps.");
                         mNotificationUtils.notify(101, nb);
     }
 
-    private void sendScheduleEndNotif(){
+    private void sendScheduleEndNotif(int i){
     NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
     Notification.Builder nb = mNotificationUtils.
-            getNotification("Schedule Ended Blocking", "");
+            getNotification("Schedule Ended Blocking", "The schedule "+Global.getInstance().getSchedules().get(i).getName()+ " is no longer blocking apps.");
                         mNotificationUtils.notify(101, nb);
     }
 
