@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
@@ -62,10 +63,14 @@ public class ProfilesFragment extends BaseFragment {
         addProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.Main_Frame, CreateProfileFragment.newInstance());
-                ft.addToBackStack(null);
-                ft.commit();
+                if(Global.getInstance().getAllProfiles(getContext()).size() < 20) {
+                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.Main_Frame, CreateProfileFragment.newInstance());
+                    ft.addToBackStack(null);
+                    ft.commit();
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.tooManyProfiles), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

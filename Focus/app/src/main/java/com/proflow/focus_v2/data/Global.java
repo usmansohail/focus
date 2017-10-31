@@ -908,8 +908,6 @@ public class Global {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt("numFlags", flags.size());
         for(int i = 0; i < flags.size(); i++){
-            FocusNotification currentNotification = notifications.get(i);
-
             editor.putBoolean(i+"_val", flags.get(i));
         }
 
@@ -921,7 +919,7 @@ public class Global {
         Vector<Boolean> flags = new Vector<>();
         int numFlags = sp.getInt("numFlags", 0);
         for(int i = 0; i < numFlags; i++){
-            flags.add(i, sp.getBoolean(i+"_val", false));
+            flags.add(sp.getBoolean(i+"_val", false));
         }
         return flags;
     }

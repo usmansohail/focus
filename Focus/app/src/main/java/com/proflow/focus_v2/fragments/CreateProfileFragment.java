@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.AppAdapter;
@@ -86,12 +87,14 @@ public class CreateProfileFragment extends BaseFragment {
             public void onClick(View view) {
                 //So right now this just gives a toast
                 //TODO implement confirmation & validation of input.
-                String profileName = mProfileNameEditText.getText().toString();
-                Vector<PackageInfo> selectedPackages = getSelectedPackages();
-
-                Profile newProfile = new Profile(profileName, selectedPackages);
-                Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
-                getActivity().onBackPressed();
+                if (validate()){
+                    String profileName = mProfileNameEditText.getText().toString();
+                    Vector<PackageInfo> selectedPackages = getSelectedPackages();
+    
+                    Profile newProfile = new Profile(profileName, selectedPackages);
+                    Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
+                    getActivity().onBackPressed();
+                }
             }
         });
 
@@ -103,6 +106,28 @@ public class CreateProfileFragment extends BaseFragment {
         });
 
         return layout;
+    }
+
+    private boolean validate() {
+        boolean atLeastOneAppSelected = mAdapter.getSelectedApps().size() > 0;
+        boolean someName = !mProfileNameEditText.getText().toString().isEmpty();
+        boolean uniqueName = true;
+        Vector<Profile> allProfiles = Global.getInstance().getAllProfiles(getContext());
+        for(Profile p : allProfiles){
+            if(mProfileNameEditText.getText().toString().compareToIgnoreCase(p.getName()) == 0){
+                uniqueName = false;
+            }
+        }
+
+        if(!atLeastOneAppSelected){
+            Toast.makeText(getContext(), getString(R.string.noAppsSelected), Toast.LENGTH_SHORT).show();
+        } else if(!uniqueName){
+            Toast.makeText(getContext(), R.string.notUniqueName, Toast.LENGTH_SHORT).show();
+        } else if(!someName){
+            Toast.makeText(getContext(), R.string.pleaseEnterName, Toast.LENGTH_SHORT).show();
+        }
+
+        return atLeastOneAppSelected && uniqueName && someName;
     }
 
     private Vector<PackageInfo> getSelectedPackages(){

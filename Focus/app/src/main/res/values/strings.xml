@@ -253,5 +253,15 @@
     <string name="delete">Delete Profile</string>
     <string name="delete_schedule">Delete Schedule</string>
     <string name="schedule_id_to_delete">ScheduleIdToDeleteKey</string>
+    <string name="tooManyProfiles">You cannot create more than 20 profiles!</string>
+    <string name="noAppsSelected">Select at least one app to create a profile!</string>
+    <string name="notUniqueName">Profile name already in use!</string>
+    <string name="pleaseEnterName">Please enter a name for your profile!</string>
+    <string name="scheduleHasNoName">Please enter a name for this schedule!</string>
+    <string name="scheduleHasNoProfiles">Please add at least one profile to this schedule.</string>
+    <string name="scheduleHasNoTimeBlocks">Please add some TimeBlocks to this schedule!</string>
+    <string name="scheduleNameIsTaken">The name for you\'ve chosen is already in use.</string>
+    <string name="timerNoSelectedProfiles">Please select a profile.</string>
+    <string name="timerAllValuesZero">Please select a time greater than 10 seconds!</string>
 
 </resources>
