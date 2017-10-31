@@ -309,15 +309,7 @@ public class modifyTimeBlock {
                 .atPosition(10);
         appCompatTextView2.perform(click());
 
-        ViewInteraction appCompatImageButton15 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton15.perform(click());
+
 
         onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 

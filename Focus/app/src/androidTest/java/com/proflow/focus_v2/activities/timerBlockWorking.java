@@ -2,7 +2,10 @@ package com.proflow.focus_v2.activities;
 
 
 import android.support.test.espresso.DataInteraction;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -12,6 +15,7 @@ import android.view.ViewParent;
 
 import com.proflow.focus_v2.R;
 
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -91,13 +95,13 @@ public class timerBlockWorking {
         }
 
         ViewInteraction appCompatCheckBox = onView(
-                allOf(withId(R.id.app_list_checkbox),
+                first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.app_list_linear_layout),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
@@ -109,15 +113,7 @@ public class timerBlockWorking {
             e.printStackTrace();
         }
 
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
@@ -203,14 +199,14 @@ public class timerBlockWorking {
         }
 
         ViewInteraction appCompatCheckBox2 = onView(
-                allOf(withId(R.id.profile_list_checkbox),
+                first(allOf(withId(R.id.profile_list_checkbox),
                         childAtPosition(
                                 allOf(withId(R.id.profile_wrapper),
                                         childAtPosition(
                                                 withClassName(is("android.widget.LinearLayout")),
                                                 0)),
                                 1),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox2.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
@@ -222,15 +218,7 @@ public class timerBlockWorking {
             e.printStackTrace();
         }
 
-        ViewInteraction appCompatImageButton4 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton4.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:
@@ -242,13 +230,13 @@ public class timerBlockWorking {
         }
 
         ViewInteraction appCompatImageButton5 = onView(
-                allOf(withId(R.id.timer_list_play_pause),
+                first(allOf(withId(R.id.timer_list_play_pause),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         2),
                                 0),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton5.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
@@ -289,4 +277,45 @@ public class timerBlockWorking {
             }
         };
     }
+
+
+    public static Matcher<View> first(final Matcher<View> matcher) {
+        return new BaseMatcher<View>() {
+            boolean isFirst = true;
+
+            @Override
+            public boolean matches(Object item) {
+                if (isFirst && matcher.matches(item)) {
+                    isFirst = false;
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Matches the first item of it's kind");
+            }
+        };
+
+    }
+
+
+    ViewAction confirmButton = new ViewAction() {
+        @Override
+        public Matcher<View> getConstraints() {
+            return ViewMatchers.isEnabled(); // no constraints, they are checked above
+        }
+
+        @Override
+        public String getDescription() {
+            return "click plus button";
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            view.performClick();
+        }
+    };
+
 }

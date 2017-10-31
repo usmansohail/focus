@@ -85,22 +85,6 @@ public class modifyProfileName {
                         isDisplayed())));
         appCompatImageButton3.perform(click());
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction appCompatImageButton9 = onView(
-                first(allOf(withId(R.id.profile_list_edit_button),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                3),
-                        isDisplayed())));
-        appCompatImageButton9.perform(click());
-        appCompatImageButton9.perform(click());
 
 
         ViewInteraction appCompatEditText2 = onView(
