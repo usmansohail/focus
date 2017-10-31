@@ -47,7 +47,7 @@ import java.util.Vector;
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = "MainActivity";
-    boolean debug = true;
+    boolean debug = false;
 
     //Layouts
     FrameLayout mainFrame;

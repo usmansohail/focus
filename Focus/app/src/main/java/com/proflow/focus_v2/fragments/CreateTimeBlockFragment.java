@@ -388,14 +388,15 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
         time startTime = parseStartTime();
         time endTime = parseEndTime();
 
+
+
         mTimeBlock.setStartTime(startTime);
         mTimeBlock.setEndTime(endTime);
 
         if(!startTime.isBefore(endTime)){
             Toast.makeText(getContext(), "INVALID: start time is after end", Toast.LENGTH_SHORT).show();
-            return false;
         }
-        return true;
+        return startTime.isBefore(endTime) && !mTimeBlock.getDays().isEmpty();
     }
 
     private time parseStartTime() {
