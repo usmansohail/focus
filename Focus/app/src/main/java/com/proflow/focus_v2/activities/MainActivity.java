@@ -53,10 +53,10 @@ public class MainActivity extends AppCompatActivity {
     FrameLayout mainFrame;
 
     //Fragments
-    NotificationsFragment notificationsFragment;
-    ProfilesFragment profilesFragment;
-    SchedulesFragment schedulesFragment;
-    TimersFragment timersFragment;
+    public static NotificationsFragment notificationsFragment;
+    public static ProfilesFragment profilesFragment;
+    public static SchedulesFragment schedulesFragment;
+    public static TimersFragment timersFragment;
 
     private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
     private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
