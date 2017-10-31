@@ -211,7 +211,7 @@ public class CreateScheduleFragment extends BaseFragment {
     }
 
     private boolean validate() {
-        //TODO
+
         return true;
     }
 
