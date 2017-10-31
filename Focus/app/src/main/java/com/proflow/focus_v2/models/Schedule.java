@@ -191,6 +191,8 @@ public class Schedule implements Serializable {
                     int currentMinute = gc.get(Calendar.MINUTE);
 
                     Log.d(TAG, "CurrentHour: " + currentHour + " CurrentMinute: " + currentMinute);
+                    Log.d(TAG, "startTime: " + tb.getStartTime().toString());
+                    Log.d(TAG, "endTime: " + tb.getEndTime());
 
                     time ct = new time(currentHour, currentMinute);
                     if (ct.isBetween(tb.getStartTime(), tb.getEndTime())) {
