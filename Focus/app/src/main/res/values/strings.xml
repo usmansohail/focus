@@ -183,7 +183,7 @@
     </string-array>
 
 
-    <string name="app_name">Focus_V2</string>
+    <string name="app_name">Focus</string>
     <string name="notifications_bottom_bar_tab_title">Notifications</string>
     <string name="profiles_bottom_bar_tab_title">Profiles</string>
     <string name="schedules_bottom_bar_tab_title">Schedules</string>
