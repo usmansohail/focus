@@ -280,7 +280,59 @@ public class WhiteBoxUnitTest {
 
     }
 
+    @Test
+    public void get_profiles(){
+        Vector<PackageInfo> temp = new Vector<PackageInfo>();
+        Profile profile = new Profile("ProfileOne", temp, 40);
+        Global.getInstance().addProfile(context, profile);
+        Profile profileTwo = new Profile("ProfileTwo", temp, 41);
+        Global.getInstance().addProfile(context, profileTwo);
+        Profile profileThree = new Profile("ProfileThree", temp, 42);
+        Global.getInstance().addProfile(context, profileThree);
+        Vector<Profile> result = Global.getInstance().getAllProfiles(context);
+        boolean one = false;
+        boolean two = false;
+        boolean three = false;
+        for(Profile p : result){
+            if(p.getId() == 40){
+                one = true;
+            }
+            if(p.getId() == 41){
+                two = true;
+            }
+            if(p.getId() == 42){
+                three = true;
+            }
+        }
+        assertTrue(one && two && three);
+    }
 
+    @Test
+    public void get_schedules(){
+        Vector<TimeBlock> times = new Vector<TimeBlock>();
+        Schedule schedule = new Schedule("scheduleOne", times, Global.getInstance().getAllProfiles(context), true, 300);
+        Global.getInstance().addSchedule(context, schedule);
+        Schedule scheduleTwo = new Schedule("scheduleTwo", times, Global.getInstance().getAllProfiles(context), true, 301);
+        Global.getInstance().addSchedule(context, scheduleTwo   );
+        Schedule scheduleThree = new Schedule("scheduleThree", times, Global.getInstance().getAllProfiles(context), true, 302);
+        Global.getInstance().addSchedule(context, scheduleThree);
+        Vector<Schedule> schedules = Global.getInstance().getSchedules(context);
+        boolean one = false;
+        boolean two = false;
+        boolean three = false;
+        for(Schedule s : schedules){
+            if(s.getName().equals("scheduleOne")){
+                one = true;
+            }
+            if(s.getName().equals("scheduleTwo")){
+                two = true;
+            }
+            if(s.getName().equals("scheduleThree")){
+                three = true;
+            }
+        }
+        assertTrue(one && two && three);
+    }
 
 
 }
