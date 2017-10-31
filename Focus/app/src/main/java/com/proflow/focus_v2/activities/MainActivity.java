@@ -185,6 +185,10 @@ public class MainActivity extends AppCompatActivity {
             currentFragment = null;
         }
 
+        if(!AppBlocker.running){
+            startService(new Intent(this, AppBlocker.class));
+        }
+
     }
 
     private void populateGlobalAppsList() {
