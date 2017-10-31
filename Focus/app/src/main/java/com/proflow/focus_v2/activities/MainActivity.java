@@ -33,6 +33,7 @@ import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.proflow.focus_v2.models.time;
+import com.proflow.focus_v2.services.AppBlocker;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -189,6 +190,10 @@ public class MainActivity extends AppCompatActivity {
             startService(new Intent(this, AppBlocker.class));
         }
 
+        if(AppBlocker.blocked){
+            BlockedApplicationAlert().show();
+            AppBlocker.blocked = false;
+        }
     }
 
     private void populateGlobalAppsList() {
@@ -420,6 +425,19 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                         android.os.Process.killProcess(android.os.Process.myPid());
                         System.exit(1);
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
+
+    private android.app.AlertDialog BlockedApplicationAlert(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Blocked Application");
+        alertDialogBuilder.setMessage("Focus! You are trying to access a distracting application that has been blocked! ");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
                     }
                 });
         return(alertDialogBuilder.create());

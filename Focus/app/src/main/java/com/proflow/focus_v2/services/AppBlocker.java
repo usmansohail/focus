@@ -43,6 +43,9 @@ public class AppBlocker extends Service {
     public static boolean running = false;
 
     private Looper mServiceLooper;
+    private final static String TAG = "AppBlocker";
+    public static boolean running = false;
+    public static boolean blocked = false;
     private ServiceHandler mServiceHandler;
     private Handler mHandler;
     private ArrayList<String> mBlockedPackages;
@@ -54,24 +57,11 @@ public class AppBlocker extends Service {
             String currentApp = getCurrentApp(getApplicationContext());
             if(Global.getInstance().appIsBlocked(getApplicationContext(), currentApp)){
                 StartApplication(getApplicationContext(), getPackageName());
-                BlockedApplicationAlert().show();
+                blocked = true;
             }
             mHandler.postDelayed(this, 300);
         }
     };
-
-    private android.app.AlertDialog BlockedApplicationAlert(){
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Blocked Application");
-        alertDialogBuilder.setMessage("Focus! You are trying to access a distracting application that has been blocked! ");
-        alertDialogBuilder.setPositiveButton(R.string.accept,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-        return(alertDialogBuilder.create());
-    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -118,7 +108,7 @@ public class AppBlocker extends Service {
 
         running = true;
 
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
         mHandler.post(mRunnableCode);
 
