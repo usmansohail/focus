@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
@@ -36,6 +37,10 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
  */
 
 public class AppBlocker extends Service {
+
+    private final static String TAG = "AppBlocker";
+
+    public static boolean running = false;
 
     private Looper mServiceLooper;
     private final static String TAG = "AppBlocker";

@@ -56,6 +56,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         public SwitchCompat activeSwitch;
         public CheckBox checkBox;
         Profile thisProfile;
+        View iv;
 
         public ProfileViewHolder(View itemView) {
             super(itemView);
@@ -63,6 +64,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             editButton = (ImageButton) itemView.findViewById(R.id.profile_list_edit_button);
             activeSwitch = (SwitchCompat) itemView.findViewById(R.id.profile_list_switch);
             checkBox = (CheckBox) itemView.findViewById(R.id.profile_list_checkbox);
+            iv = itemView;
 
             if(mSchedule != null || mTimer){
                 checkBox.setVisibility(View.VISIBLE);
@@ -134,6 +136,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                     }
                 }
             });
+            holder.iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    holder.editButton.callOnClick();
+                }
+            });
         } else {
             if(mTimer){
                 holder.checkBox.setChecked(false);
@@ -141,6 +149,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 for(Profile p : mSchedule.getProfiles()){
                     if(p.getId() == currentProfile.getId()){
                         holder.checkBox.setChecked(true);
+                        checkedProfiles.add(p);
                         break;
                     }
                 }

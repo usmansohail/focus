@@ -673,7 +673,6 @@ public class Global {
             timerIDs.add(id);
             //open editor
             SharedPreferences.Editor editor = sp.edit();
-            editor.clear();
             //put primitives in sp associated with id:
             editor.putString(id + "_name", t.getName());
             editor.putLong(id + "_currentDuration", t.getCurrentDuration());
@@ -821,7 +820,6 @@ public class Global {
         int numNotes = notifications.size();
         SharedPreferences sp = context.getSharedPreferences(notifications_file_name, 0);
         SharedPreferences.Editor editor = sp.edit();
-        editor.clear();
         editor.putInt("numNotifications", numNotes);
         for(int i = 0; i < numNotes; i++){
             FocusNotification currentNotification = notifications.get(i);
@@ -901,6 +899,30 @@ public class Global {
     }
 
     public void clearNotifications(Context context) {
+        notifications.clear();
         context.getSharedPreferences(notifications_file_name,0).edit().clear().commit();
+    }
+
+    public void setScheduleFlags(Context context, Vector<Boolean> flags){
+        SharedPreferences sp = context.getSharedPreferences(schedules_file_name, 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("numFlags", flags.size());
+        for(int i = 0; i < flags.size(); i++){
+            FocusNotification currentNotification = notifications.get(i);
+
+            editor.putBoolean(i+"_val", flags.get(i));
+        }
+
+        editor.commit();
+    }
+
+    public Vector<Boolean> getNotificationFlags(Context context){
+        SharedPreferences sp = context.getSharedPreferences(schedules_file_name, 0);
+        Vector<Boolean> flags = new Vector<>();
+        int numFlags = sp.getInt("numFlags", 0);
+        for(int i = 0; i < numFlags; i++){
+            flags.add(i, sp.getBoolean(i+"_val", false));
+        }
+        return flags;
     }
 }
