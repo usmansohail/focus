@@ -10,15 +10,19 @@ package com.proflow.focus_v2;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewAssertion;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
+import com.fdunlap.focus_v2.test.*;
 
 import com.proflow.focus_v2.activities.MainActivity;
 
@@ -26,34 +30,45 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
 import org.junit.runner.RunWith;
 
+import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.doubleClick;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.view.View;
+import android.widget.ListView;
+
+import java.io.File;
+import java.util.List;
 
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.proflow.focus_v2.TestUtils.withRecyclerView;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class profileTest {
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        appContext.startActivity(new Intent(appContext, MainActivity.class));
-    }
 
+    String name = "Sample Profile";
+
+    /*
     @Test
     public void makeProfile()
     {
@@ -70,7 +85,7 @@ public class profileTest {
 
 
         // type the name of the profile
-        onView(withId(R.id.profile_name_edit_text)).perform(typeText("Sample Profile"), closeSoftKeyboard());
+        onView(withId(R.id.profile_name_edit_text)).perform(typeText(name), closeSoftKeyboard());
 
         // select at least one item, just do the first one
         onView(withId(R.id.create_profile_recycler_view)).perform(RecyclerViewActions.actionOnItemAtPosition(0,click()));
@@ -94,10 +109,11 @@ public class profileTest {
         });
 
         // check data for new profile
-        onView(first(withText("Sample Profile"))).check(matches(isDisplayed()));
+        onView(first(withText(name))).check(matches(isDisplayed()));
 
     }
 
+    */
 
 
     @Test
@@ -105,15 +121,13 @@ public class profileTest {
     {
         String newName = "New Profile Name";
 
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = getTargetContext();
         appContext.startActivity(new Intent(appContext, MainActivity.class));
 
 
         // click the profiles button
         onView(withId(R.id.tab_profiles)).perform(click());
 
-        // try and edit the first profile that shows up
-        onView(first(withId(R.id.profile_list_edit_button))).perform(click());
 
         // edit the name
         onView(withId(R.id.profile_name_edit_text)).perform(clearText(), typeText(newName));
@@ -138,6 +152,7 @@ public class profileTest {
 
         // check data for new profile
         onView(first(withText(newName))).check(matches(isDisplayed()));
+
 
     }
 
@@ -189,5 +204,6 @@ public class profileTest {
             }
         };
     }
+
 
 }
