@@ -137,7 +137,7 @@ public class CreateTimerFragment extends BaseFragment {
     }
 
     private boolean allZero() {
-        return getDuration() > 10*1000;
+        return getDuration() >= 10*1000;
     }
 
 }
