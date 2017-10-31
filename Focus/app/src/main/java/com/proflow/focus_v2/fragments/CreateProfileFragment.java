@@ -127,7 +127,7 @@ public class CreateProfileFragment extends BaseFragment {
             Toast.makeText(getContext(), R.string.pleaseEnterName, Toast.LENGTH_SHORT).show();
         }
 
-        return atLeastOneAppSelected && uniqueName;
+        return atLeastOneAppSelected && uniqueName && someName;
     }
 
     private Vector<PackageInfo> getSelectedPackages(){
