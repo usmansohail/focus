@@ -1,7 +1,10 @@
 package com.proflow.focus_v2.activities;
 
 
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -11,6 +14,7 @@ import android.view.ViewParent;
 
 import com.proflow.focus_v2.R;
 
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -60,37 +64,47 @@ public class modifyProfileName {
         appCompatEditText.perform(replaceText("Test"), closeSoftKeyboard());
 
         ViewInteraction appCompatCheckBox = onView(
-                allOf(withId(R.id.app_list_checkbox),
+                first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.app_list_linear_layout),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox.perform(click());
 
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction appCompatImageButton3 = onView(
-                allOf(withId(R.id.profile_list_edit_button),
+                first(allOf(withId(R.id.profile_list_edit_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 3),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton3.perform(click());
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction appCompatImageButton9 = onView(
+                first(allOf(withId(R.id.profile_list_edit_button),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                3),
+                        isDisplayed())));
+        appCompatImageButton9.perform(click());
+        appCompatImageButton9.perform(click());
+
+
         ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.profile_name_edit_text), withText("Test"),
+                allOf(withId(R.id.profile_name_edit_text),
                         childAtPosition(
                                 allOf(withId(R.id.fragment_create_profile),
                                         childAtPosition(
@@ -111,18 +125,48 @@ public class modifyProfileName {
                         isDisplayed()));
         appCompatEditText3.perform(closeSoftKeyboard());
 
-        ViewInteraction appCompatImageButton4 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton4.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
     }
 
+    ViewAction confirmButton = new ViewAction() {
+        @Override
+        public Matcher<View> getConstraints() {
+            return ViewMatchers.isEnabled(); // no constraints, they are checked above
+        }
+
+        @Override
+        public String getDescription() {
+            return "click plus button";
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            view.performClick();
+        }
+    };
+
+    public static Matcher<View> first(final Matcher<View> matcher)
+    {
+        return new BaseMatcher<View>() {
+            boolean isFirst = true;
+
+            @Override
+            public boolean matches(Object item) {
+                if(isFirst && matcher.matches(item))
+                {
+                    isFirst = false;
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Matches the first item of it's kind");
+            }
+        };
+    }
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
 

@@ -23,32 +23,18 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class deleteSchedule3 {
+public class w {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void deleteSchedule3() {
-        ViewInteraction bottomBarTab = onView(
-                allOf(withId(R.id.tab_schedules),
-                        childAtPosition(
-                                allOf(withId(R.id.bb_bottom_bar_item_container),
-                                        childAtPosition(
-                                                withId(R.id.bb_bottom_bar_outer_container),
-                                                1)),
-                                1),
-                        isDisplayed()));
-        bottomBarTab.perform(click());
-
+    public void w() {
         ViewInteraction appCompatImageButton = onView(
                 allOf(withId(R.id.toolbar_add_item),
                         childAtPosition(
@@ -60,14 +46,25 @@ public class deleteSchedule3 {
         appCompatImageButton.perform(click());
 
         ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.schedule_name_edit_text),
+                allOf(withId(R.id.profile_name_edit_text),
+                        childAtPosition(
+                                allOf(withId(R.id.fragment_create_profile),
+                                        childAtPosition(
+                                                withId(R.id.Main_Frame),
+                                                0)),
+                                1),
+                        isDisplayed()));
+        appCompatEditText.perform(replaceText("t"), closeSoftKeyboard());
+
+        ViewInteraction appCompatCheckBox = onView(
+                allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.Main_Frame),
+                                        withId(R.id.app_list_linear_layout),
                                         0),
-                                0),
+                                2),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("test"), closeSoftKeyboard());
+        appCompatCheckBox.perform(click());
 
         ViewInteraction appCompatImageButton2 = onView(
                 allOf(withId(R.id.toolbar_confirm),
@@ -78,36 +75,6 @@ public class deleteSchedule3 {
                                 3),
                         isDisplayed()));
         appCompatImageButton2.perform(click());
-
-        ViewInteraction appCompatImageButton3 = onView(
-                allOf(withId(R.id.schedule_more_button),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                2),
-                        isDisplayed()));
-        appCompatImageButton3.perform(click());
-
-        ViewInteraction appCompatImageButton4 = onView(
-                allOf(withId(R.id.schedule_more_button),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                2),
-                        isDisplayed()));
-        appCompatImageButton4.perform(click());
-
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.create_schedule_delete_button), withText("Delete Schedule"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.Main_Frame),
-                                        0),
-                                7),
-                        isDisplayed()));
-        appCompatButton.perform(click());
 
     }
 

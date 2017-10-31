@@ -77,20 +77,14 @@ public class deleteProfile {
         onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction appCompatCheckBox3 = onView(
-                first(allOf(withId(R.id.create_profile_delete_button),
+                first(allOf(withId(R.id.profile_list_edit_button),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.app_list_linear_layout),
+                                        withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 3),
                         isDisplayed())));
         appCompatCheckBox3.perform(click());
-
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         onView(withId(R.id.create_profile_delete_button)).perform(click());
 
