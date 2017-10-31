@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
@@ -209,8 +210,28 @@ public class CreateScheduleFragment extends BaseFragment {
     }
 
     private boolean validate() {
+        boolean hasName = !mNameEditText.getText().toString().isEmpty();
+        boolean hasProfile = mProfileAdapter.getCheckedProfiles().size() > 0;
+        boolean hasTimeBlocks = mTimeBlockAdapter.getTimeBlocks().size() > 0;
+        boolean uniqueName = true;
+        for(Schedule s : Global.getInstance().getSchedules()){
+            if(s.getName().compareToIgnoreCase(mNameEditText.getText().toString()) == 0){
+                uniqueName = false;
+            }
+        }
 
-        return true;
+        if(!hasName){
+            Toast.makeText(getContext(), getString(R.string.scheduleHasNoName), Toast.LENGTH_SHORT).show();
+        } else if(!hasProfile){
+            Toast.makeText(getContext(), getString(R.string.scheduleHasNoProfiles), Toast.LENGTH_SHORT).show();
+        } else if(!hasTimeBlocks){
+            Toast.makeText(getContext(), getString(R.string.scheduleHasNoTimeBlocks), Toast.LENGTH_SHORT).show();
+        } else if(!uniqueName){
+            Toast.makeText(getContext(), getString(R.string.scheduleNameIsTaken), Toast.LENGTH_SHORT).show();
+        }
+
+
+        return hasName && hasProfile && hasTimeBlocks && uniqueName;
     }
 
     public void addTimeBlock(TimeBlock timeBlock) {

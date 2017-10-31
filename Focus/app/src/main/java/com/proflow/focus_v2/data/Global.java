@@ -908,8 +908,6 @@ public class Global {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt("numFlags", flags.size());
         for(int i = 0; i < flags.size(); i++){
-            FocusNotification currentNotification = notifications.get(i);
-
             editor.putBoolean(i+"_val", flags.get(i));
         }
 
