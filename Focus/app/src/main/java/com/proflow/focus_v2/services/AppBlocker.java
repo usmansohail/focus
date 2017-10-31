@@ -265,11 +265,7 @@ public class AppBlocker extends Service {
         for(int i=0; i<schedules.size(); i++){
             newBlockingProfiles.add(schedules.get(i).isBlocking());
         }
-        int j = oldBlockingProfiles.size();
-        if(newBlockingProfiles.size() < oldBlockingProfiles.size()){
-            j = newBlockingProfiles.size();
-        }
-        for(int i=0; i<j; i++){
+        for(int i=0; i<oldBlockingProfiles.size(); i++){
             if(oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true){
                 sendScheduleStartNotif(i);
             }else if(oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false){
