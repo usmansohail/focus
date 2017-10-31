@@ -921,7 +921,7 @@ public class Global {
         Vector<Boolean> flags = new Vector<>();
         int numFlags = sp.getInt("numFlags", 0);
         for(int i = 0; i < numFlags; i++){
-            flags.add(i, sp.getBoolean(i+"_val", false));
+            flags.add(sp.getBoolean(i+"_val", false));
         }
         return flags;
     }
