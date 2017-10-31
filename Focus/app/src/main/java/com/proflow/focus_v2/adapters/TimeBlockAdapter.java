@@ -34,10 +34,12 @@ public class TimeBlockAdapter extends BaseAdapter {
 
     Context mContext;
     Schedule mSchedule;
+    boolean mIsNew;
 
-    public TimeBlockAdapter(Context context, Schedule schedule){
+    public TimeBlockAdapter(Context context, Schedule schedule, boolean isNew){
         mContext = context;
         mSchedule = schedule;
+        mIsNew = isNew;
         Log.d(TAG, "STATS: NumTimeBlocks: " + mSchedule.getTimeBlocks().size());
     }
 
@@ -86,6 +88,7 @@ public class TimeBlockAdapter extends BaseAdapter {
 
                 args.putInt(mContext.getString(R.string.scheduleKey), mSchedule.getId());
                 args.putInt(mContext.getString(R.string.timeBlockIndex), i);
+                args.putBoolean(mContext.getString(R.string.schedule_is_new), mIsNew);
                 frag.setArguments(args);
                 FragmentTransaction ft = ((MainActivity)mContext).getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.Main_Frame, frag);
