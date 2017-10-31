@@ -38,10 +38,6 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 public class AppBlocker extends Service {
 
-    private final static String TAG = "AppBlocker";
-
-    public static boolean running = false;
-
     private Looper mServiceLooper;
     private final static String TAG = "AppBlocker";
     public static boolean running = false;
