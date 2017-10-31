@@ -252,5 +252,6 @@
     <string name="deny">Deny</string>
     <string name="delete">Delete Profile</string>
     <string name="delete_schedule">Delete Schedule</string>
+    <string name="schedule_id_to_delete">ScheduleIdToDeleteKey</string>
 
 </resources>

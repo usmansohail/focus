@@ -3,6 +3,7 @@ package com.proflow.focus_v2.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -138,9 +139,16 @@ public class CreateScheduleFragment extends BaseFragment {
             mDeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Global.getInstance().removeSchedule(getContext(), mSchedule);
-                    resetNotificationFlags();
-                    getActivity().onBackPressed();
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    fm.popBackStack();
+                    FragmentTransaction ft = fm.beginTransaction();
+                    ft.replace(R.id.Main_Frame, MainActivity.schedulesFragment);
+
+                    Bundle args = new Bundle();
+                    args.putInt(getString(R.string.schedule_id_to_delete), mSchedule.getId());
+
+                    MainActivity.schedulesFragment.setArguments(args);
+                    ft.commit();
                 }
             });
         } else {
@@ -183,6 +191,7 @@ public class CreateScheduleFragment extends BaseFragment {
             public void onClick(View view) {
                 if(mIsNew) {
                     Global.getInstance().removeSchedule(getContext(), mSchedule);
+                    resetNotificationFlags();
                 }
                 getActivity().onBackPressed();
             }

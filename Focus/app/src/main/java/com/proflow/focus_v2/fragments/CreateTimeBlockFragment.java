@@ -384,11 +384,36 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
     }
 
     private boolean validate() {
-        if(!mTimeBlock.getStartTime().isBefore(mTimeBlock.getEndTime())){
+
+        time startTime = parseStartTime();
+        time endTime = parseEndTime();
+
+        mTimeBlock.setStartTime(startTime);
+        mTimeBlock.setEndTime(endTime);
+
+        if(!startTime.isBefore(endTime)){
             Toast.makeText(getContext(), "INVALID: start time is after end", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
+    }
+
+    private time parseStartTime() {
+        int sHour = startHour.getSelectedItemPosition();
+        if(startPM.isChecked()){
+            sHour += 12;
+        }
+        int sMinute = startMinute.getSelectedItemPosition();
+        return new time(sHour, sMinute);
+    }
+
+    private time parseEndTime() {
+        int eHour = endHour.getSelectedItemPosition();
+        if(endPM.isChecked()){
+            eHour += 12;
+        }
+        int eMinute = endMinute.getSelectedItemPosition();
+        return new time(eHour, eMinute);
     }
 
     @Override

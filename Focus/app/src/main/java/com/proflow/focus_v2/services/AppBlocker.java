@@ -42,11 +42,10 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 public class AppBlocker extends Service {
 
-    private final static String TAG = "AppBlocker";
-
-    public static boolean running = false;
-
     private Looper mServiceLooper;
+    private final static String TAG = "AppBlocker";
+    public static boolean running = false;
+    public static boolean blocked = false;
     private ServiceHandler mServiceHandler;
     private Handler mHandler;
     private ArrayList<String> mBlockedPackages;
@@ -55,61 +54,15 @@ public class AppBlocker extends Service {
         public synchronized void run() {
 
             checkScheduleNotificationFlags();
-
             //Added global method for checking if app is blocked.
             String currentApp = getCurrentApp(getApplicationContext());
             if(Global.getInstance().appIsBlocked(getApplicationContext(), currentApp)){
                 StartApplication(getApplicationContext(), getPackageName());
-                BlockedApplicationAlert().show();
+                blocked = true;
             }
             mHandler.postDelayed(this, 300);
         }
     };
-
-    private void checkScheduleNotificationFlags(){
-        Vector<Boolean> newBlockingProfiles = new Vector<Boolean>();
-        Vector<Boolean> oldBlockingProfiles = Global.getInstance().getNotificationFlags(getApplicationContext());
-        Vector<Schedule> schedules = Global.getInstance().getSchedules();
-        for(int i=0; i<schedules.size(); i++){
-            newBlockingProfiles.add(schedules.get(i).isBlocking());
-        }
-
-        for(int i=0; i<oldBlockingProfiles.size(); i++){
-            if(oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true){
-                sendScheduleStartNotif();
-            }else if(oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false){
-                sendScheduleEndNotif();
-            }
-        }
-        Global.getInstance().setScheduleFlags(getApplicationContext(), newBlockingProfiles);
-    }
-
-    private void sendScheduleStartNotif(){
-            NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
-    Notification.Builder nb = mNotificationUtils.
-            getNotification("Schedule Started blocking", "");
-                        mNotificationUtils.notify(101, nb);
-    }
-
-    private void sendScheduleEndNotif(){
-    NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
-    Notification.Builder nb = mNotificationUtils.
-            getNotification("Schedule Ended Blocking", "");
-                        mNotificationUtils.notify(101, nb);
-    }
-
-    private android.app.AlertDialog BlockedApplicationAlert(){
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Blocked Application");
-        alertDialogBuilder.setMessage("Focus! You are trying to access a distracting application that has been blocked! ");
-        alertDialogBuilder.setPositiveButton(R.string.accept,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-        return(alertDialogBuilder.create());
-    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -156,7 +109,7 @@ public class AppBlocker extends Service {
 
         running = true;
 
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
         mHandler.post(mRunnableCode);
 
@@ -305,4 +258,48 @@ public class AppBlocker extends Service {
         return true;
     }
 
+    private void checkScheduleNotificationFlags(){
+        Vector<Boolean> newBlockingProfiles = new Vector<Boolean>();
+        Vector<Boolean> oldBlockingProfiles = Global.getInstance().getNotificationFlags(getApplicationContext());
+        Vector<Schedule> schedules = Global.getInstance().getSchedules();
+        for(int i=0; i<schedules.size(); i++){
+            newBlockingProfiles.add(schedules.get(i).isBlocking());
+        }
+
+        for(int i=0; i<oldBlockingProfiles.size(); i++){
+            if(oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true){
+                sendScheduleStartNotif();
+            }else if(oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false){
+                sendScheduleEndNotif();
+            }
+        }
+        Global.getInstance().setScheduleFlags(getApplicationContext(), newBlockingProfiles);
+    }
+
+    private void sendScheduleStartNotif(){
+            NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
+    Notification.Builder nb = mNotificationUtils.
+            getNotification("Schedule Started blocking", "");
+                        mNotificationUtils.notify(101, nb);
+    }
+
+    private void sendScheduleEndNotif(){
+    NotificationUtils mNotificationUtils = new NotificationUtils(getApplicationContext());
+    Notification.Builder nb = mNotificationUtils.
+            getNotification("Schedule Ended Blocking", "");
+                        mNotificationUtils.notify(101, nb);
+    }
+
+    private android.app.AlertDialog BlockedApplicationAlert(){
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Blocked Application");
+        alertDialogBuilder.setMessage("Focus! You are trying to access a distracting application that has been blocked! ");
+        alertDialogBuilder.setPositiveButton(R.string.accept,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        return(alertDialogBuilder.create());
+    }
 }
