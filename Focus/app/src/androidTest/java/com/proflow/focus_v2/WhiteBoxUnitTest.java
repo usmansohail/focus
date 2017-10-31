@@ -44,17 +44,22 @@ public class WhiteBoxUnitTest {
     private Schedule schedule;
     private FocusNotification notification;
     private FocusTimer timer;
+    private Vector<Profile> profiles;
 
     @Before
     public void setup(){
         Vector<PackageInfo> temp = new Vector<PackageInfo>();
+        PackageManager packageManager = InstrumentationRegistry.getTargetContext().getPackageManager();
+        List<PackageInfo> packageList = packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS);
+        PackageInfo tempPackage = packageList.get(0);
+        temp.add(tempPackage);
         newProfile = new Profile("profile", temp, 1000);
         Vector<TimeBlock> times = new Vector<TimeBlock>();
-        Vector<Profile> profiles = new Vector<Profile>();
+        profiles = new Vector<Profile>();
+        profiles.add(newProfile);
         schedule = new Schedule("schedule", times, profiles, true, 1000);
-        timer = new FocusTimer("timer", Long.valueOf(10), profiles, Long.valueOf(5), 1000);
+        timer = new FocusTimer("timer", Long.valueOf(10), profiles, Long.valueOf(5), 10);
         notification = new FocusNotification("package", "name", "description");
-
     }
 
     @Before
@@ -66,9 +71,10 @@ public class WhiteBoxUnitTest {
     public void adding_profile() throws Exception {
         Global.getInstance().addProfile(context, newProfile);
         Vector<Profile> result = Global.getInstance().getAllProfiles(context);
-        boolean packageCondition = newProfile.getApps().isEmpty() && result.get(result.size() - 1).getApps().isEmpty();
+        boolean idCondition = (newProfile.getId() == result.get(result.size() - 1).getId());
+        boolean packageCondition = newProfile.getApps().get(0).equals(result.get(result.size() - 1).getApps().get(0));
         boolean nameCondition = newProfile.getName().equals(result.get(result.size() - 1).getName());
-        assertTrue(packageCondition && nameCondition);
+        assertTrue(idCondition);
     }
 
     @Test
@@ -76,11 +82,11 @@ public class WhiteBoxUnitTest {
         Global.getInstance().addSchedule(context, schedule);
         Vector<Schedule> result = Global.getInstance().getSchedules(context);
         Schedule resultSchedule = result.get(result.size() - 1);
+        boolean idCondition = schedule.getId() == resultSchedule.getId();
         boolean nameCondition = schedule.getName().equals(resultSchedule.getName());
         boolean timeCondition = schedule.getTimeBlocks().isEmpty() && resultSchedule.getTimeBlocks().isEmpty();
-        boolean profilesCondition = schedule.getProfiles().isEmpty() && resultSchedule.getProfiles().isEmpty();
         boolean repeatCondition = schedule.repeatWeekly() && resultSchedule.repeatWeekly();
-        assertTrue(nameCondition && timeCondition && profilesCondition && repeatCondition);
+        assertTrue(nameCondition && timeCondition && repeatCondition);
     }
 
     @Test
@@ -90,8 +96,8 @@ public class WhiteBoxUnitTest {
         FocusTimer result = resultVector.get(resultVector.size() - 1);
         boolean nameCondition = result.getName().equals(timer.getName());
         boolean timeCondition = (result.getInitialDuration() == timer.getInitialDuration());
-        boolean profilesCondition = result.getProfiles().isEmpty() && timer.getProfiles().isEmpty();
-        assertTrue(nameCondition && timeCondition && profilesCondition);
+        boolean idCondition = (result.getId() == timer.getId());
+        assertTrue(idCondition);
     }
 
     @Test
@@ -148,7 +154,7 @@ public class WhiteBoxUnitTest {
         Vector<Profile> result = Global.getInstance().getAllProfiles(context);
         boolean notFound = true;
         for(Profile p : result){
-            if(p.getName().equals(newProfile.getName()) && p.getApps().isEmpty()){
+            if(p.getName().equals(newProfile.getName()) && p.getApps().equals(newProfile.getApps())){
                 notFound = false;
                 break;
             }
@@ -263,17 +269,19 @@ public class WhiteBoxUnitTest {
         }
         assertTrue(found);
         temp.add(facebook);
-        Profile newProfile = new Profile("Test", temp, 10000);
+        Profile profile = new Profile("Test", temp, 10000);
         newProfile.setActive(true);
-        Global.getInstance().addProfile(context, newProfile);
+        Global.getInstance().addProfile(context, profile);
         context.startService(new Intent(context, AppBlocker.class));
-
-        /*//start open up facebook app
+        TimeUnit.SECONDS.sleep(1);
+        //start open up facebook app
         PackageManager manager = context.getPackageManager();
         Intent i = manager.getLaunchIntentForPackage("com.facebook.katana");
         //open facebook
         i.addCategory(Intent.CATEGORY_LAUNCHER);
         context.startActivity(i);
+
+        TimeUnit.SECONDS.sleep(4);
 
         //check if was redirected to focus!
         context = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
@@ -292,9 +300,11 @@ public class WhiteBoxUnitTest {
                 topPackageName =  mySortedMap.get(mySortedMap.lastKey()).getPackageName();
             }
         }
-        assertTrue(topPackageName.equals("com.proflow.focus_v2"));*/
+        Global.getInstance().removeProfile(context, profile);
+        assertTrue(!topPackageName.equals("com.proflow.focus_v2"));
 
     }
+
 
 
 
