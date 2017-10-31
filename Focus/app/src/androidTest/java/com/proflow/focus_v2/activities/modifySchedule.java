@@ -1,7 +1,10 @@
 package com.proflow.focus_v2.activities;
 
 
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -62,34 +65,17 @@ public class modifySchedule {
         appCompatEditText.perform(replaceText("test"), closeSoftKeyboard());
 
         ViewInteraction appCompatCheckBox = onView(
-                allOf(withId(R.id.app_list_checkbox),
+                first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.app_list_linear_layout),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox.perform(click());
 
-        ViewInteraction appCompatCheckBox2 = onView(
-                allOf(withId(R.id.app_list_checkbox),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.app_list_linear_layout),
-                                        0),
-                                2),
-                        isDisplayed()));
-        appCompatCheckBox2.perform(click());
 
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction bottomBarTab = onView(
                 allOf(withId(R.id.tab_schedules),
@@ -122,67 +108,40 @@ public class modifySchedule {
                         isDisplayed()));
         appCompatEditText2.perform(replaceText("test"), closeSoftKeyboard());
 
-        pressBack();
 
         ViewInteraction appCompatCheckBox3 = onView(
-                allOf(withId(R.id.profile_list_checkbox),
+                first(allOf(withId(R.id.profile_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 1),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox3.perform(click());
 
-        ViewInteraction appCompatImageButton4 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton4.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction appCompatImageButton5 = onView(
-                allOf(withId(R.id.schedule_more_button),
+                first(allOf(withId(R.id.schedule_more_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton5.perform(click());
 
-        ViewInteraction appCompatImageButton6 = onView(
-                allOf(withId(R.id.schedule_more_button),
+        ViewInteraction appCompatImageButton9 = onView(
+                first(allOf(withId(R.id.schedule_more_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 2),
-                        isDisplayed()));
-        appCompatImageButton6.perform(click());
+                        isDisplayed())));
+        appCompatImageButton9.perform(click());
 
-        ViewInteraction appCompatEditText3 = onView(
-                allOf(withId(R.id.schedule_name_edit_text), withText("test"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.Main_Frame),
-                                        0),
-                                0),
-                        isDisplayed()));
-        appCompatEditText3.perform(replaceText("test modified"));
-
-        ViewInteraction appCompatEditText4 = onView(
-                allOf(withId(R.id.schedule_name_edit_text), withText("test modified"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.Main_Frame),
-                                        0),
-                                0),
-                        isDisplayed()));
-        appCompatEditText4.perform(closeSoftKeyboard());
+        onView(withId(R.id.schedule_name_edit_text)).perform(replaceText("test modified"));
 
         ViewInteraction appCompatCheckBox4 = onView(
                 allOf(withId(R.id.schedule_repeat_weekly_radio),
@@ -194,15 +153,7 @@ public class modifySchedule {
                         isDisplayed()));
         appCompatCheckBox4.perform(click());
 
-        ViewInteraction appCompatImageButton7 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton7.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
     }
 
@@ -226,6 +177,27 @@ public class modifySchedule {
         };
 
     }
+
+
+    ViewAction confirmButton = new ViewAction() {
+        @Override
+        public Matcher<View> getConstraints() {
+            return ViewMatchers.isEnabled(); // no constraints, they are checked above
+        }
+
+        @Override
+        public String getDescription() {
+            return "click plus button";
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            view.performClick();
+        }
+    };
+
+
+
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {

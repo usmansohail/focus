@@ -2,7 +2,10 @@ package com.proflow.focus_v2.activities;
 
 
 import android.support.test.espresso.DataInteraction;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -12,6 +15,7 @@ import android.view.ViewParent;
 
 import com.proflow.focus_v2.R;
 
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -64,37 +68,20 @@ public class modifyTimeBlock {
                         isDisplayed()));
         appCompatEditText.perform(replaceText("te"), closeSoftKeyboard());
 
-        pressBack();
 
         ViewInteraction appCompatCheckBox = onView(
-                allOf(withId(R.id.app_list_checkbox),
+                first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.app_list_linear_layout),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox.perform(click());
 
-        ViewInteraction appCompatCheckBox2 = onView(
-                allOf(withId(R.id.app_list_checkbox),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.app_list_linear_layout),
-                                        0),
-                                2),
-                        isDisplayed()));
-        appCompatCheckBox2.perform(click());
 
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
+
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction bottomBarTab = onView(
                 allOf(withId(R.id.tab_schedules),
@@ -118,7 +105,7 @@ public class modifyTimeBlock {
         appCompatImageButton3.perform(click());
 
         ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.schedule_add_time_block), withText("Add Time Block"),
+                allOf(withId(R.id.schedule_add_time_block),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.Main_Frame),
@@ -127,35 +114,37 @@ public class modifyTimeBlock {
                         isDisplayed()));
         appCompatButton.perform(click());
 
+
         ViewInteraction appCompatImageButton4 = onView(
-                allOf(withId(R.id.monday_button),
+                first(allOf(withId(R.id.monday_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 0),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton4.perform(click());
 
         ViewInteraction appCompatImageButton5 = onView(
-                allOf(withId(R.id.wednesday_button),
+                first(allOf(withId(R.id.wednesday_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         4),
                                 0),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton5.perform(click());
 
-        ViewInteraction appCompatImageButton6 = onView(
-                allOf(withId(R.id.friday_button),
+        ViewInteraction appCompatRadioButton = onView(
+                first(allOf(withId(R.id.create_time_block_end_time_pm), withText("PM"),
                         childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        8),
-                                0),
-                        isDisplayed()));
-        appCompatImageButton6.perform(click());
+                                allOf(withId(R.id.time_block_end_time_radio_group),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.LinearLayout")),
+                                                1)),
+                                1),
+                        isDisplayed())));
+        appCompatRadioButton.perform(click());
 
         ViewInteraction appCompatSpinner = onView(
                 allOf(withId(R.id.create_time_block_start_time_hour_spinner),
@@ -167,35 +156,40 @@ public class modifyTimeBlock {
                         isDisplayed()));
         appCompatSpinner.perform(click());
 
-        ViewInteraction appCompatRadioButton = onView(
-                allOf(withId(R.id.create_time_block_end_time_pm), withText("PM"),
-                        childAtPosition(
-                                allOf(withId(R.id.time_block_end_time_radio_group),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.LinearLayout")),
-                                                1)),
-                                1),
-                        isDisplayed()));
-        appCompatRadioButton.perform(click());
+        DataInteraction appCompatTextView1 = onData(anything())
+                .inAdapterView(childAtPosition(
+                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
+                        0))
+                .atPosition(10);
+        appCompatTextView1.perform(click());
 
-        ViewInteraction appCompatImageButton7 = onView(
-                allOf(withId(R.id.toolbar_confirm),
+        ViewInteraction appCompatSpinner21 = onView(
+                allOf(withId(R.id.create_time_block_end_time_hour_spinner),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                0),
                         isDisplayed()));
-        appCompatImageButton7.perform(click());
+        appCompatSpinner21.perform(click());
+
+        DataInteraction appCompatTextView21 = onData(anything())
+                .inAdapterView(childAtPosition(
+                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
+                        0))
+                .atPosition(2);
+        appCompatTextView21.perform(click());
+
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction appCompatCheckBox3 = onView(
-                allOf(withId(R.id.profile_list_checkbox),
+                first(allOf(withId(R.id.profile_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 1),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatCheckBox3.perform(click());
 
         ViewInteraction appCompatEditText2 = onView(
@@ -208,38 +202,30 @@ public class modifyTimeBlock {
                         isDisplayed()));
         appCompatEditText2.perform(replaceText("test"), closeSoftKeyboard());
 
-        ViewInteraction appCompatImageButton8 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton8.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction appCompatImageButton9 = onView(
-                allOf(withId(R.id.schedule_more_button),
+                first(allOf(withId(R.id.schedule_more_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton9.perform(click());
 
         ViewInteraction appCompatImageButton10 = onView(
-                allOf(withId(R.id.schedule_more_button),
+                first(allOf(withId(R.id.schedule_more_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 2),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton10.perform(click());
 
         ViewInteraction appCompatButton2 = onView(
-                allOf(withId(R.id.schedule_add_time_block), withText("Add Time Block"),
+                allOf(withId(R.id.schedule_add_time_block),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.Main_Frame),
@@ -279,22 +265,14 @@ public class modifyTimeBlock {
                         isDisplayed()));
         appCompatRadioButton2.perform(click());
 
-        ViewInteraction appCompatImageButton13 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton13.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
         ViewInteraction appCompatImageButton14 = onView(
-                allOf(withId(R.id.schedule_info_edit_button),
+                first(allOf(withId(R.id.schedule_info_edit_button),
                         childAtPosition(
                                 withParent(withId(R.id.schedule_time_block_list_view)),
                                 5),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton14.perform(click());
 
         ViewInteraction appCompatSpinner2 = onView(
@@ -341,17 +319,52 @@ public class modifyTimeBlock {
                         isDisplayed()));
         appCompatImageButton15.perform(click());
 
-        ViewInteraction appCompatImageButton16 = onView(
-                allOf(withId(R.id.toolbar_confirm),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                3),
-                        isDisplayed()));
-        appCompatImageButton16.perform(click());
+        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
     }
+
+
+    public static Matcher<View> first(final Matcher<View> matcher) {
+        return new BaseMatcher<View>() {
+            boolean isFirst = true;
+
+            @Override
+            public boolean matches(Object item) {
+                if (isFirst && matcher.matches(item)) {
+                    isFirst = false;
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Matches the first item of it's kind");
+            }
+        };
+
+    }
+
+
+    ViewAction confirmButton = new ViewAction() {
+        @Override
+        public Matcher<View> getConstraints() {
+            return ViewMatchers.isEnabled(); // no constraints, they are checked above
+        }
+
+        @Override
+        public String getDescription() {
+            return "click plus button";
+        }
+
+        @Override
+        public void perform(UiController uiController, View view) {
+            view.performClick();
+        }
+    };
+
+
+
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
