@@ -217,7 +217,8 @@ public class CreateScheduleFragment extends BaseFragment {
         boolean hasTimeBlocks = mTimeBlockAdapter.getTimeBlocks().size() > 0;
         boolean uniqueName = true;
         for(Schedule s : Global.getInstance().getSchedules()){
-            if(s.getName().compareToIgnoreCase(mNameEditText.getText().toString()) == 0 && s.getId() != mSchedule.getId()){
+            if(s.getName().compareToIgnoreCase(mNameEditText.getText().toString()) == 0
+                    && s.getId() != getArguments().getInt(getString(R.string.scheduleKey))){
                 uniqueName = false;
             }
         }
