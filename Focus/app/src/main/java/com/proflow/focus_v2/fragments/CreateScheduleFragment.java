@@ -181,6 +181,7 @@ public class CreateScheduleFragment extends BaseFragment {
                     //tell schedule to modify sched if it exists, and if not - add it.
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
                     Global.getInstance().synchAll(getContext());
+                    resetNotificationFlags();
                     getActivity().onBackPressed();
                 }
             }
@@ -191,6 +192,7 @@ public class CreateScheduleFragment extends BaseFragment {
             public void onClick(View view) {
                 if(mIsNew) {
                     Global.getInstance().removeSchedule(getContext(), mSchedule);
+                    resetNotificationFlags();
                 }
                 getActivity().onBackPressed();
             }
@@ -215,7 +217,7 @@ public class CreateScheduleFragment extends BaseFragment {
         boolean hasTimeBlocks = mTimeBlockAdapter.getTimeBlocks().size() > 0;
         boolean uniqueName = true;
         for(Schedule s : Global.getInstance().getSchedules()){
-            if(s.getName().compareToIgnoreCase(mNameEditText.getText().toString()) == 0){
+            if(s.getName().compareToIgnoreCase(mNameEditText.getText().toString()) == 0 && s.getId() != mSchedule.getId()){
                 uniqueName = false;
             }
         }
@@ -239,6 +241,14 @@ public class CreateScheduleFragment extends BaseFragment {
         mTimeBlockAdapter.notifyDataSetChanged();
     }
 
+    public void resetNotificationFlags(){
+        Vector<Boolean> blockingProfiles = new Vector<>();
+        Vector<Schedule> schedules = Global.getInstance().getSchedules();
+        for(int i=0; i<schedules.size(); i++){
+            blockingProfiles.add(schedules.get(i).isBlocking());
+        }
+        Global.getInstance().setScheduleFlags(getContext(), blockingProfiles);
+    }
 
     public Vector<Profile> getSelectedProfiles() {
         return mProfileAdapter.getCheckedProfiles();
