@@ -57,6 +57,13 @@ public class SchedulesFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_schedules, container, false);
 
+        if(getArguments() != null){
+            int scheduleToDeleteID = getArguments().getInt(getString(R.string.schedule_id_to_delete));
+            Schedule scheduleToDelete = Global.getInstance().getScheduleById(scheduleToDeleteID);
+            Global.getInstance().removeSchedule(getContext(), scheduleToDelete);
+            this.setArguments(null);
+        }
+
         resetToolbar();
 
         //instantiate global views
