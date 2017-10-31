@@ -1,10 +1,7 @@
 package com.proflow.focus_v2.activities;
 
 
-import android.support.test.espresso.UiController;
-import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -14,7 +11,6 @@ import android.view.ViewParent;
 
 import com.proflow.focus_v2.R;
 
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -25,7 +21,6 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.doubleClick;
 import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
@@ -36,13 +31,24 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class deleteProfile {
+public class deleteSchedule3 {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void deleteProfile() {
+    public void deleteSchedule3() {
+        ViewInteraction bottomBarTab = onView(
+                allOf(withId(R.id.tab_schedules),
+                        childAtPosition(
+                                allOf(withId(R.id.bb_bottom_bar_item_container),
+                                        childAtPosition(
+                                                withId(R.id.bb_bottom_bar_outer_container),
+                                                1)),
+                                1),
+                        isDisplayed()));
+        bottomBarTab.perform(click());
+
         ViewInteraction appCompatImageButton = onView(
                 allOf(withId(R.id.toolbar_add_item),
                         childAtPosition(
@@ -54,87 +60,56 @@ public class deleteProfile {
         appCompatImageButton.perform(click());
 
         ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.profile_name_edit_text),
+                allOf(withId(R.id.schedule_name_edit_text),
                         childAtPosition(
-                                allOf(withId(R.id.fragment_create_profile),
-                                        childAtPosition(
-                                                withId(R.id.Main_Frame),
-                                                0)),
-                                1),
+                                childAtPosition(
+                                        withId(R.id.Main_Frame),
+                                        0),
+                                0),
                         isDisplayed()));
         appCompatEditText.perform(replaceText("test"), closeSoftKeyboard());
 
-        ViewInteraction appCompatCheckBox = onView(
-                first(allOf(withId(R.id.app_list_checkbox),
+        ViewInteraction appCompatImageButton2 = onView(
+                allOf(withId(R.id.toolbar_confirm),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.app_list_linear_layout),
+                                        withId(R.id.toolbar),
+                                        2),
+                                3),
+                        isDisplayed()));
+        appCompatImageButton2.perform(click());
+
+        ViewInteraction appCompatImageButton3 = onView(
+                allOf(withId(R.id.schedule_more_button),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 2),
-                        isDisplayed())));
-        appCompatCheckBox.perform(click());
+                        isDisplayed()));
+        appCompatImageButton3.perform(click());
 
-        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
-
-        ViewInteraction appCompatCheckBox3 = onView(
-                first(allOf(withId(R.id.create_profile_delete_button),
+        ViewInteraction appCompatImageButton4 = onView(
+                allOf(withId(R.id.schedule_more_button),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.app_list_linear_layout),
+                                        withClassName(is("android.widget.LinearLayout")),
                                         0),
-                                3),
-                        isDisplayed())));
-        appCompatCheckBox3.perform(click());
+                                2),
+                        isDisplayed()));
+        appCompatImageButton4.perform(click());
 
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        onView(withId(R.id.create_profile_delete_button)).perform(click());
+        ViewInteraction appCompatButton = onView(
+                allOf(withId(R.id.create_schedule_delete_button), withText("Delete Schedule"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.Main_Frame),
+                                        0),
+                                7),
+                        isDisplayed()));
+        appCompatButton.perform(click());
 
     }
-
-    ViewAction confirmButton = new ViewAction() {
-        @Override
-        public Matcher<View> getConstraints() {
-            return ViewMatchers.isEnabled(); // no constraints, they are checked above
-        }
-
-        @Override
-        public String getDescription() {
-            return "click plus button";
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            view.performClick();
-        }
-    };
-
-    public static Matcher<View> first(final Matcher<View> matcher)
-    {
-        return new BaseMatcher<View>() {
-            boolean isFirst = true;
-
-            @Override
-            public boolean matches(Object item) {
-                if(isFirst && matcher.matches(item))
-                {
-                    isFirst = false;
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Matches the first item of it's kind");
-            }
-        };
-    }
-
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {

@@ -1,11 +1,7 @@
 package com.proflow.focus_v2.activities;
 
 
-import android.support.test.espresso.DataInteraction;
-import android.support.test.espresso.UiController;
-import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -15,7 +11,6 @@ import android.view.ViewParent;
 
 import com.proflow.focus_v2.R;
 
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -23,7 +18,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -33,26 +27,25 @@ import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class createSchedule {
+public class deleteSchedule2 {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void createSchedule() {
+    public void deleteSchedule2() {
         ViewInteraction appCompatImageButton = onView(
-                first(allOf(withId(R.id.toolbar_add_item),
+                allOf(withId(R.id.toolbar_add_item),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.toolbar),
                                         2),
                                 1),
-                        isDisplayed())));
+                        isDisplayed()));
         appCompatImageButton.perform(click());
 
         ViewInteraction appCompatEditText = onView(
@@ -67,186 +60,137 @@ public class createSchedule {
         appCompatEditText.perform(replaceText("test"), closeSoftKeyboard());
 
         ViewInteraction appCompatCheckBox = onView(
-                first(allOf(withId(R.id.app_list_checkbox),
+                allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.app_list_linear_layout),
                                         0),
                                 2),
-                        isDisplayed())));
+                        isDisplayed()));
         appCompatCheckBox.perform(click());
 
-        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
+        ViewInteraction appCompatImageButton2 = onView(
+                allOf(withId(R.id.toolbar_confirm),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.toolbar),
+                                        2),
+                                3),
+                        isDisplayed()));
+        appCompatImageButton2.perform(click());
 
         ViewInteraction bottomBarTab = onView(
-                first(allOf(withId(R.id.tab_schedules),
+                allOf(withId(R.id.tab_schedules),
                         childAtPosition(
                                 allOf(withId(R.id.bb_bottom_bar_item_container),
                                         childAtPosition(
                                                 withId(R.id.bb_bottom_bar_outer_container),
                                                 1)),
                                 1),
-                        isDisplayed())));
+                        isDisplayed()));
         bottomBarTab.perform(click());
 
         ViewInteraction appCompatImageButton3 = onView(
-                first(allOf(withId(R.id.toolbar_add_item),
+                allOf(withId(R.id.toolbar_add_item),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.toolbar),
                                         2),
                                 1),
-                        isDisplayed())));
+                        isDisplayed()));
         appCompatImageButton3.perform(click());
 
-        ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.schedule_name_edit_text),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.Main_Frame),
-                                        0),
-                                0),
-                        isDisplayed()));
-        appCompatEditText2.perform(replaceText("test"), closeSoftKeyboard());
-
         ViewInteraction appCompatButton = onView(
-                first(allOf(withId(R.id.schedule_add_time_block), withText("Add Time Block"),
+                allOf(withId(R.id.schedule_add_time_block), withText("Add Time Block"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.Main_Frame),
                                         0),
                                 3),
-                        isDisplayed())));
+                        isDisplayed()));
         appCompatButton.perform(click());
 
         ViewInteraction appCompatImageButton4 = onView(
-                first(allOf(withId(R.id.monday_button),
+                allOf(withId(R.id.monday_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 0),
-                        isDisplayed())));
+                        isDisplayed()));
         appCompatImageButton4.perform(click());
 
-        ViewInteraction appCompatImageButton5 = onView(
-                first(allOf(withId(R.id.wednesday_button),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        4),
-                                0),
-                        isDisplayed())));
-        appCompatImageButton5.perform(click());
-
         ViewInteraction appCompatRadioButton = onView(
-                first(allOf(withId(R.id.create_time_block_end_time_pm), withText("PM"),
+                allOf(withId(R.id.create_time_block_end_time_pm), withText("PM"),
                         childAtPosition(
                                 allOf(withId(R.id.time_block_end_time_radio_group),
                                         childAtPosition(
                                                 withClassName(is("android.widget.LinearLayout")),
                                                 1)),
                                 1),
-                        isDisplayed())));
+                        isDisplayed()));
         appCompatRadioButton.perform(click());
 
-        ViewInteraction appCompatSpinner = onView(
-                allOf(withId(R.id.create_time_block_start_time_hour_spinner),
+        ViewInteraction appCompatImageButton5 = onView(
+                allOf(withId(R.id.toolbar_confirm),
                         childAtPosition(
                                 childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                0),
+                                        withId(R.id.toolbar),
+                                        2),
+                                3),
                         isDisplayed()));
-        appCompatSpinner.perform(click());
-
-        DataInteraction appCompatTextView = onData(anything())
-                .inAdapterView(childAtPosition(
-                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
-                        0))
-                .atPosition(10);
-        appCompatTextView.perform(click());
-
-        ViewInteraction appCompatSpinner2 = onView(
-                allOf(withId(R.id.create_time_block_end_time_hour_spinner),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                0),
-                        isDisplayed()));
-        appCompatSpinner2.perform(click());
-
-        DataInteraction appCompatTextView2 = onData(anything())
-                .inAdapterView(childAtPosition(
-                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
-                        0))
-                .atPosition(2);
-        appCompatTextView2.perform(click());
-
-        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
+        appCompatImageButton5.perform(click());
 
         ViewInteraction appCompatCheckBox2 = onView(
-                allOf(withId(R.id.schedule_repeat_weekly_radio),
+                allOf(withId(R.id.profile_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
-                                        4),
+                                        0),
                                 1),
                         isDisplayed()));
         appCompatCheckBox2.perform(click());
 
-        ViewInteraction appCompatCheckBox3 = onView(
-                first(allOf(withId(R.id.profile_list_checkbox),
+        ViewInteraction appCompatImageButton6 = onView(
+                allOf(withId(R.id.toolbar_confirm),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.toolbar),
+                                        2),
+                                3),
+                        isDisplayed()));
+        appCompatImageButton6.perform(click());
+
+        ViewInteraction appCompatImageButton7 = onView(
+                allOf(withId(R.id.schedule_more_button),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
-                                1),
-                        isDisplayed())));
-        appCompatCheckBox3.perform(click());
+                                2),
+                        isDisplayed()));
+        appCompatImageButton7.perform(click());
 
-        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
+        ViewInteraction appCompatImageButton8 = onView(
+                allOf(withId(R.id.schedule_more_button),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        0),
+                                2),
+                        isDisplayed()));
+        appCompatImageButton8.perform(click());
 
-    }
+        ViewInteraction appCompatButton2 = onView(
+                allOf(withId(R.id.create_schedule_delete_button), withText("Delete Schedule"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.Main_Frame),
+                                        0),
+                                7),
+                        isDisplayed()));
+        appCompatButton2.perform(click());
 
-    ViewAction confirmButton = new ViewAction() {
-        @Override
-        public Matcher<View> getConstraints() {
-            return ViewMatchers.isEnabled(); // no constraints, they are checked above
-        }
-
-        @Override
-        public String getDescription() {
-            return "click plus button";
-        }
-
-        @Override
-        public void perform(UiController uiController, View view) {
-            view.performClick();
-        }
-    };
-
-    public static Matcher<View> first(final Matcher<View> matcher)
-    {
-        return new BaseMatcher<View>() {
-            boolean isFirst = true;
-
-            @Override
-            public boolean matches(Object item) {
-                if(isFirst && matcher.matches(item))
-                {
-                    isFirst = false;
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Matches the first item of it's kind");
-            }
-        };
     }
 
     private static Matcher<View> childAtPosition(
