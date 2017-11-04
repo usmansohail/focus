@@ -41,13 +41,10 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
  */
 
 public class AppBlocker extends Service {
-<<<<<<< HEAD
 
     private final static String TAG = "AppBlocker";
 
 
-=======
->>>>>>> fc7fe877c03a4bfcfc032234c1630c9f490bb3c7
     private Looper mServiceLooper;
 
     public static boolean running = false;
