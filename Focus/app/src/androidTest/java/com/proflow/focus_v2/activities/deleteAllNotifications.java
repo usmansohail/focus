@@ -1,4 +1,4 @@
-package com.proflow.focus_v2.activities;
+package com.proflow.focus_v2;
 
 
 import android.support.test.espresso.UiController;
@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.activities.MainActivity;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -23,11 +24,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.replaceText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isFocusable;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -36,21 +38,21 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class modifySchedule {
+public class deleteAllNotifications {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void modifySchedule() {
+    public void deleteAll() {
         ViewInteraction appCompatImageButton = onView(
-                allOf(withId(R.id.toolbar_add_item),
+                first(allOf(withId(R.id.toolbar_add_item),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.toolbar),
                                         2),
                                 1),
-                        isDisplayed()));
+                        isDisplayed())));
         appCompatImageButton.perform(click());
 
         ViewInteraction appCompatEditText = onView(
@@ -62,7 +64,7 @@ public class modifySchedule {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("test"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("Test profile"), closeSoftKeyboard());
 
         ViewInteraction appCompatCheckBox = onView(
                 first(allOf(withId(R.id.app_list_checkbox),
@@ -74,107 +76,42 @@ public class modifySchedule {
                         isDisplayed())));
         appCompatCheckBox.perform(click());
 
-
-        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
-
-        ViewInteraction bottomBarTab = onView(
-                allOf(withId(R.id.tab_schedules),
-                        childAtPosition(
-                                allOf(withId(R.id.bb_bottom_bar_item_container),
-                                        childAtPosition(
-                                                withId(R.id.bb_bottom_bar_outer_container),
-                                                1)),
-                                1),
-                        isDisplayed()));
-        bottomBarTab.perform(click());
-
-        ViewInteraction appCompatImageButton3 = onView(
-                allOf(withId(R.id.toolbar_add_item),
+        ViewInteraction appCompatCheckBox2 = onView(
+                first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.toolbar),
-                                        2),
-                                1),
-                        isDisplayed()));
-        appCompatImageButton3.perform(click());
-
-        ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.schedule_name_edit_text),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.Main_Frame),
+                                        withId(R.id.app_list_linear_layout),
                                         0),
-                                0),
-                        isDisplayed()));
-        appCompatEditText2.perform(replaceText("test"), closeSoftKeyboard());
-
+                                2),
+                        isDisplayed())));
+        appCompatCheckBox2.perform(click());
 
         ViewInteraction appCompatCheckBox3 = onView(
-                first(allOf(withId(R.id.profile_list_checkbox),
+                first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
+                                        withId(R.id.app_list_linear_layout),
                                         0),
-                                1),
+                                2),
                         isDisplayed())));
         appCompatCheckBox3.perform(click());
 
         onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
-        ViewInteraction appCompatImageButton5 = onView(
-                first(allOf(withId(R.id.schedule_more_button),
+        ViewInteraction profileExists = onView(
+                allOf(withText("Test profile"),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
-                                2),
-                        isDisplayed())));
-        appCompatImageButton5.perform(click());
+                                3),
 
-        ViewInteraction appCompatImageButton9 = onView(
-                first(allOf(withId(R.id.schedule_more_button),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                2),
-                        isDisplayed())));
-        appCompatImageButton9.perform(click());
-
-        onView(withId(R.id.schedule_name_edit_text)).perform(replaceText("test modified"));
-
-        ViewInteraction appCompatCheckBox4 = onView(
-                allOf(withId(R.id.schedule_repeat_weekly_radio),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        4),
-                                1),
                         isDisplayed()));
-        appCompatCheckBox4.perform(click());
 
-        onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
-    }
+        onView(withId(R.id.tab_notifications)).perform(click());
 
-    public static Matcher<View> first(final Matcher<View> matcher) {
-        return new BaseMatcher<View>() {
-            boolean isFirst = true;
-
-            @Override
-            public boolean matches(Object item) {
-                if (isFirst && matcher.matches(item)) {
-                    isFirst = false;
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Matches the first item of it's kind");
-            }
-        };
+        onView(withId(R.id.toolbar_clear_notifications)).perform(confirmButton);
 
     }
 
@@ -196,8 +133,27 @@ public class modifySchedule {
         }
     };
 
+    public static Matcher<View> first(final Matcher<View> matcher)
+    {
+        return new BaseMatcher<View>() {
+            boolean isFirst = true;
 
+            @Override
+            public boolean matches(Object item) {
+                if(isFirst && matcher.matches(item))
+                {
+                    isFirst = false;
+                    return true;
+                }
+                return false;
+            }
 
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Matches the first item of it's kind");
+            }
+        };
+    }
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
