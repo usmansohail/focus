@@ -906,7 +906,7 @@ public class Global {
     public void setScheduleFlags(Context context, Vector<Boolean> flags){
         SharedPreferences sp = context.getSharedPreferences(schedules_file_name, 0);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putInt("numFlags", flags.size());
+        editor.putInt("numFlags", getSchedules(context).size());
         for(int i = 0; i < flags.size(); i++){
             editor.putBoolean(i+"_val", flags.get(i));
         }
