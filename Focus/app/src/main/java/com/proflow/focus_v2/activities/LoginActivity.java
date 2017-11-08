@@ -29,24 +29,25 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.Task;
 import com.proflow.focus_v2.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -72,6 +73,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+    //private GoogleSignInClient mGoogleSignInClient;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -80,6 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private TextView mStatusTextView;
     private GoogleApiClient mGoogleApiClient;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,12 +115,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mStatusTextView = findViewById(R.id.status);
+        mStatusTextView.setText(R.string.sign_in);
 
         // Button listeners
         findViewById(R.id.sign_in_button).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, 9001);
             }
         });
@@ -150,6 +154,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 .build();
         // [END configure_signin]
 
+        // create client
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // check if google already signed in    // TODO
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
+        //updateUI
+
+
         // [START build_client]
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -157,12 +170,104 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         // [END build_client]
+        if(account != null)
+        {
+            mGoogleSignInClient.signOut();
+        }
+
+
 
         // [START customize_button]
         // Set the dimensions of the sign-in button.
         SignInButton signInButton = findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setColorScheme(SignInButton.COLOR_LIGHT);
+
+        // setup the sign up stuff
+        final ScrollView signIn = findViewById(R.id.login_form);
+        final ScrollView signUp = findViewById(R.id.register_form);
+        final Button sign_up = findViewById(R.id.email_sign_up_button);
+        sign_up.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // hide the current view
+
+                signIn.setVisibility(View.GONE);
+                signUp.setVisibility(View.VISIBLE);
+                mStatusTextView.setText(R.string.sign_up);
+
+                Button signUpDone = findViewById(R.id.email_sign_up_button_done);
+                signUpDone.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // get all the data
+                        validateRegister();
+                    }
+                });
+
+                Button signInSwitch = findViewById(R.id.email_sign_in_button_switch);
+                signInSwitch.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mStatusTextView.setText(R.string.sign_in);
+                        signIn.setVisibility(View.VISIBLE);
+                        signUp.setVisibility(View.GONE);
+                    }
+                });
+            }
+        });
+    }
+
+    private void validateRegister() {
+        // get the proper views
+        TextView usernameView = findViewById(R.id.username_register);
+        TextView passwordView = findViewById(R.id.password_register);
+        TextView passwordConfirmView = findViewById(R.id.password_register_confirm);
+        TextView emailView = findViewById(R.id.email_register);
+        TextView fullNameView = findViewById(R.id.full_name_register);
+
+        // get the string values
+        String username = usernameView.getText().toString();
+        String password = passwordView.getText().toString();
+        String passwordConfirm = passwordConfirmView.getText().toString();
+        String email = emailView.getText().toString();
+        String fullName = fullNameView.getText().toString();
+
+        // boolean to determine validity
+        boolean isValid = true;
+
+        if(username.length() == 0)
+        {
+            usernameView.setError(getString(R.string.prompt_username));
+            isValid = false;
+        }
+        if(password.length() == 0)
+        {
+            isValid = false;
+            passwordView.setError(getString(R.string.enter_password));
+        }
+        if(!password.equals(passwordConfirm) || passwordConfirm.length() == 0)
+        {
+            isValid = false;
+            passwordConfirmView.setError(getString(R.string.match_password));
+        }
+        if(!email.contains("@") || (!email.contains(".")))
+        {
+            isValid = false;
+            emailView.setError(getString(R.string.error_invalid_email));
+        }
+        if(fullName.length() == 0 || !fullName.contains(" "))
+        {
+            isValid = false;
+            fullNameView.setError(getString(R.string.invalid_name));
+        }
+
+        if(isValid) {
+            // TODO: put  this into db
+
+            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask.execute((Void) null);
+
+        }
     }
 
     private void populateAutoComplete() {
@@ -224,27 +329,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
+        String emailOrUsername = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(emailOrUsername)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!isEmailValid(emailOrUsername)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
             cancel = true;
         }
 
@@ -256,7 +361,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(emailOrUsername, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -361,24 +466,35 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 9001) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+
         }
     }
 
     // [START handleSignInResult]
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d("Yo", "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            Intent enter = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(enter);
-        } else {
-            // Signed out, show unauthenticated UI.
+    private void handleSignInResult(Task<GoogleSignInAccount> result) {
+        try
+        {
+            GoogleSignInAccount account = result.getResult(ApiException.class);
+
+            signInWithGoogle(account);
 
         }
+        catch (ApiException e)
+        {
+
+        }
+    }
+
+    private void signInWithGoogle(GoogleSignInAccount account) {
+        //TODO: add the user to the db if its not already in there
+
+        Log.d("ID Token", account.getId());
+        // enter the app
+        mAuthTask = new UserLoginTask(account.getEmail(), account.getIdToken());
+        mAuthTask.execute((Void) null);
+
     }
 
     private interface ProfileQuery {

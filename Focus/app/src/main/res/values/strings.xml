@@ -281,5 +281,15 @@
     <string name="disconnect">Disconnect</string>
     <string name="signed_out">Signed Out</string>
     <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="prompt_password_confirm">Please Confirm Password</string>
+    <string name="prompt_username">Please enter a username</string>
+    <string name="prompt_name">Please enter your full name</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="enter_password">Please enter a password</string>
+    <string name="match_password">please  enter a matching password</string>
+    <string name="invalid_name">Please enter your full name</string>
+    <string name="sign_in_google">Sign In With Google</string>
 
 </resources>
