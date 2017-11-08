@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.AppAdapter;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
@@ -21,6 +23,7 @@ import com.proflow.focus_v2.models.Profile;
 
 import java.util.Collections;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 public class ModifyProfileFragment extends BaseFragment {
 
@@ -85,6 +88,9 @@ public class ModifyProfileFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 Global.getInstance().removeProfile(getContext(), currentProfile);
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child("User1").child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
+
                 getActivity().onBackPressed();
             }
         });
@@ -96,6 +102,8 @@ public class ModifyProfileFragment extends BaseFragment {
                 //TODO implement confirmation & validation of input.
                 currentProfile.setName(mProfileNameEditText.getText().toString());
                 currentProfile.setApps(getSelectedPackages());
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child("User1").child("Profiles").child(String.valueOf(currentProfile.getId())).setValue(currentProfile);
                 boolean found = Global.getInstance().modifyProfile(getContext(), currentProfile);
                 if(!found){
                     Log.d(TAG, "MPF: profile not found");

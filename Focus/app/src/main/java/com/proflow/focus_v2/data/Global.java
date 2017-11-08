@@ -283,19 +283,20 @@ public class Global {
 
     //This could almost certainly be optimized, but it works... So...
     public int getProfileUniqueID() {
-        int possibleId = new Random().nextInt();
+        int possibleId;
+        if(profileList.size() == 0){
+            possibleId = 0;
+        }
+        else{
+            Vector<Integer> existingIds = new Vector<>();
+
+            for (Profile p : profileList) {
+                existingIds.add(p.getId());
+            }
+            possibleId = existingIds.get(existingIds.size() - 1) + 1;
+        }
         if (!profilesValid) {
             synchProfiles(mMostRecentContext);
-        }
-
-        Vector<Integer> existingIds = new Vector<>();
-
-        for (Profile p : profileList) {
-            existingIds.add(p.getId());
-        }
-
-        while (existingIds.contains(possibleId)) {
-            possibleId = new Random().nextInt();
         }
         return possibleId;
     }

@@ -8,6 +8,8 @@ import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.FocusNotification;
 import com.proflow.focus_v2.models.Profile;
@@ -58,6 +60,8 @@ public class NotificationBlockerListener extends NotificationListenerService{
                 e.printStackTrace();
             }
             //will then add notification to vector of what a user missed during blocked profile
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+            mDatabase.child("User1").child("Notification").child(fn.getName()).setValue(fn);
             Global.getInstance().addFocusNotification(getApplicationContext(), fn);
         }
     }

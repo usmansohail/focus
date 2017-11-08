@@ -1,6 +1,7 @@
 package com.proflow.focus_v2.adapters;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -14,6 +15,11 @@ import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.data.Global;
@@ -24,6 +30,7 @@ import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -38,7 +45,7 @@ import java.util.Vector;
 
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder> {
 
-    private List<Profile> mProfiles = new ArrayList<>();
+    private static List<Profile> mProfiles = new ArrayList<>();
     private Context mContext;
     Schedule mSchedule = null;
     Vector<Profile> checkedProfiles = new Vector<>();
@@ -76,7 +83,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     public ProfileAdapter(List<Profile> profiles, Context context){
         mContext = context;
-        this.mProfiles = Global.getInstance().getAllProfiles(context);
+        this.mProfiles = profiles;
+        //this.mProfiles = Global.getInstance().getAllProfiles(context);
     }
 
 
@@ -105,6 +113,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     @Override
     public void onBindViewHolder(final ProfileViewHolder holder, int position) {
+        //Log.e("Test", String.valueOf(mProfiles.size()));
+
         final Profile currentProfile = mProfiles.get(position);
         holder.thisProfile = currentProfile;
         holder.name.setText(currentProfile.getName());

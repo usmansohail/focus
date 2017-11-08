@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.AppAdapter;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
@@ -93,6 +95,8 @@ public class CreateProfileFragment extends BaseFragment {
     
                     Profile newProfile = new Profile(profileName, selectedPackages);
                     Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                    mDatabase.child("User1").child("Profiles").child(String.valueOf(newProfile.getId())).setValue(newProfile);
                     getActivity().onBackPressed();
                 }
             }
