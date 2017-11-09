@@ -88,8 +88,8 @@ public class ModifyProfileFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 Global.getInstance().removeProfile(getContext(), currentProfile);
-                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("User1").child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
+//                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+//                mDatabase.child("User1").child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
 
                 getActivity().onBackPressed();
             }

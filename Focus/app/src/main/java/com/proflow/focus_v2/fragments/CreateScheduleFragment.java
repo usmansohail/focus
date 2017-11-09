@@ -142,8 +142,8 @@ public class CreateScheduleFragment extends BaseFragment {
             mDeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.child("User1").child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
+//                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+//                    mDatabase.child("User1").child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     fm.popBackStack();
                     FragmentTransaction ft = fm.beginTransaction();
