@@ -91,6 +91,15 @@ public class ScheduleAdapter extends BaseAdapter {
             }
         });
 
+        final ImageButton deleteButton = view.findViewById(R.id.schedule_delete_icon_button);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Global.getInstance().removeSchedule(mContext, currentSchedule);
+                notifyDataSetChanged();
+            }
+        });
+
         SwitchCompat activeSwitch = view.findViewById(R.id.schedule_active_switch);
 
         activeSwitch.setChecked(currentSchedule.isActive());
@@ -105,6 +114,8 @@ public class ScheduleAdapter extends BaseAdapter {
                 }
             }
         });
+
+
 
         return view;
     }
