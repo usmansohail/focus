@@ -13,6 +13,11 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.ScheduleAdapter;
 import com.proflow.focus_v2.data.Global;
@@ -61,6 +66,7 @@ public class SchedulesFragment extends BaseFragment {
             int scheduleToDeleteID = getArguments().getInt(getString(R.string.schedule_id_to_delete));
             Schedule scheduleToDelete = Global.getInstance().getScheduleById(scheduleToDeleteID);
             Global.getInstance().removeSchedule(getContext(), scheduleToDelete);
+            resetNotificationFlags();
             this.setArguments(null);
         }
 
@@ -73,9 +79,27 @@ public class SchedulesFragment extends BaseFragment {
         Log.d("SchedulesFragment", "starting global getSchedules");
 
         Log.d("SchedulesFragment", "Creating new Schedule Adapter");
-        mAdapter = new ScheduleAdapter(getActivity());
-        // attach the adapter to the expandable list view
-        scheduleListView.setAdapter(mAdapter);
+
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Schedules");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vector<Schedule> temp = new Vector<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    Schedule schedule = new Schedule(id);
+                    temp.add(schedule);
+                }
+                mAdapter = new ScheduleAdapter(getActivity(), temp);
+                // attach the adapter to the expandable list view
+                scheduleListView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         addScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,4 +126,12 @@ public class SchedulesFragment extends BaseFragment {
         return layout;
     }
 
+    public void resetNotificationFlags(){
+        Vector<Boolean> blockingProfiles = new Vector<>();
+        Vector<Schedule> schedules = Global.getInstance().getSchedules();
+        for(int i=0; i<schedules.size(); i++){
+            blockingProfiles.add(schedules.get(i).isBlocking());
+        }
+        Global.getInstance().setScheduleFlags(getContext(), blockingProfiles);
+    }
 }

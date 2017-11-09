@@ -563,19 +563,16 @@ public class Global {
     //Wow this is a terrible implementation and I hate myself for it.
     //TODO Optimize this entire fucking TERRIBLE class.
     public int getUniqueScheduleID() {
-        int possibleId = new Random().nextInt();
+        int possibleId = 0;
+        if(scheduleList.size() == 0){
+            possibleId = 0;
+        }
+        else{
+            possibleId = scheduleList.get(scheduleList.size() - 1).getId() + 1;
+        }
+
         if (!schedulesValid) {
             synchSchedules(mMostRecentContext);
-        }
-
-        Vector<Integer> existingIds = new Vector<>();
-
-        for (Schedule s : scheduleList) {
-            existingIds.add(s.getId());
-        }
-
-        while (existingIds.contains(possibleId)) {
-            possibleId = new Random().nextInt();
         }
 
         return possibleId;

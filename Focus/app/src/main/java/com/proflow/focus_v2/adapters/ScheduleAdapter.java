@@ -33,19 +33,21 @@ public class ScheduleAdapter extends BaseAdapter {
     private static final String TAG = "ScheduleAdapter";
 
     Context mContext;
+    Vector<Schedule> mSchedules;
 
-    public ScheduleAdapter(Context context){
+    public ScheduleAdapter(Context context, Vector<Schedule> schedules){
         mContext = context;
+        mSchedules = schedules;
     }
 
     @Override
     public int getCount() {
-        return Global.getInstance().getSchedules(mContext).size();
+        return mSchedules.size();
     }
 
     @Override
     public Schedule getItem(int i) {
-        return Global.getInstance().getSchedules().get(i);
+        return mSchedules.get(i);
     }
 
     @Override
