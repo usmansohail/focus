@@ -83,7 +83,9 @@ public class FocusTimer {
                 if(!paused && ! finished){
                     if(mCurrentDuration <= 0){
                         togglePause();
-                        finished = true;
+
+                        mCurrentDuration = mInitialDuration;
+
                         NotificationUtils mNotificationUtils = new NotificationUtils(ContextActivity.getAppContext());
                         Notification.Builder nb = mNotificationUtils.
                                 getNotification("Timer Ended", mNotifMessage);

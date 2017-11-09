@@ -102,8 +102,10 @@ public class AppBlocker extends Service {
     public synchronized int onStartCommand(Intent intent, int flags, int startId) {
 
         //If we have ORIGINAL_INENT
-        if(intent.hasExtra("ORIGINAL_INTENT")){
+        if(intent != null) {
+            if (intent.hasExtra("ORIGINAL_INTENT")) {
 
+            }
         }
 
         running = true;
@@ -264,11 +266,15 @@ public class AppBlocker extends Service {
         for(int i=0; i<schedules.size(); i++){
             newBlockingProfiles.add(schedules.get(i).isBlocking());
         }
-        for(int i=0; i<oldBlockingProfiles.size(); i++){
-            if(oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true){
-                sendScheduleStartNotif(i);
-            }else if(oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false){
-                sendScheduleEndNotif(i);
+
+
+        if(oldBlockingProfiles.size() > 0 && newBlockingProfiles.size() > 0) {
+            for (int i = 0; i < oldBlockingProfiles.size(); i++) {
+                if (oldBlockingProfiles.get(i) == false && newBlockingProfiles.get(i) == true) {
+                    sendScheduleStartNotif(i);
+                } else if (oldBlockingProfiles.get(i) == true && newBlockingProfiles.get(i) == false) {
+                    sendScheduleEndNotif(i);
+                }
             }
         }
         Global.getInstance().setScheduleFlags(getApplicationContext(), newBlockingProfiles);
