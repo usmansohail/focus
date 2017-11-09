@@ -2,6 +2,7 @@ package com.proflow.focus_v2.adapters;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,6 +63,15 @@ public class NotificationAdapter extends BaseAdapter {
             view = inf.inflate(R.layout.list_item_notification, null);
         }
         ImageView iconView = view.findViewById(R.id.notification_list_icon);
+        iconView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!Global.getInstance().appIsBlocked(mContext, currentNote.getPackageName())) {
+                    Intent intent = mContext.getPackageManager().getLaunchIntentForPackage(currentNote.getPackageName());
+                    mContext.startActivity(intent);
+                }
+            }
+        });
 
         TextView titleView = view.findViewById(R.id.notification_list_title);
         TextView descrView = view.findViewById(R.id.notification_list_description);
