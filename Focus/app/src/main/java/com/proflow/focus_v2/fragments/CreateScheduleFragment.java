@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
@@ -140,6 +142,8 @@ public class CreateScheduleFragment extends BaseFragment {
             mDeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+//                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+//                    mDatabase.child("User1").child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     fm.popBackStack();
                     FragmentTransaction ft = fm.beginTransaction();
@@ -179,6 +183,10 @@ public class CreateScheduleFragment extends BaseFragment {
                     mSchedule.setRepeatWeekly(repeat);
 
                     //tell schedule to modify sched if it exists, and if not - add it.
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                    mDatabase.child("User1").child("Schedules").child(String.valueOf(mSchedule.getId())).setValue(mSchedule);
+                    mDatabase.child("User1").child("Schedules").child(String.valueOf(mSchedule.getId())).child("repeatWeekly").setValue(repeat);
+
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
                     Global.getInstance().synchAll(getContext());
                     resetNotificationFlags();

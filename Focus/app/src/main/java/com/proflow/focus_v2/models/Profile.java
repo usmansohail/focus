@@ -4,9 +4,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Parcelable;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.proflow.focus_v2.data.Global;
 
-import java.io.Serializable;
 import java.util.Vector;
 
 /**
@@ -22,6 +23,18 @@ public class Profile {
     private Vector<PackageInfo> mPackages;
     private boolean mIsActive;
     private int id;
+
+    public Profile(){
+        //for DataSnapshot.getValue
+    }
+
+    public Profile(DataSnapshot snapshot){
+        mName = snapshot.child("name").getValue(String.class);
+        mIsActive = snapshot.child("active").getValue(Boolean.class);
+        id = snapshot.child("id").getValue(Integer.class);
+        /*GenericTypeIndicator<Vector<PackageInfo>> vectorGeneric = new GenericTypeIndicator<Vector<PackageInfo>>() {};
+        mPackages = snapshot.child("apps").getValue(vectorGeneric);*/
+    }
 
     public Profile(String name, Vector<PackageInfo> packageIds){
         mName = name;

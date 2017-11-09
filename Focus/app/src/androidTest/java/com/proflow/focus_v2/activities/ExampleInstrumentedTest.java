@@ -1,9 +1,11 @@
-package com.proflow.focus_v2;
+package com.proflow.focus_v2.activities;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.proflow.focus_v2.R;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

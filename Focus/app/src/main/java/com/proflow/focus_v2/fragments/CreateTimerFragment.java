@@ -13,6 +13,8 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
@@ -102,6 +104,8 @@ public class CreateTimerFragment extends BaseFragment {
             public void onClick(View view) {
                 if(validate()){
                     FocusTimer ft = new FocusTimer("", getDuration(), mProfileAdapter.getCheckedProfiles());
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                    mDatabase.child("User1").child("Timers").child(String.valueOf(ft.getId())).setValue(ft);
                     Global.getInstance().addTimer(getContext(), ft);
                     getActivity().onBackPressed();
                 }

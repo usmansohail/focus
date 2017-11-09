@@ -489,7 +489,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private void signInWithGoogle(GoogleSignInAccount account) {
         //TODO: add the user to the db if its not already in there
-
+        //use id as password
+        //maybe getid instead getidtoken
         Log.d("ID Token", account.getId());
         // enter the app
         mAuthTask = new UserLoginTask(account.getEmail(), account.getIdToken());

@@ -5,10 +5,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
 import com.proflow.focus_v2.data.Global;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Vector;
@@ -43,6 +45,23 @@ public class Schedule implements Serializable {
         mRepeatWeekly = repeatWeekly;
         mProfiles = profiles;
         this.id = id;
+    }
+
+    public Schedule(DataSnapshot snapshot){
+        mName = snapshot.child("name").getValue(String.class);
+        id = snapshot.child("id").getValue(Integer.class);
+        ArrayList<TimeBlock> result1 = (ArrayList<TimeBlock>) snapshot.child("timeBlocks").getValue();
+        Vector<TimeBlock> timeBlocks = new Vector<>();
+        for(int i = 0; i < result1.size(); i++){
+            timeBlocks.add(result1.get(i));
+        }
+        mTimeBlocks = timeBlocks;
+        ArrayList<Profile> result2 = (ArrayList<Profile>) snapshot.child("profiles").getValue();
+        Vector<Profile> profiles = new Vector<>();
+        for(int i = 0; i < result2.size(); i++){
+            profiles.add(result2.get(i));
+        }
+        mProfiles = profiles;
     }
 
     /*
