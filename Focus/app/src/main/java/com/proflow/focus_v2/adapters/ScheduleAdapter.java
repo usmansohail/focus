@@ -14,6 +14,8 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.data.Global;
@@ -98,6 +100,8 @@ public class ScheduleAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 Global.getInstance().removeSchedule(mContext, currentSchedule);
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child("User1").child("Schedules").child(Integer.toString(currentSchedule.getId())).removeValue();
                 notifyDataSetChanged();
             }
         });

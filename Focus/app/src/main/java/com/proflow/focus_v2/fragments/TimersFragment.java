@@ -67,7 +67,7 @@ public class TimersFragment extends BaseFragment {
         resetToolbar();
         //TODO implement timerListView
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Timer");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Timers");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
