@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
+import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -61,7 +62,8 @@ public class NotificationBlockerListener extends NotificationListenerService{
             }
             //will then add notification to vector of what a user missed during blocked profile
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            mDatabase.child("User1").child("Notification").child(fn.getName()).setValue(fn);
+            mDatabase.child("User1").child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
+            Log.e("Notification", "Notification added");
             Global.getInstance().addFocusNotification(getApplicationContext(), fn);
         }
     }

@@ -795,11 +795,21 @@ public class Global {
         }
     }
 
+    public int getUniqueNotificationId(){
+        Vector<FocusNotification> nots = notifications;
+        if(nots.isEmpty()){
+            return 0;
+        }
+        else{
+            return (nots.get(nots.size() - 1).getId() + 1);
+        }
+    }
+
     public Boolean removeFocusNotification(Context context, FocusNotification notification) {
         Vector<FocusNotification> nots = getFocusNotifications(context);
 
         for(FocusNotification fn : nots){
-            if(fn.getDescription().compareToIgnoreCase(notification.getDescription()) == 0){
+            if(fn.getId() == notification.getId()){
                 nots.remove(fn);
                 return true;
             }
