@@ -196,7 +196,7 @@ public class deleteTimer {
             e.printStackTrace();
         }
 
-        /*ViewInteraction appCompatCheckBox2 = onView(
+        ViewInteraction appCompatCheckBox2 = onView(
                 first(allOf(withId(R.id.profile_list_checkbox),
                         childAtPosition(
                                 allOf(withId(R.id.profile_wrapper),
@@ -205,7 +205,7 @@ public class deleteTimer {
                                                 0)),
                                 1),
                         isDisplayed())));
-        appCompatCheckBox2.perform(click());*/
+        appCompatCheckBox2.perform(click());
 
         // Added a sleep statement to match the app's execution delay.
         // The recommended way to handle such scenarios is to use Espresso idling resources:

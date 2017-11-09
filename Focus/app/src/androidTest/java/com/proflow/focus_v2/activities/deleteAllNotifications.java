@@ -1,4 +1,4 @@
-package com.proflow.focus_v2.activities;
+package com.proflow.focus_v2;
 
 
 import android.support.test.espresso.UiController;

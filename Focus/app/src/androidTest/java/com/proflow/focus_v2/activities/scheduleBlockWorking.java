@@ -39,21 +39,24 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class timerBlockWorking {
+public class scheduleBlockWorking {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
     public void timerBlockWorking() {
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        ViewInteraction bottomBarTab2 = onView(
+                allOf(withId(R.id.tab_profiles),
+                        childAtPosition(
+                                allOf(withId(R.id.bb_bottom_bar_item_container),
+                                        childAtPosition(
+                                                withId(R.id.bb_bottom_bar_outer_container),
+                                                1)),
+                                0),
+                        isDisplayed()));
+        bottomBarTab2.perform(click());
 
         ViewInteraction appCompatImageButton = onView(
                 allOf(withId(R.id.toolbar_add_item),
@@ -64,15 +67,6 @@ public class timerBlockWorking {
                                 1),
                         isDisplayed()));
         appCompatImageButton.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.profile_name_edit_text),
@@ -85,15 +79,6 @@ public class timerBlockWorking {
                         isDisplayed()));
         appCompatEditText.perform(replaceText("t"), closeSoftKeyboard());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         ViewInteraction appCompatCheckBox = onView(
                 first(allOf(withId(R.id.app_list_checkbox),
                         childAtPosition(
@@ -104,45 +89,18 @@ public class timerBlockWorking {
                         isDisplayed())));
         appCompatCheckBox.perform(click());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction bottomBarTab = onView(
-                allOf(withId(R.id.tab_timers),
+        ViewInteraction bottomBarTab3 = onView(
+                allOf(withId(R.id.tab_schedules),
                         childAtPosition(
                                 allOf(withId(R.id.bb_bottom_bar_item_container),
                                         childAtPosition(
                                                 withId(R.id.bb_bottom_bar_outer_container),
                                                 1)),
-                                2),
+                                1),
                         isDisplayed()));
-        bottomBarTab.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        bottomBarTab3.perform(click());
 
         ViewInteraction appCompatImageButton3 = onView(
                 allOf(withId(R.id.toolbar_add_item),
@@ -154,99 +112,28 @@ public class timerBlockWorking {
                         isDisplayed()));
         appCompatImageButton3.perform(click());
 
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ViewInteraction appCompatEditText2 = onView(
+                allOf(withId(R.id.schedule_name_edit_text),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.Main_Frame),
+                                        0),
+                                0),
+                        isDisplayed()));
+        appCompatEditText2.perform(replaceText("test"), closeSoftKeyboard());
 
-        ViewInteraction appCompatSpinner = onView(
-                allOf(withId(R.id.create_timer_hour_spinner),
+
+        ViewInteraction appCompatCheckBox3 = onView(
+                first(allOf(withId(R.id.profile_list_checkbox),
                         childAtPosition(
                                 childAtPosition(
                                         withClassName(is("android.widget.LinearLayout")),
                                         0),
                                 1),
-                        isDisplayed()));
-        appCompatSpinner.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        DataInteraction appCompatTextView = onData(anything())
-                .inAdapterView(childAtPosition(
-                        withClassName(is("android.widget.PopupWindow$PopupBackgroundView")),
-                        0))
-                .atPosition(1);
-        appCompatTextView.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction appCompatCheckBox2 = onView(
-                first(allOf(withId(R.id.profile_list_checkbox),
-                        childAtPosition(
-                                allOf(withId(R.id.profile_wrapper),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.LinearLayout")),
-                                                0)),
-                                1),
                         isDisplayed())));
-        appCompatCheckBox2.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        appCompatCheckBox3.perform(click());
 
         onView(withId(R.id.toolbar_confirm)).perform(confirmButton);
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ViewInteraction appCompatImageButton5 = onView(
-                first(allOf(withId(R.id.timer_list_play_pause),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        2),
-                                0),
-                        isDisplayed())));
-        appCompatImageButton5.perform(click());
-
-        // Added a sleep statement to match the app's execution delay.
-        // The recommended way to handle such scenarios is to use Espresso idling resources:
-        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(android.R.id.button1), withText("Accept"),
