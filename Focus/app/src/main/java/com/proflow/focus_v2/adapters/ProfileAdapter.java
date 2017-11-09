@@ -62,6 +62,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
         public ImageButton editButton;
         public SwitchCompat activeSwitch;
         public CheckBox checkBox;
+        ImageButton deleteButton;
         Profile thisProfile;
         View iv;
 
@@ -72,6 +73,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
             activeSwitch = (SwitchCompat) itemView.findViewById(R.id.profile_list_switch);
             checkBox = (CheckBox) itemView.findViewById(R.id.profile_list_checkbox);
             iv = itemView;
+            deleteButton = (ImageButton) itemView.findViewById(R.id.profle_delete_icon_button);
 
             if(mSchedule != null || mTimer){
                 checkBox.setVisibility(View.VISIBLE);
@@ -113,8 +115,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
 
     @Override
     public void onBindViewHolder(final ProfileViewHolder holder, int position) {
-        //Log.e("Test", String.valueOf(mProfiles.size()));
-
         final Profile currentProfile = mProfiles.get(position);
         holder.thisProfile = currentProfile;
         holder.name.setText(currentProfile.getName());
@@ -150,6 +150,15 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 @Override
                 public void onClick(View view) {
                     holder.editButton.callOnClick();
+                }
+            });
+
+            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Global.getInstance().removeProfile(mContext, currentProfile);
+                    notifyDataSetChanged();
                 }
             });
         } else {
