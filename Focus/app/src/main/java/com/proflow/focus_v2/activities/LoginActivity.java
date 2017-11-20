@@ -19,6 +19,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -48,7 +51,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.adapters.ProfileAdapter;
+import com.proflow.focus_v2.models.Profile;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -263,7 +273,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         if(isValid) {
             // TODO: put  this into db
-
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+            String replace = email.replace('.', '(');
+            Log.e("Email before validate", replace);;
+            mDatabase.child(replace).child("Password").setValue(password);
+            Log.e("Success", "Success!");
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
 
@@ -329,41 +343,72 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String emailOrUsername = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        final String emailOrUsername = mEmailView.getText().toString();
+        final String password = mPasswordView.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean success = false;
+                boolean correctEmail = false;
+                boolean correctPassword = false;
+                View focusView = null;
 
+                for(DataSnapshot s : dataSnapshot.getChildren()){
+/*                    String temp = s.getValue(String.class);
+                    String tmp = temp.replace('(', '.');
+                    Log.e("Email for checking", tmp);*/
+                    String tmp = s.getKey();
+                    if(tmp.equals(emailOrUsername)){
+                        correctEmail = true;
+                        if(s.child("Password").getValue(String.class).equals(password)){
+                            correctPassword = true;
+                            success = true;
+                        }
+                    }
+                }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(emailOrUsername)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(emailOrUsername)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
+                // Check for a valid email address.
+                if (TextUtils.isEmpty(emailOrUsername)) {
+                    mEmailView.setError(getString(R.string.error_field_required));
+                    focusView = mEmailView;
+                    success = false;
+                } else if (!correctEmail) {
+                    mEmailView.setError(getString(R.string.error_invalid_email));
+                    focusView = mEmailView;
+                }
+                // Check for a valid password, if the user entered one.
+                else if (!TextUtils.isEmpty(password) && !correctPassword) {
+                    mPasswordView.setError("Password is wrong");
+                    focusView = mPasswordView;
+                }
 
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(emailOrUsername, password);
-            mAuthTask.execute((Void) null);
-        }
+                if(!success){
+                    loginFailure(focusView);
+                }
+                else{
+                    loginSuccess(emailOrUsername, password);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void loginSuccess(String emailOrUsername, String password){
+        // Show a progress spinner, and kick off a background task to
+        // perform the user login attempt.
+        showProgress(true);
+        mAuthTask = new UserLoginTask(emailOrUsername, password);
+        mAuthTask.execute((Void) null);
+    }
+
+    private void loginFailure(View focusView){
+        focusView.requestFocus();
     }
 
     private boolean isEmailValid(String email) {
@@ -492,6 +537,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //use id as password
         //maybe getid instead getidtoken
         Log.d("ID Token", account.getId());
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child(account.getEmail()).child("Password").setValue(account.getIdToken());
         // enter the app
         mAuthTask = new UserLoginTask(account.getEmail(), account.getIdToken());
         mAuthTask.execute((Void) null);
@@ -533,7 +580,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
+           /* for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
                     // Account exists, return true if the password matches.
@@ -541,7 +588,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }
 
-            // TODO: register the new account here.
+            // TODO: register the new account here.*/
             return true;
         }
 
