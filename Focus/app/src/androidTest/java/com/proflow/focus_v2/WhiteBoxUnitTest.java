@@ -277,7 +277,7 @@ public class WhiteBoxUnitTest {
             }
         }
         Global.getInstance().removeProfile(context, profile);
-        assertTrue(topPackageName.equals("com.fdunlap.focus_v2"));
+        assertTrue(topPackageName.equals("com.proflow.focus_v2"));
 
     }
 
