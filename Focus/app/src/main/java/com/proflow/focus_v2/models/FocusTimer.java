@@ -3,6 +3,7 @@ package com.proflow.focus_v2.models;
 import android.app.Notification;
 import android.content.pm.PackageInfo;
 
+import com.google.firebase.database.DataSnapshot;
 import com.proflow.focus_v2.activities.ContextActivity;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.helpers.NotificationUtils;
@@ -34,7 +35,7 @@ public class FocusTimer {
     private boolean paused = true;
     private boolean finished = false;
 
-    Timer mTimer = new Timer(true);
+    transient Timer mTimer = new Timer(true);
 
     public int mPeriod = 1000;
 
@@ -68,6 +69,16 @@ public class FocusTimer {
         }, 0, mPeriod);
 
         id = Global.getInstance().getUniqueTimerID();
+    }
+
+    public FocusTimer(DataSnapshot snapshot){
+        mName = snapshot.child("name").getValue(String.class);
+        id = snapshot.child("id").getValue(Integer.class);
+        finished = snapshot.child("finished").getValue(Boolean.class);
+        mCurrentDuration = snapshot.child("currentDuration").getValue(Long.class);
+        mInitialDuration = snapshot.child("initialDuration").getValue(Long.class);
+        paused = snapshot.child("paused").getValue(Boolean.class);
+
     }
 
     public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles,long currentDuration, int id){

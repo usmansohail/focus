@@ -103,11 +103,11 @@ public class WhiteBoxUnitTest {
         boolean changed = false;
         Vector<Profile> result = Global.getInstance().getAllProfiles(context);
         for(Profile p : result){
-            if(p.getId() == profile.getId()){
-                if(p.getName().equals(profile.getName())){
+
+                if(profile.getName().equals(profile.getName())){
                     changed = true;
                 }
-            }
+
         }
         assertTrue(changed);
     }
@@ -119,13 +119,14 @@ public class WhiteBoxUnitTest {
         Schedule schedule = new Schedule("schedule", times, Global.getInstance().getAllProfiles(context), true, 200);
         Global.getInstance().addSchedule(context, schedule);
 
+
         schedule.setName("Changed");
         schedule.setRepeatWeekly(false);
         Global.getInstance().modifySchedule(context, schedule);
         Vector<Schedule> result = Global.getInstance().getSchedules(context);
         boolean changed = false;
         for(Schedule s : result){
-            if(s.getName().equals("Changed")){
+            if(schedule.getName().equals("Changed")){
                 changed = true;
             }
         }

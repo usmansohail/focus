@@ -283,19 +283,20 @@ public class Global {
 
     //This could almost certainly be optimized, but it works... So...
     public int getProfileUniqueID() {
-        int possibleId = new Random().nextInt();
+        int possibleId;
+        if(profileList.size() == 0){
+            possibleId = 0;
+        }
+        else{
+            Vector<Integer> existingIds = new Vector<>();
+
+            for (Profile p : profileList) {
+                existingIds.add(p.getId());
+            }
+            possibleId = existingIds.get(existingIds.size() - 1) + 1;
+        }
         if (!profilesValid) {
             synchProfiles(mMostRecentContext);
-        }
-
-        Vector<Integer> existingIds = new Vector<>();
-
-        for (Profile p : profileList) {
-            existingIds.add(p.getId());
-        }
-
-        while (existingIds.contains(possibleId)) {
-            possibleId = new Random().nextInt();
         }
         return possibleId;
     }
@@ -562,19 +563,16 @@ public class Global {
     //Wow this is a terrible implementation and I hate myself for it.
     //TODO Optimize this entire fucking TERRIBLE class.
     public int getUniqueScheduleID() {
-        int possibleId = new Random().nextInt();
+        int possibleId = 0;
+        if(scheduleList.size() == 0){
+            possibleId = 0;
+        }
+        else{
+            possibleId = scheduleList.get(scheduleList.size() - 1).getId() + 1;
+        }
+
         if (!schedulesValid) {
             synchSchedules(mMostRecentContext);
-        }
-
-        Vector<Integer> existingIds = new Vector<>();
-
-        for (Schedule s : scheduleList) {
-            existingIds.add(s.getId());
-        }
-
-        while (existingIds.contains(possibleId)) {
-            possibleId = new Random().nextInt();
         }
 
         return possibleId;
@@ -794,11 +792,21 @@ public class Global {
         }
     }
 
+    public int getUniqueNotificationId(){
+        Vector<FocusNotification> nots = notifications;
+        if(nots.isEmpty()){
+            return 0;
+        }
+        else{
+            return (nots.get(nots.size() - 1).getId() + 1);
+        }
+    }
+
     public Boolean removeFocusNotification(Context context, FocusNotification notification) {
         Vector<FocusNotification> nots = getFocusNotifications(context);
 
         for(FocusNotification fn : nots){
-            if(fn.getDescription().compareToIgnoreCase(notification.getDescription()) == 0){
+            if(fn.getId() == notification.getId()){
                 nots.remove(fn);
                 return true;
             }

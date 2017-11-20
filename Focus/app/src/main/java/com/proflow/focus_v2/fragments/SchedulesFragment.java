@@ -18,6 +18,11 @@ import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ScheduleAdapter;
@@ -70,6 +75,7 @@ public class SchedulesFragment extends BaseFragment {
             int scheduleToDeleteID = getArguments().getInt(getString(R.string.schedule_id_to_delete));
             Schedule scheduleToDelete = Global.getInstance().getScheduleById(scheduleToDeleteID);
             Global.getInstance().removeSchedule(getContext(), scheduleToDelete);
+            resetNotificationFlags();
             this.setArguments(null);
         }
 
@@ -91,6 +97,29 @@ public class SchedulesFragment extends BaseFragment {
 //        scheduleListView.setAdapter(mAdapter);
 
         weekViewSetup(layout);
+        Log.d("SchedulesFragment", "Creating new Schedule Adapter");
+
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Schedules");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vector<Schedule> temp = new Vector<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    Schedule schedule = new Schedule(id);
+                    temp.add(schedule);
+                }
+                //When data is changed, it should just be added to the Globals. TBD
+//                mAdapter = new ScheduleAdapter(getActivity(), temp);
+                // attach the adapter to the expandable list view
+//                scheduleListView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         addScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -245,4 +274,12 @@ public class SchedulesFragment extends BaseFragment {
         });
     }
 
+    public void resetNotificationFlags(){
+        Vector<Boolean> blockingProfiles = new Vector<>();
+        Vector<Schedule> schedules = Global.getInstance().getSchedules();
+        for(int i=0; i<schedules.size(); i++){
+            blockingProfiles.add(schedules.get(i).isBlocking());
+        }
+        Global.getInstance().setScheduleFlags(getContext(), blockingProfiles);
+    }
 }

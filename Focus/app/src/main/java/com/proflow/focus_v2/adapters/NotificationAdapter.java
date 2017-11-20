@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.FocusNotification;
+
+import java.util.Vector;
 
 /**
  * Created by forre on 10/19/2017.
@@ -26,9 +31,12 @@ import com.proflow.focus_v2.models.FocusNotification;
 public class NotificationAdapter extends BaseAdapter {
 
     private Context mContext;
+    private Vector<FocusNotification> mNotifications = new Vector<FocusNotification>();
 
-    public NotificationAdapter(Context context){
+    public NotificationAdapter(Context context, Vector<FocusNotification> notifications){
+        mNotifications = notifications;
         mContext = context;
+
     }
 
     @Override
@@ -48,6 +56,7 @@ public class NotificationAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        Log.e("Notification", "Notification: " + i + " and has name: " + getItem(i).getName());
         final FocusNotification currentNote = getItem(i);
 
         PackageManager pm = mContext.getPackageManager();
@@ -86,6 +95,8 @@ public class NotificationAdapter extends BaseAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child("User1").child("Notification").child(String.valueOf(currentNote.getId())).removeValue();
                 Global.getInstance().removeFocusNotification(mContext, currentNote);
                 notifyDataSetChanged();
             }
