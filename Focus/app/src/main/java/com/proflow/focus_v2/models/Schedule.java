@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.alamkanak.weekview.WeekViewEvent;
 import com.proflow.focus_v2.data.Global;
 
 import java.io.Serializable;
@@ -17,7 +18,7 @@ import java.util.Vector;
  * Created by forre on 10/19/2017.
  */
 
-public class Schedule implements Serializable {
+public class Schedule implements Serializable  {
 
     private static final String TAG = "Schedule";
 
@@ -166,9 +167,7 @@ public class Schedule implements Serializable {
         return mRepeatWeekly;
     }
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getId(){return id;}
 
     public boolean isBlocking() {
         if(isActive) {

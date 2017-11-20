@@ -4,9 +4,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('C:/Users/Usman Sohail/.android/debug.keystore')
-            storePassword 'android'
+            keyPassword 'greencap01'
+            storeFile file('D:/keystore')
+            storePassword 'greencap01'
         }
     }
     compileSdkVersion 26
@@ -36,7 +36,6 @@ android {
 dependencies {
     // more google sign in stuff
     compile 'com.google.android.gms:play-services-auth:11.6.0'
-
     implementation 'com.google.android.gms:play-services-auth:11.6.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile 'com.android.support:support-annotations:24.0.0'
@@ -59,7 +58,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
-
+    compile 'com.github.alamkanak:android-week-view:1.2.6'
 }
 
 

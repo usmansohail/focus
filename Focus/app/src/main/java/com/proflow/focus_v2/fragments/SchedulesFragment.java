@@ -1,6 +1,7 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,12 +14,20 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.alamkanak.weekview.DateTimeInterpreter;
+import com.alamkanak.weekview.MonthLoader;
+import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewEvent;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ScheduleAdapter;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Vector;
 
 public class SchedulesFragment extends BaseFragment {
@@ -46,10 +55,10 @@ public class SchedulesFragment extends BaseFragment {
     ImageButton addScheduleButton;
 
     //RecyclerView Adapter
-    ScheduleAdapter mAdapter;
+//    ScheduleAdapter mAdapter;
 
     //Schedule List
-    Vector<Schedule> schedules;
+//    Vector<Schedule> schedules;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,15 +76,21 @@ public class SchedulesFragment extends BaseFragment {
         resetToolbar();
 
         //instantiate global views
-        scheduleListView = layout.findViewById(R.id.schedule_list_view);
+//        scheduleListView = layout.findViewById(R.id.schedule_list_view);
         addScheduleButton = addItemButton;
 
-        Log.d("SchedulesFragment", "starting global getSchedules");
+        /*
+            Deprecated SchedulesListView
+         */
 
-        Log.d("SchedulesFragment", "Creating new Schedule Adapter");
-        mAdapter = new ScheduleAdapter(getActivity());
+//        Log.d("SchedulesFragment", "starting global getSchedules");
+
+//        Log.d("SchedulesFragment", "Creating new Schedule Adapter");
+//        mAdapter = new ScheduleAdapter(getActivity());
         // attach the adapter to the expandable list view
-        scheduleListView.setAdapter(mAdapter);
+//        scheduleListView.setAdapter(mAdapter);
+
+        weekViewSetup(layout);
 
         addScheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +103,7 @@ public class SchedulesFragment extends BaseFragment {
                 Global.getInstance().addSchedule(getContext(), sched);
                 Global.getInstance().synchSchedules(getContext());
                 Log.d("SchedulesFragment", "Adding scheduleID: " + sched.getId() + " to args");
-                args.putInt(getString(R.string.scheduleKey), sched.getId());
+                args.putInt(getString(R.string.scheduleKey), (int) sched.getId());
                 args.putBoolean(getString(R.string.schedule_is_new), true);
                 frag.setArguments(args);
 
@@ -100,6 +115,134 @@ public class SchedulesFragment extends BaseFragment {
         });
 
         return layout;
+    }
+
+    private void weekViewSetup(View layout) {
+        WeekView mWeekView = layout.findViewById(R.id.weekView);
+
+// Set an action when any event is clicked.
+        mWeekView.setOnEventClickListener(new WeekView.EventClickListener() {
+            @Override
+            public void onEventClick(WeekViewEvent event, RectF eventRect) {
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+
+                Bundle args = new Bundle();
+                args.putInt(getContext().getString(R.string.scheduleKey), (int) event.getId());
+                args.putBoolean(getContext().getString(R.string.schedule_is_new), false);
+
+                CreateScheduleFragment frag = CreateScheduleFragment.newInstance();
+                frag.setArguments(args);
+
+                ft.replace(R.id.Main_Frame, frag);
+                ft.addToBackStack(null);
+
+                ft.commit();
+            }
+        });
+
+// The week view has infinite scrolling horizontally. We have to provide the events of a
+// month every time the month changes on the week view.
+        mWeekView.setMonthChangeListener(new MonthLoader.MonthChangeListener() {
+            public static final String TAG = "WeekViewSetup";
+
+            @Override
+            public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+
+                Log.d(TAG, "onMonthChange");
+
+                List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
+
+                // Calendar Based Method
+                for(Schedule s : Global.getInstance().getSchedules(getContext())){
+                    Log.d(TAG, "Got schedule: " + s.getName());
+                    for(TimeBlock tb : s.getTimeBlocks()){
+                        Calendar startTime = Calendar.getInstance();
+                        startTime.set(Calendar.MONTH, newMonth - 1);
+                        startTime.set(Calendar.YEAR, newYear);
+                        startTime.set(Calendar.HOUR_OF_DAY, tb.getStartTime().hour);
+                        startTime.set(Calendar.MINUTE, tb.getStartTime().minute);
+                        Calendar endTime = (Calendar) startTime.clone();
+                        endTime.set(Calendar.HOUR, tb.getEndTime().hour);
+                        endTime.set(Calendar.MINUTE, tb.getEndTime().minute);
+                        for(TimeBlock.day day : tb.getDays()){
+                            Log.d(TAG, "Got day of Week" + day.toString());
+                            int dayOfWeekInt = TimeBlock.day.toInteger(day);
+                            for(int i = 0; i < 4; i++){
+                                startTime.set(Calendar.DAY_OF_WEEK_IN_MONTH, dayOfWeekInt + (i*dayOfWeekInt));
+                                endTime.set(Calendar.DAY_OF_WEEK_IN_MONTH, dayOfWeekInt + (i*dayOfWeekInt));
+                                WeekViewEvent event = new WeekViewEvent(s.getId(), s.getName(), (Calendar) startTime.clone(), (Calendar) endTime.clone());
+                                event.setColor(getResources().getColor(R.color.ActivatedSwitch));
+                                events.add(event);
+                            }
+                        }
+                    }
+                }
+
+//                for(Schedule s : Global.getInstance().getSchedules(getContext())){
+//                    Log.d(TAG, "Got schedule: " + s.getName());
+//                    for(TimeBlock tb : s.getTimeBlocks()){
+//                        Calendar currTime = Calendar.getInstance();
+//                        for(TimeBlock.day day : tb.getDays()){
+//                            int dayOfWeekInt = TimeBlock.day.toInteger(day);
+//
+//                            for(int i = 0; i < 4; i++){
+//                                events.add(
+//                                        new WeekViewEvent(s.getId(), s.getName(),
+//                                        currTime.get(Calendar.YEAR), newMonth, dayOfWeekInt, tb.getStartTime().hour, tb.getStartTime().minute,
+//                                        currTime.get(Calendar.YEAR), newMonth, dayOfWeekInt, tb.getEndTime().hour, tb.getEndTime().minute));
+//                            }
+//                        }
+//                    }
+//                }
+
+                return events;
+            }
+        });
+
+// Set long press listener for events.
+        mWeekView.setEventLongPressListener(new WeekView.EventLongPressListener() {
+            @Override
+            public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
+
+            }
+        });
+
+        mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
+            @Override
+            public String interpretDate(Calendar date) {
+                switch(date.get(Calendar.DAY_OF_WEEK)){
+                    case 1:
+                        return "SUNDAY";
+                    case 2:
+                        return "MONDAY";
+                    case 3:
+                        return "TUESDAY";
+                    case 4:
+                        return "WEDNESDAY";
+                    case 5:
+                        return "THURSDAY";
+                    case 6:
+                        return "FRIDAY";
+                    case 7:
+                        return "SATURDAY";
+                }
+                return "HOW?";
+            }
+
+            @Override
+            public String interpretTime(int hour) {
+                if(hour == 0){
+                    return "12:00AM";
+                } else if(hour < 12){
+                    return "" + hour + ":00AM";
+                } else if(hour == 12) {
+                    return "12:00PM";
+                } else {
+                    return "" + (hour-12) + ":00PM";
+                }
+            }
+        });
     }
 
 }
