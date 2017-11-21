@@ -275,8 +275,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // TODO: put  this into db
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
             String replace = email.replace('.', '(');
-            Log.e("Email before validate", replace);
-            mDatabase.setValue("What");
+            Log.e("Email before validate", replace);;
             mDatabase.child(replace).child("Password").setValue(password);
             Log.e("Success", "Success!");
             mAuthTask = new UserLoginTask(email, password);
@@ -357,8 +356,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 View focusView = null;
 
                 for(DataSnapshot s : dataSnapshot.getChildren()){
-                    String tmp = s.getValue(String.class).replace('(', '.');
-                    Log.e("Email for checking", tmp);
+/*                    String temp = s.getValue(String.class);
+                    String tmp = temp.replace('(', '.');
+                    Log.e("Email for checking", tmp);*/
+                    String tmp = s.getKey();
                     if(tmp.equals(emailOrUsername)){
                         correctEmail = true;
                         if(s.child("Password").getValue(String.class).equals(password)){
@@ -378,8 +379,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     focusView = mEmailView;
                 }
                 // Check for a valid password, if the user entered one.
-                if (!TextUtils.isEmpty(password) && !correctPassword) {
-                    mPasswordView.setError(getString(R.string.error_invalid_password));
+                else if (!TextUtils.isEmpty(password) && !correctPassword) {
+                    mPasswordView.setError("Password is wrong");
                     focusView = mPasswordView;
                 }
 
