@@ -1,15 +1,12 @@
 package com.proflow.focus_v2.models;
 
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 import com.proflow.focus_v2.data.Global;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -19,7 +16,7 @@ import java.util.Vector;
  * Created by forre on 10/19/2017.
  */
 
-public class Schedule implements Serializable {
+public class Schedule implements Serializable  {
 
     private static final String TAG = "Schedule";
 
@@ -185,9 +182,7 @@ public class Schedule implements Serializable {
         return mRepeatWeekly;
     }
 
-    public Integer getId() {
-        return id;
-    }
+    public Integer getId(){return id;}
 
     public boolean isBlocking() {
         if(isActive) {

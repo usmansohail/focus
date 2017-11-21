@@ -12,7 +12,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.fdunlap.focus_v2"
+        applicationId "com.proflow.focus_v2"
         minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
@@ -38,7 +38,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // more google sign in stuff
     compile 'com.google.android.gms:play-services-auth:11.6.0'
-
     implementation 'com.google.android.gms:play-services-auth:11.6.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile 'com.android.support:support-annotations:24.0.0'
@@ -61,11 +60,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     }
-
+    compile 'com.github.alamkanak:android-week-view:1.2.6'
 }
 
 
 // google sign in stuff
-apply plugin: 'com.google.gms.google-services'
-
 apply plugin: 'com.google.gms.google-services'
