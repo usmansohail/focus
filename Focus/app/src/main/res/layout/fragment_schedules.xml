@@ -2,21 +2,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.proflow.focus_v2.fragments.SchedulesFragment"
     android:background="@color/primaryBackground">
 
-    <LinearLayout
+    <com.alamkanak.weekview.WeekView
+        android:id="@+id/weekView"
         android:layout_width="match_parent"
+        app:firstDayOfWeek="sunday"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:columnGap="8dp"
+        app:dayBackgroundColor="#05000000"
+        app:eventTextColor="@android:color/white"
+        app:headerColumnBackground="#ffffffff"
+        app:headerColumnPadding="8dp"
+        app:headerColumnTextColor="#8f000000"
+        app:headerRowBackgroundColor="#ffefefef"
+        app:headerRowPadding="12dp"
+        app:hourHeight="60dp"
+        app:noOfVisibleDays="3"
+        app:textSize="12sp"
+        app:todayBackgroundColor="#1848adff"
+        app:showNowLine="true"/>
 
-        <ListView
-            android:id="@+id/schedule_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <!--Deprecated schedule List View to replace with Week View-->
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:orientation="vertical">-->
 
-        </ListView>
+        <!--<ListView-->
+            <!--android:id="@+id/schedule_list_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
 
-    </LinearLayout>
+        <!--</ListView>-->
+
+    <!--</LinearLayout>-->
 
 </FrameLayout>
