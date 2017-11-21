@@ -6,6 +6,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
@@ -864,52 +869,6 @@ public class Global {
         }
 
         notificationsValid = true;
-    }
-
-    public boolean appIsBlocked(Context context, String packageName) {
-        Vector<PackageInfo> activeApps = new Vector<>();
-
-        Log.d("NBL", "looking for: " + packageName);
-
-        Vector<Profile> profiles = getAllProfiles(context);
-        Vector<Schedule> schedules = getSchedules(context);
-        Vector<FocusTimer> timers = getTimers(context);
-
-        //Do this first cause it should be relatively quick.
-        for(FocusTimer t : timers){
-            if(!t.isPaused()){
-                for(String pName : t.getApps()){
-                    if(pName.compareToIgnoreCase(packageName) == 0){
-                        return true;
-                    }
-                }
-            }
-        }
-
-        for(Profile p : profiles){
-            if(p.isActive()){
-                activeApps.addAll(p.getApps());
-            }
-        }
-
-        for(Schedule s: schedules){
-            if(s.isBlocking()){
-                Log.d(TAG, "Blocking. Num Profiles:" + s.getProfiles().size());
-                for(Profile p : s.getProfiles()){
-                    Log.d(TAG, "Adding apps from profile: " + p.getName());
-                    activeApps.addAll(p.getApps());
-                }
-            }
-        }
-
-        for(PackageInfo pi : activeApps){
-            Log.d("NBL", "Found: " + pi.packageName);
-            if(pi.packageName.compareToIgnoreCase(packageName) == 0){
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void clearNotifications(Context context) {

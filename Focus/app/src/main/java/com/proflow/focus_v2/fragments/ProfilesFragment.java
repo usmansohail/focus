@@ -54,7 +54,6 @@ public class ProfilesFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
     }
 
     @Override

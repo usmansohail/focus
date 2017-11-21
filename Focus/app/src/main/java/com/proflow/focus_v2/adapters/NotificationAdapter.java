@@ -75,10 +75,8 @@ public class NotificationAdapter extends BaseAdapter {
         iconView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!Global.getInstance().appIsBlocked(mContext, currentNote.getPackageName())) {
                     Intent intent = mContext.getPackageManager().getLaunchIntentForPackage(currentNote.getPackageName());
                     mContext.startActivity(intent);
-                }
             }
         });
 
