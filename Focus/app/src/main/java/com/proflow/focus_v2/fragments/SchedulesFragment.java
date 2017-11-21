@@ -1,6 +1,7 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.content.Intent;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,11 +9,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.alamkanak.weekview.DateTimeInterpreter;
 import com.alamkanak.weekview.MonthLoader;
@@ -24,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.activities.LoginActivity;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ScheduleAdapter;
 import com.proflow.focus_v2.data.Global;
@@ -58,6 +64,7 @@ public class SchedulesFragment extends BaseFragment {
     //Global views
     ListView scheduleListView;
     ImageButton addScheduleButton;
+    ImageButton expandMenuButton;
 
     //RecyclerView Adapter
 //    ScheduleAdapter mAdapter;
@@ -70,6 +77,7 @@ public class SchedulesFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_schedules, container, false);
+        expandMenuButton = largerMenuButton;
 
         if(getArguments() != null){
             int scheduleToDeleteID = getArguments().getInt(getString(R.string.schedule_id_to_delete));
@@ -143,7 +151,44 @@ public class SchedulesFragment extends BaseFragment {
             }
         });
 
-        return layout;
+
+
+        //TODO
+        expandMenuButton.setVisibility(View.VISIBLE);
+        expandMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO figure out what would even need to go into a menu, and then add that here
+                //Recommend looking for a dropdown library?
+                PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.container_menu));
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.options_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+
+                        Toast toast = Toast.makeText(getContext(), "clicked button", Toast.LENGTH_SHORT);
+                        toast.show();
+                        switch (menuItem.getItemId())
+                        {
+                            case R.id.logout:
+                                Intent logout = new Intent(getContext(), LoginActivity.class);
+                                startActivity(logout);
+
+
+
+                                return true;
+
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
+            }
+        });
+
+
+                return layout;
     }
 
     private void weekViewSetup(View layout) {
