@@ -62,7 +62,7 @@ public class NotificationBlockerListener extends NotificationListenerService{
             }
             //will then add notification to vector of what a user missed during blocked profile
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            mDatabase.child("User1").child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
+            mDatabase.child(Global.getInstance().getUsername()).child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
             Log.e("Notification", "Notification added");
             Global.getInstance().addFocusNotification(getApplicationContext(), fn);
         }

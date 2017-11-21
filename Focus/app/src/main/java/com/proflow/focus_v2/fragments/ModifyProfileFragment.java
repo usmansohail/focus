@@ -89,7 +89,7 @@ public class ModifyProfileFragment extends BaseFragment {
             public void onClick(View view) {
                 Global.getInstance().removeProfile(getContext(), currentProfile);
 //                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-//                mDatabase.child("User1").child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
+//                mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
 
                 getActivity().onBackPressed();
             }
@@ -103,7 +103,7 @@ public class ModifyProfileFragment extends BaseFragment {
                 currentProfile.setName(mProfileNameEditText.getText().toString());
                 currentProfile.setApps(getSelectedPackages());
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("User1").child("Profiles").child(String.valueOf(currentProfile.getId())).setValue(currentProfile);
+                mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(currentProfile.getId())).setValue(currentProfile);
                 boolean found = Global.getInstance().modifyProfile(getContext(), currentProfile);
                 if(!found){
                     Log.d(TAG, "MPF: profile not found");

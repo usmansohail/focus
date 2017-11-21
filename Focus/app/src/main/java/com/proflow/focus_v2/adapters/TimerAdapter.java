@@ -98,7 +98,7 @@ public class TimerAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("User1").child("Timers").child(String.valueOf(currentTimer.getId())).removeValue();
+                mDatabase.child(Global.getInstance().getUsername()).child("Timers").child(String.valueOf(currentTimer.getId())).removeValue();
                 Global.getInstance().removeTimer(mContext, currentTimer);
                 notifyDataSetChanged();
             }

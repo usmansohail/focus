@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         checkPermissions();
-
         //Set up globals from IDs
             //mainFrame = Fragment frame
         mainFrame = (FrameLayout) findViewById(R.id.Main_Frame);

@@ -57,6 +57,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.models.Profile;
 
@@ -360,7 +361,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     String tmp = temp.replace('(', '.');
                     Log.e("Email for checking", tmp);*/
                     String tmp = s.getKey();
-                    if(tmp.equals(emailOrUsername)){
+                    String replace = tmp.replace('(', '.');
+                    if(replace.equals(emailOrUsername)){
                         correctEmail = true;
                         if(s.child("Password").getValue(String.class).equals(password)){
                             correctPassword = true;
@@ -598,6 +600,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                String replace = mEmail.replace('.', '(');
+                Global.getInstance().setUsername(replace);
                 Intent enter = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(enter);
                 finish();

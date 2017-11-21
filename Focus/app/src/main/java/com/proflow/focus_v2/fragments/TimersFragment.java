@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.adapters.TimerAdapter;
 import com.proflow.focus_v2.models.FocusTimer;
@@ -67,7 +68,7 @@ public class TimersFragment extends BaseFragment {
         resetToolbar();
         //TODO implement timerListView
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Timers");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -117,7 +118,7 @@ public class TimersFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Timer");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timer");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

@@ -86,7 +86,7 @@ public class ProfilesFragment extends BaseFragment {
             }
         });
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Profiles");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

@@ -81,7 +81,7 @@ public class SchedulesFragment extends BaseFragment {
         Log.d("SchedulesFragment", "Creating new Schedule Adapter");
 
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Schedules");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Schedules");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

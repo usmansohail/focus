@@ -51,6 +51,8 @@ public class Global {
     private static Vector<FocusTimer> timerList = new Vector<>();
     private static Vector<FocusNotification> notifications = new Vector<>();
 
+    private static String mUsername;
+
     private Global() {
     }
 
@@ -60,6 +62,10 @@ public class Global {
     private boolean schedulesValid = false;
     private boolean timersValid = false;
     private boolean notificationsValid = false;
+
+    //For saving and returning username
+    public void setUsername(String username) { mUsername = username; }
+    public String getUsername() { return mUsername; }
 
     public void invalidateApps() {
         appsValid = false;

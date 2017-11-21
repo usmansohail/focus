@@ -143,7 +143,7 @@ public class CreateScheduleFragment extends BaseFragment {
                 @Override
                 public void onClick(View view) {
 //                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-//                    mDatabase.child("User1").child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
+//                    mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     fm.popBackStack();
                     FragmentTransaction ft = fm.beginTransaction();
@@ -184,8 +184,8 @@ public class CreateScheduleFragment extends BaseFragment {
 
                     //tell schedule to modify sched if it exists, and if not - add it.
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.child("User1").child("Schedules").child(String.valueOf(mSchedule.getId())).setValue(mSchedule);
-                    mDatabase.child("User1").child("Schedules").child(String.valueOf(mSchedule.getId())).child("repeatWeekly").setValue(repeat);
+                    mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(String.valueOf(mSchedule.getId())).setValue(mSchedule);
+                    mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(String.valueOf(mSchedule.getId())).child("repeatWeekly").setValue(repeat);
 
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
                     Global.getInstance().synchAll(getContext());

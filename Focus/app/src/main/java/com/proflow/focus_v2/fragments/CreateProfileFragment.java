@@ -96,7 +96,7 @@ public class CreateProfileFragment extends BaseFragment {
                     Profile newProfile = new Profile(profileName, selectedPackages);
                     Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.child("User1").child("Profiles").child(String.valueOf(newProfile.getId())).setValue(newProfile);
+                    mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(newProfile.getId())).setValue(newProfile);
                     getActivity().onBackPressed();
                 }
             }

@@ -86,7 +86,7 @@ public class NotificationAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("User1").child("Notification").child(String.valueOf(currentNote.getId())).removeValue();
+                mDatabase.child(Global.getInstance().getUsername()).child("Notification").child(String.valueOf(currentNote.getId())).removeValue();
                 Global.getInstance().removeFocusNotification(mContext, currentNote);
                 notifyDataSetChanged();
             }
