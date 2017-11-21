@@ -20,6 +20,7 @@ import java.util.Vector;
 public class Profile {
 
     private String mName;
+    public Vector<String> mPackageNames = new Vector<>();
     private Vector<PackageInfo> mPackages;
     private boolean mIsActive;
     private int id;
@@ -32,8 +33,10 @@ public class Profile {
         mName = snapshot.child("name").getValue(String.class);
         mIsActive = snapshot.child("active").getValue(Boolean.class);
         id = snapshot.child("id").getValue(Integer.class);
-        /*GenericTypeIndicator<Vector<PackageInfo>> vectorGeneric = new GenericTypeIndicator<Vector<PackageInfo>>() {};
-        mPackages = snapshot.child("apps").getValue(vectorGeneric);*/
+        for(DataSnapshot userSnapshot : snapshot.child("apps").getChildren()){
+            String temp = userSnapshot.child("packageName").getValue(String.class);
+            mPackageNames.add(temp);
+        }
     }
 
     public Profile(String name, Vector<PackageInfo> packageIds){
@@ -56,8 +59,8 @@ public class Profile {
         mName = name;
     }
 
-    public Vector<PackageInfo> getApps(){
-        return mPackages;
+    public Vector<String> getApps(){
+        return mPackageNames;
     }
 
     public void setApps(Vector<PackageInfo> apps){

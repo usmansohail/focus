@@ -34,19 +34,18 @@ public class TimerAdapter extends BaseAdapter {
 
     public TimerAdapter(Context context, Vector<FocusTimer> timers){
         mContext = context;
-        Timer timer = new Timer(true);
         this.mTimers = timers;
         //Forces the text views to update. Woo.
     }
 
     @Override
     public int getCount() {
-        return Global.getInstance().getTimers(mContext).size();
+        return mTimers.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return Global.getInstance().getTimers(mContext).get(i);
+        return mTimers.get(i);
     }
 
     @Override
@@ -83,8 +82,8 @@ public class TimerAdapter extends BaseAdapter {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                currentTimer.togglePause();
-
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child(Global.getInstance().getUsername()).child("Timers").child(Integer.toString(currentTimer.getId())).child("paused").setValue(!currentTimer.isPaused());
                 if(currentTimer.isPaused()){
                     playPauseButton.setBackground(mContext.getDrawable(R.drawable.ic_play_dark));
                 } else {

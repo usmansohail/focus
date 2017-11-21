@@ -130,7 +130,6 @@ public class AppBlocker extends Service {
                 }
             });
             mHandler.postDelayed(this, 300);
-
         }
     };
 

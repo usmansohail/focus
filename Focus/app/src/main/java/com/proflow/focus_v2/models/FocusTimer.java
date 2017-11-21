@@ -8,6 +8,8 @@ import com.proflow.focus_v2.activities.ContextActivity;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.helpers.NotificationUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -31,6 +33,7 @@ public class FocusTimer {
     private Long mInitialDuration;
     private Long mCurrentDuration;
     private int id;
+    private Vector<String> mApps;
 
     private boolean paused = true;
     private boolean finished = false;
@@ -39,7 +42,7 @@ public class FocusTimer {
 
     public int mPeriod = 1000;
 
-    private Vector<Profile> mProfiles;
+    private Vector<Profile> mProfiles = new Vector();
     private String mNotifMessage;
 
     public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles){
@@ -78,7 +81,10 @@ public class FocusTimer {
         mCurrentDuration = snapshot.child("currentDuration").getValue(Long.class);
         mInitialDuration = snapshot.child("initialDuration").getValue(Long.class);
         paused = snapshot.child("paused").getValue(Boolean.class);
-
+        for(DataSnapshot userSnapshot : snapshot.child("profiles").getChildren()){
+            Profile profile = new Profile(userSnapshot);
+            mProfiles.add(profile);
+        }
     }
 
     public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles,long currentDuration, int id){
@@ -167,10 +173,11 @@ public class FocusTimer {
     public Vector<String> getApps(){
         Vector<String> appBucket = new Vector<>();
 
-        for(Profile p : mProfiles){
-            for(PackageInfo pi : p.getApps()){
-                if(!appBucket.contains(pi.packageName)){
-                    appBucket.add(pi.packageName);
+        for(int i=0; i<mProfiles.size(); i++){
+            Vector<String> temp = mProfiles.get(i).getApps();
+            for(int j = 0; j<temp.size(); j++){
+                if(!appBucket.contains(temp.get(j))){
+                    appBucket.add(temp.get(j));
                 }
             }
         }
