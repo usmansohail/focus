@@ -16,10 +16,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.firebase.database.DatabaseReference;
@@ -32,9 +38,10 @@ import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
-import com.google.api.client.*;
-import com.google.api.services.calendar.model.Calendar;
+import com.google.api.services.calendar.*;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Vector;
 
 import static android.content.ContentValues.TAG;
@@ -210,7 +217,26 @@ public class CreateScheduleFragment extends BaseFragment {
                     googleEvent.setEnd(end);
 
                     String calendarID = "primary";
-                   //googleEvent = service.events().insert(calendarID, googleEvent).execute();
+
+                    // more calendar stuff
+                    String [] SCOPES = {CalendarScopes.CALENDAR_READONLY};
+
+                    GoogleAccountCredential mCredential = GoogleAccountCredential.usingOAuth2(
+                            getContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
+
+                    // transport and json factory
+                    HttpTransport transport = AndroidHttp.newCompatibleTransport();
+                    JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+
+                    Calendar service = new Calendar.Builder(transport, jsonFactory, mCredential).build();
+
+                    try {
+                        //GoogleSignInAccount googleSignInAccount = new GoogleSignInAccount();
+
+                        googleEvent = service.events().insert(calendarID, googleEvent).execute();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
 
                     Global.getInstance().modifySchedule(getContext(), mSchedule);

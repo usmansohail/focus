@@ -40,18 +40,23 @@ repositories {
 dependencies {
     implementation 'com.google.firebase:firebase-database:11.6.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    // google calendar stuff
-    compile 'pub.devrel:easypermissions:0.3.0'
-    compile('com.google.api-client:google-api-client-android:1.23.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    compile('com.google.apis:google-api-services-calendar:v3-rev268-1.23.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
+
     // more google sign in stuff
     compile 'com.google.android.gms:play-services-auth:11.6.0'
     implementation 'com.google.android.gms:play-services-auth:11.6.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    // google calendar stuff
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'pub.devrel:easypermissions:0.3.0'
+    compile('com.google.api-client:google-api-client-android:1.23.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+    compile('com.google.apis:google-api-services-calendar:v3-rev269-1.23.0') {
+        exclude group: 'org.apache.httpcomponents'
+    }
+
+
     //AddedLibraries
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

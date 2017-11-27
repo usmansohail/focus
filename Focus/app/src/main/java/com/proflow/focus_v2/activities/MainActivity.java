@@ -11,8 +11,10 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.proflow.focus_v2.Manifest;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
 import com.proflow.focus_v2.data.Global;
@@ -47,6 +50,7 @@ import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_REQUEST_INTERNET = 1019;
     private final String TAG = "MainActivity";
     boolean debug = false;
 
@@ -350,6 +354,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean checkPermissions(){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            // ask for permission
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.INTERNET},
+                    MY_PERMISSIONS_REQUEST_INTERNET);
+        }
+
         //dialog to turn on permissions appears if notification service has not yet been enabled
         if(!isUsageAccessEnabled(getApplicationContext())){
             buildUsageAccessPermissionsAlertDialog().show();
