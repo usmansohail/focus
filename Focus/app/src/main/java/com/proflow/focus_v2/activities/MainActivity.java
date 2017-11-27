@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     //BottomBar
     BottomBar bottomBar;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

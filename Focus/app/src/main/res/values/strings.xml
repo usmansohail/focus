@@ -291,5 +291,7 @@
     <string name="match_password">please  enter a matching password</string>
     <string name="invalid_name">Please enter your full name</string>
     <string name="sign_in_google">Sign In With Google</string>
+    <string name="title_activity_calendar_delete">CalendarDelete</string>
+    <string name="logout">Logout</string>
 
 </resources>
