@@ -1,6 +1,9 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.content.ClipData;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -9,10 +12,15 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.FocusFinder;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.activities.LoginActivity;
+import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.NotificationAdapter;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.data.Global;
@@ -43,6 +53,8 @@ public class NotificationsFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -59,11 +71,17 @@ public class NotificationsFragment extends BaseFragment {
     //RecyclerView Adapter
     NotificationAdapter mAdapter;
 
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_notifications, container, false);
+
+        setHasOptionsMenu(true);
+
+
 
         resetToolbar();
         //Global view assignment
@@ -74,7 +92,7 @@ public class NotificationsFragment extends BaseFragment {
 
         //TODO Implement NotificationListView
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Profiles");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -104,17 +122,50 @@ public class NotificationsFragment extends BaseFragment {
             }
         });
 
+        final View menuContainer  = layout.findViewById(R.id.container_menu);
+        final Context c = getContext();
+
         //TODO
-        expandMenuButton.setVisibility(View.GONE);
+        expandMenuButton.setVisibility(View.VISIBLE);
+
         expandMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //TODO figure out what would even need to go into a menu, and then add that here
                 //Recommend looking for a dropdown library?
+                PopupMenu popup = new PopupMenu(getContext(), getActivity().findViewById(R.id.container_menu));
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.options_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+
+                        Toast toast = Toast.makeText(getContext(), "clicked button", Toast.LENGTH_SHORT);
+                        toast.show();
+                        switch (menuItem.getItemId())
+                        {
+                            case R.id.logout:
+                                Intent logout = new Intent(getContext(), LoginActivity.class);
+                                startActivity(logout);
+
+
+
+                                return true;
+
+                        }
+                        return false;
+                    }
+                });
+                popup.show();
             }
         });
 
+
+
+
         return layout;
     }
+
+
 
 }

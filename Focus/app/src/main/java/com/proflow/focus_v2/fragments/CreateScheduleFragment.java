@@ -19,6 +19,9 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.proflow.focus_v2.R;
@@ -29,6 +32,8 @@ import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
+import com.google.api.client.*;
+import com.google.api.services.calendar.model.Calendar;
 
 import java.util.Vector;
 
@@ -143,7 +148,7 @@ public class CreateScheduleFragment extends BaseFragment {
                 @Override
                 public void onClick(View view) {
 //                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-//                    mDatabase.child("User1").child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
+//                    mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(Integer.toString(mSchedule.getId())).removeValue();
                     FragmentManager fm = getActivity().getSupportFragmentManager();
                     fm.popBackStack();
                     FragmentTransaction ft = fm.beginTransaction();
@@ -184,8 +189,29 @@ public class CreateScheduleFragment extends BaseFragment {
 
                     //tell schedule to modify sched if it exists, and if not - add it.
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.child("User1").child("Schedules").child(String.valueOf(mSchedule.getId())).setValue(mSchedule);
-                    mDatabase.child("User1").child("Schedules").child(String.valueOf(mSchedule.getId())).child("repeatWeekly").setValue(repeat);
+                    mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(String.valueOf(mSchedule.getId())).setValue(mSchedule);
+                    mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(String.valueOf(mSchedule.getId())).child("repeatWeekly").setValue(repeat);
+
+                    //TODO: Implement adding to google calendar
+                    Event googleEvent = new Event()
+                            .setSummary("Test")
+                            .setDescription("This is a test");
+
+                    DateTime startDate = new DateTime("2017-11-21T09:00:00-7:00");
+                    EventDateTime start = new EventDateTime()
+                            .setDateTime(startDate)
+                            .setTimeZone("America/Los_Angeles");
+                    googleEvent.setStart(start);
+
+                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+                    EventDateTime end = new EventDateTime()
+                            .setDate(endTime)
+                            .setTimeZone("America/Los_Angeles");
+                    googleEvent.setEnd(end);
+
+                    String calendarID = "primary";
+                   // googleEvent = service.events().insert(calendarID, googleEvent).execute();
+
 
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
                     Global.getInstance().synchAll(getContext());

@@ -57,7 +57,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
+import com.proflow.focus_v2.fragments.CalendarDelete;
 import com.proflow.focus_v2.models.Profile;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -360,7 +362,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     String tmp = temp.replace('(', '.');
                     Log.e("Email for checking", tmp);*/
                     String tmp = s.getKey();
-                    if(tmp.equals(emailOrUsername)){
+                    String replace = tmp.replace('(', '.');
+                    if(replace.equals(emailOrUsername)){
                         correctEmail = true;
                         if(s.child("Password").getValue(String.class).equals(password)){
                             correctPassword = true;
@@ -534,15 +537,58 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private void signInWithGoogle(GoogleSignInAccount account) {
         //TODO: add the user to the db if its not already in there
+
+        // if the user doesn't exist
         //use id as password
         //maybe getid instead getidtoken
         Log.d("ID Token", account.getId());
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(account.getEmail()).child("Password").setValue(account.getIdToken());
-        // enter the app
-        mAuthTask = new UserLoginTask(account.getEmail(), account.getIdToken());
-        mAuthTask.execute((Void) null);
 
+        // add a listener to the database
+        final String email = account.getEmail().toString();
+        final String password = account.getId().toString();
+
+        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            Boolean success = false;
+            Boolean correctPassword = false;
+            Boolean validEmail = false;
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot s : dataSnapshot.getChildren()){
+/*                    String temp = s.getValue(String.class);
+                    String tmp = temp.replace('(', '.');
+                    Log.e("Email for checking", tmp);*/
+                    String tmp = s.getKey();
+                    String replace = tmp.replace('(', '.');
+                    if(replace.equals(email)){
+                        validEmail = true;
+                        if(s.child("Password").getValue(String.class).equals(password)){
+                            success = true;
+                            correctPassword =  true;
+
+                            //login with google stuff!
+                            mAuthTask = new UserLoginTask(email, password);
+                            mAuthTask.execute((Void) null);
+                            Log.e("GOOGLE:", "google sign in");
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        String replace = email.replace('.', '(');
+        Log.e("Email before validate", replace);;
+        mDatabase.child(replace).child("Password").setValue(password);
+        Log.e("Success", "Success!");
+        mAuthTask = new UserLoginTask(email, password);
+        mAuthTask.execute((Void) null);
     }
 
     private interface ProfileQuery {
@@ -598,7 +644,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                String replace = mEmail.replace('.', '(');
+                Global.getInstance().setUsername(replace);
                 Intent enter = new Intent(getApplicationContext(), MainActivity.class);
+                //Intent enter = new Intent(getApplicationContext(), CalendarDelete.class);
                 startActivity(enter);
                 finish();
             } else {
