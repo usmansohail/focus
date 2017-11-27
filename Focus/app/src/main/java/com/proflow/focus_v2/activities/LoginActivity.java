@@ -49,6 +49,7 @@ import com.google.android.gms.common.api.Status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -95,6 +96,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private GoogleApiClient mGoogleApiClient;
     private GoogleSignInClient mGoogleSignInClient;
 
+    // used to only launch intent once
+    boolean intentStarted;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +106,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        // indicate that an intent has not been started
+        intentStarted = false;
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -139,20 +146,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         findViewById(R.id.sign_out_button).setOnClickListener(new OnClickListener() {
                                                                   @Override
                                                                   public void onClick(View view) {
-                                                                      Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                                                                              new ResultCallback<Status>() {
-                                                                                  @Override
-                                                                                  public void onResult(Status status) {
-                                                                                      // [START_EXCLUDE]
-                                                                                      //updateUI(false);
-                                                                                      // [END_EXCLUDE]
-                                                                                  }
-                                                                              });
-                                                                  }
-                                                              });
-                findViewById(R.id.disconnect_button).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+        new ResultCallback<Status>() {
+        @Override
+        public void onResult(Status status) {
+        // [START_EXCLUDE]
+        //updateUI(false);
+        // [END_EXCLUDE]
+                    }
+            });}
+        });
+        findViewById(R.id.disconnect_button).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
                     }
                 });
@@ -174,18 +180,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //updateUI
 
 
+
         // [START build_client]
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
+
+
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         // [END build_client]
         if(account != null)
         {
-            mGoogleSignInClient.signOut();
+           mGoogleSignInClient.signOut();
         }
-
 
 
         // [START customize_button]
@@ -546,6 +554,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // add a listener to the database
         final String email = account.getEmail().toString();
         final String password = account.getId().toString();
+        final Vector<Boolean> numIntents = new Vector<>();
 
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             Boolean success = false;
@@ -570,6 +579,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             mAuthTask = new UserLoginTask(email, password);
                             mAuthTask.execute((Void) null);
                             Log.e("GOOGLE:", "google sign in");
+                            numIntents.add(true);
+
                         }
                     }
                 }
@@ -583,11 +594,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
         String replace = email.replace('.', '(');
-        Log.e("Email before validate", replace);;
+        Log.e("Email before validate", replace);
         mDatabase.child(replace).child("Password").setValue(password);
         Log.e("Success", "Success!");
-        mAuthTask = new UserLoginTask(email, password);
-        mAuthTask.execute((Void) null);
+
+        // if a task hasn't been launched yet, then launch it
+        if(numIntents.size() > 0) {
+            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask.execute((Void) null);
+        }
     }
 
     private interface ProfileQuery {
@@ -645,6 +660,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (success) {
                 Intent enter = new Intent(getApplicationContext(), MainActivity.class);
                 //Intent enter = new Intent(getApplicationContext(), CalendarDelete.class);
+
+                Log.d("INTENT", "entering main activity");
+
                 startActivity(enter);
                 finish();
             } else {

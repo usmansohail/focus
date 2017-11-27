@@ -158,7 +158,15 @@ public class TimersFragment extends BaseFragment {
     @Override
     public void onPause() {
         super.onPause();
-        mRunnable.stop();
+
+        // TODO: Check if this is ok Forrest
+        if(mRunnable != null) {
+            mRunnable.stop();
+        }
+        else
+        {
+            Log.d("NULL:", "mRunnable is null on line 161");
+        }
     }
 
     @Override

@@ -197,13 +197,13 @@ public class CreateScheduleFragment extends BaseFragment {
                             .setSummary("Test")
                             .setDescription("This is a test");
 
-                    DateTime startDate = new DateTime("2017-11-21T09:00:00-7:00");
+                    DateTime startDate = new DateTime("2017-11-21T09:00:00");
                     EventDateTime start = new EventDateTime()
                             .setDateTime(startDate)
                             .setTimeZone("America/Los_Angeles");
                     googleEvent.setStart(start);
 
-                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+                    DateTime endTime = new DateTime("2018-11-21T09:00:00");
                     EventDateTime end = new EventDateTime()
                             .setDate(endTime)
                             .setTimeZone("America/Los_Angeles");

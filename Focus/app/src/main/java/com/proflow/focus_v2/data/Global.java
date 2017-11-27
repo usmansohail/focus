@@ -863,7 +863,7 @@ public class Global {
     public boolean appIsBlocked(Context context, String packageName) {
         Vector<PackageInfo> activeApps = new Vector<>();
 
-        Log.d("NBL", "looking for: " + packageName);
+        //Log.d("NBL", "looking for: " + packageName);
 
         Vector<Profile> profiles = getAllProfiles(context);
         Vector<Schedule> schedules = getSchedules(context);

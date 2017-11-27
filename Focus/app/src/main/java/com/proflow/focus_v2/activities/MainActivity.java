@@ -191,12 +191,23 @@ public class MainActivity extends AppCompatActivity {
 
         if(!AppBlocker.running){
             startService(new Intent(this, AppBlocker.class));
+            Log.d("SERVICE IND:", "the appBlocker wasn't running");
         }
 
         if(AppBlocker.blocked){
             BlockedApplicationAlert().show();
             AppBlocker.blocked = false;
+            Log.d("SERVICE IND:", "the appBlocker was blocked");
         }
+
+
+        // initially go to the profiles fragment
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.Main_Frame, profilesFragment);
+        transaction.commit();
+        currentFragment = fragmentType.PROFILES;
+        Log.d("TAG", "The profiles fragment was just put in the main activity");
+
     }
 
     private void populateGlobalAppsList() {
