@@ -4,9 +4,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('C:/Users/Patrick Truong/.android/debug.keystore')
-            storePassword 'android'
+            keyPassword 'greencap01'
+            storeFile file('D:/keystore')
+            storePassword 'greencap01'
         }
     }
     compileSdkVersion 26
