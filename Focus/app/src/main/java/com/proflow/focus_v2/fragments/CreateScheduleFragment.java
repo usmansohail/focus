@@ -22,8 +22,11 @@ import android.widget.Toast;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
@@ -35,6 +38,8 @@ import com.proflow.focus_v2.models.TimeBlock;
 import com.google.api.client.*;
 import com.google.api.services.calendar.model.Calendar;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import static android.content.ContentValues.TAG;
@@ -49,7 +54,6 @@ public class CreateScheduleFragment extends BaseFragment {
     private boolean mIsNew = false;
 
     private Schedule mSchedule = null;
-
     private RecyclerView mProfileRecycler;
     private ProfileAdapter mProfileAdapter;
 
@@ -131,15 +135,29 @@ public class CreateScheduleFragment extends BaseFragment {
 
         Log.d(TAG, "TIMEBLOCKADAPTER: HAS: " + mTimeBlockAdapter.getCount());
         mTimeBlockList.setAdapter(mTimeBlockAdapter);
-
-
-        mProfileAdapter = new ProfileAdapter(Global.getInstance().getAllProfiles(getContext()), getContext(), mSchedule);
         mProfileRecycler = layout.findViewById(R.id.create_schedule_profile_recycler);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Profile> temp = new ArrayList<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    Profile profile = new Profile(id);
+                    temp.add(profile);
+                }
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-        mProfileRecycler.setLayoutManager(mLayoutManager);
-        mProfileRecycler.setItemAnimator(new DefaultItemAnimator());
-        mProfileRecycler.setAdapter(mProfileAdapter);
+                mProfileAdapter = new ProfileAdapter(temp, getContext(), mSchedule);
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+                mProfileRecycler.setLayoutManager(mLayoutManager);
+                mProfileRecycler.setItemAnimator(new DefaultItemAnimator());
+                mProfileRecycler.setAdapter(mProfileAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         Button mDeleteButton = layout.findViewById(R.id.create_schedule_delete_button);
         if (!mIsNew){
@@ -193,7 +211,7 @@ public class CreateScheduleFragment extends BaseFragment {
                     mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(String.valueOf(mSchedule.getId())).child("repeatWeekly").setValue(repeat);
 
                     //TODO: Implement adding to google calendar
-                    Event googleEvent = new Event()
+                    /*Event googleEvent = new Event()
                             .setSummary("Test")
                             .setDescription("This is a test");
 
@@ -209,12 +227,12 @@ public class CreateScheduleFragment extends BaseFragment {
                             .setTimeZone("America/Los_Angeles");
                     googleEvent.setEnd(end);
 
-                    String calendarID = "primary";
+                    String calendarID = "primary";*/
                    // googleEvent = service.events().insert(calendarID, googleEvent).execute();
 
 
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
-                    Global.getInstance().synchAll(getContext());
+                    Global.getInstance().synchSchedules(getContext());
                     resetNotificationFlags();
                     getActivity().onBackPressed();
                 }
