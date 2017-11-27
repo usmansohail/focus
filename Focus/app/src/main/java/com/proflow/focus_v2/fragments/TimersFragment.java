@@ -2,6 +2,7 @@ package com.proflow.focus_v2.fragments;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -160,8 +161,10 @@ class timerUpdaterRunnable implements Runnable {
     @Override
     public void run() {
         adapter.notifyDataSetChanged();
-        if(running)
+        if(running) {
             list.postDelayed(this, delay);
+
+        }
     }
 
     public void stop(){

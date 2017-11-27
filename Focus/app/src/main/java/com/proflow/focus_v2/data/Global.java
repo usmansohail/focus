@@ -139,7 +139,7 @@ public class Global {
             Log.d(TAG, "setAllPro p.size: " + p.getApps().size() + "name; " + p.getName());
 
             for (int i = 0; i < p.getApps().size(); i++) {
-                String name = p.getApps().get(i).packageName;
+                String name = p.getApps().get(i);
                 editor.putString("" + id + "_" + i, name);
             }
             editor.commit();
@@ -186,12 +186,12 @@ public class Global {
 
             Log.d(TAG, "getAllPro p.size: " + numApps + "name; " + pName);
 
-            Vector<PackageInfo> pi_vec = new Vector<>();
+            Vector<String> pi_vec = new Vector<>();
             for (int j = 0; j < numApps; j++) {
                 String packageName = sp.getString("" + id + "_" + j, "");
                 try {
                     PackageInfo pi = pm.getPackageInfo(packageName, 0);
-                    pi_vec.add(pi);
+                    pi_vec.add(pi.packageName);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -228,9 +228,9 @@ public class Global {
 
                 Log.d(TAG, "FOUND PROFILE IN MODIFY PROFILE");
 
-                for (PackageInfo pi : p.getApps()) {
+                /*for (PackageInfo pi : p.getApps()) {
                     Log.d(TAG, pi.packageName);
-                }
+                }*/
 
                 allProfiles.get(i).setApps(p.getApps());
                 allProfiles.get(i).setName(p.getName());
@@ -737,7 +737,7 @@ public class Global {
     APPS
      */
 
-    private void synchApps(Context context) {
+    public void synchApps(Context context) {
         Log.d(TAG, "synchApps: Synching apps");
 
         Set<String> appNameSet =

@@ -14,15 +14,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.adapters.AppAdapter;
+import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Profile;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 public class CreateProfileFragment extends BaseFragment {
@@ -89,16 +95,65 @@ public class CreateProfileFragment extends BaseFragment {
             public void onClick(View view) {
                 //So right now this just gives a toast
                 //TODO implement confirmation & validation of input.
-                if (validate()){
+
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        boolean atLeastOneAppSelected = mAdapter.getSelectedApps().size() > 0;
+                        boolean someName = !mProfileNameEditText.getText().toString().isEmpty();
+                        boolean uniqueName = true;
+
+                        List<Profile> temp = new ArrayList<>();
+                        for(DataSnapshot id : dataSnapshot.getChildren()) {
+                            Profile profile = new Profile(id);
+                            temp.add(profile);
+                        }
+
+                        List<Profile> allProfiles = temp;
+                        for(Profile p : allProfiles){
+                            if(mProfileNameEditText.getText().toString().compareToIgnoreCase(p.getName()) == 0){
+                                uniqueName = false;
+                            }
+                        }
+
+                        if(!atLeastOneAppSelected){
+                            Toast.makeText(getContext(), getString(R.string.noAppsSelected), Toast.LENGTH_SHORT).show();
+                        } else if(!uniqueName){
+                            Toast.makeText(getContext(), R.string.notUniqueName, Toast.LENGTH_SHORT).show();
+                        } else if(!someName){
+                            Toast.makeText(getContext(), R.string.pleaseEnterName, Toast.LENGTH_SHORT).show();
+                        }
+                        if(atLeastOneAppSelected && uniqueName && someName){
+                            String profileName = mProfileNameEditText.getText().toString();
+                            Vector<String> selectedPackages = getSelectedPackages();
+
+                            Profile newProfile = new Profile(profileName, selectedPackages);
+                            //Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
+                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                            mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(newProfile.getId())).setValue(newProfile);
+                            getActivity().onBackPressed();
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                /*if (validate()){
                     String profileName = mProfileNameEditText.getText().toString();
-                    Vector<PackageInfo> selectedPackages = getSelectedPackages();
+                    Vector<String> selectedPackages = getSelectedPackages();
     
                     Profile newProfile = new Profile(profileName, selectedPackages);
-                    Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
+                    //Global.getInstance().addProfile(getContext().getApplicationContext(), newProfile);
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                     mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(newProfile.getId())).setValue(newProfile);
                     getActivity().onBackPressed();
-                }
+                }*/
             }
         });
 
@@ -116,6 +171,7 @@ public class CreateProfileFragment extends BaseFragment {
         boolean atLeastOneAppSelected = mAdapter.getSelectedApps().size() > 0;
         boolean someName = !mProfileNameEditText.getText().toString().isEmpty();
         boolean uniqueName = true;
+
         Vector<Profile> allProfiles = Global.getInstance().getAllProfiles(getContext());
         for(Profile p : allProfiles){
             if(mProfileNameEditText.getText().toString().compareToIgnoreCase(p.getName()) == 0){
@@ -134,7 +190,7 @@ public class CreateProfileFragment extends BaseFragment {
         return atLeastOneAppSelected && uniqueName && someName;
     }
 
-    private Vector<PackageInfo> getSelectedPackages(){
+    private Vector<String> getSelectedPackages(){
         return mAdapter.getSelectedApps();
     }
 

@@ -83,6 +83,7 @@ public class TimerAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.child(Global.getInstance().getUsername()).child("Timers").child(Integer.toString(currentTimer.getId())).child("currentDuration").setValue(currentTimer.getCurrentDuration());
                 mDatabase.child(Global.getInstance().getUsername()).child("Timers").child(Integer.toString(currentTimer.getId())).child("paused").setValue(!currentTimer.isPaused());
                 if(currentTimer.isPaused()){
                     playPauseButton.setBackground(mContext.getDrawable(R.drawable.ic_play_dark));
@@ -98,11 +99,13 @@ public class TimerAdapter extends BaseAdapter {
             public void onClick(View view) {
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                 mDatabase.child(Global.getInstance().getUsername()).child("Timers").child(String.valueOf(currentTimer.getId())).removeValue();
-                Global.getInstance().removeTimer(mContext, currentTimer);
+                //Global.getInstance().removeTimer(mContext, currentTimer);
                 notifyDataSetChanged();
             }
         });
 
         return view;
     }
+
+
 }
