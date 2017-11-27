@@ -57,7 +57,6 @@ public abstract class BaseFragment extends android.support.v4.app.Fragment {
         //Because default
         setShowBottomBar(true);
 
-
         setupToolbar();
     }
 

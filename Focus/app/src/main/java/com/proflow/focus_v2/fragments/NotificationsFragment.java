@@ -69,6 +69,7 @@ public class NotificationsFragment extends BaseFragment {
         //Global view assignment
         notificationRecyclerView = layout.findViewById(R.id.notification_recycler_view);
         expandMenuButton = largerMenuButton;
+        expandMenuButton.setVisibility(View.VISIBLE);
         clearButton = clearNotificationsButton;
 
         //TODO Implement NotificationListView
