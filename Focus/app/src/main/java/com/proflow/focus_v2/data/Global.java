@@ -6,6 +6,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
@@ -51,6 +56,8 @@ public class Global {
     private static Vector<FocusTimer> timerList = new Vector<>();
     private static Vector<FocusNotification> notifications = new Vector<>();
 
+    private static String mUsername;
+
     private Global() {
     }
 
@@ -60,6 +67,10 @@ public class Global {
     private boolean schedulesValid = false;
     private boolean timersValid = false;
     private boolean notificationsValid = false;
+
+    //For saving and returning username
+    public void setUsername(String username) { mUsername = username; }
+    public String getUsername() { return mUsername; }
 
     public void invalidateApps() {
         appsValid = false;
@@ -128,7 +139,7 @@ public class Global {
             Log.d(TAG, "setAllPro p.size: " + p.getApps().size() + "name; " + p.getName());
 
             for (int i = 0; i < p.getApps().size(); i++) {
-                String name = p.getApps().get(i).packageName;
+                String name = p.getApps().get(i);
                 editor.putString("" + id + "_" + i, name);
             }
             editor.commit();
@@ -175,12 +186,12 @@ public class Global {
 
             Log.d(TAG, "getAllPro p.size: " + numApps + "name; " + pName);
 
-            Vector<PackageInfo> pi_vec = new Vector<>();
+            Vector<String> pi_vec = new Vector<>();
             for (int j = 0; j < numApps; j++) {
                 String packageName = sp.getString("" + id + "_" + j, "");
                 try {
                     PackageInfo pi = pm.getPackageInfo(packageName, 0);
-                    pi_vec.add(pi);
+                    pi_vec.add(pi.packageName);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -217,9 +228,9 @@ public class Global {
 
                 Log.d(TAG, "FOUND PROFILE IN MODIFY PROFILE");
 
-                for (PackageInfo pi : p.getApps()) {
+                /*for (PackageInfo pi : p.getApps()) {
                     Log.d(TAG, pi.packageName);
-                }
+                }*/
 
                 allProfiles.get(i).setApps(p.getApps());
                 allProfiles.get(i).setName(p.getName());
@@ -726,7 +737,7 @@ public class Global {
     APPS
      */
 
-    private void synchApps(Context context) {
+    public void synchApps(Context context) {
         Log.d(TAG, "synchApps: Synching apps");
 
         Set<String> appNameSet =
@@ -858,52 +869,6 @@ public class Global {
         }
 
         notificationsValid = true;
-    }
-
-    public boolean appIsBlocked(Context context, String packageName) {
-        Vector<PackageInfo> activeApps = new Vector<>();
-
-        Log.d("NBL", "looking for: " + packageName);
-
-        Vector<Profile> profiles = getAllProfiles(context);
-        Vector<Schedule> schedules = getSchedules(context);
-        Vector<FocusTimer> timers = getTimers(context);
-
-        //Do this first cause it should be relatively quick.
-        for(FocusTimer t : timers){
-            if(!t.isPaused()){
-                for(String pName : t.getApps()){
-                    if(pName.compareToIgnoreCase(packageName) == 0){
-                        return true;
-                    }
-                }
-            }
-        }
-
-        for(Profile p : profiles){
-            if(p.isActive()){
-                activeApps.addAll(p.getApps());
-            }
-        }
-
-        for(Schedule s: schedules){
-            if(s.isBlocking()){
-                Log.d(TAG, "Blocking. Num Profiles:" + s.getProfiles().size());
-                for(Profile p : s.getProfiles()){
-                    Log.d(TAG, "Adding apps from profile: " + p.getName());
-                    activeApps.addAll(p.getApps());
-                }
-            }
-        }
-
-        for(PackageInfo pi : activeApps){
-            Log.d("NBL", "Found: " + pi.packageName);
-            if(pi.packageName.compareToIgnoreCase(packageName) == 0){
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void clearNotifications(Context context) {

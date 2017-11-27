@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         checkPermissions();
-
         //Set up globals from IDs
             //mainFrame = Fragment frame
         mainFrame = (FrameLayout) findViewById(R.id.Main_Frame);
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
         Global.getInstance().setAllApps(getApplicationContext(), new Vector<PackageInfo>());
         Global.getInstance().setAllApps(this, packageList1);
-        Global.getInstance().synchAll(getApplicationContext());
+        Global.getInstance().synchApps(getApplicationContext());
 
         //FOR DEBUGGING - note done after apps.
 //        if(debug) {
@@ -231,11 +230,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateFakeData() {
-        Random rand = new Random();
+        /*Random rand = new Random();
 
         //Random profiles!
         for(int i = 0; i < 10; i++){
-            Vector<PackageInfo> apps = new Vector<>();
+            Vector<String> apps = new Vector<>();
             Vector<PackageInfo> allApps = Global.getInstance().getAllApps(getApplicationContext());
 
 
@@ -246,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                 while(selected.contains(appIndex)){
                     appIndex = rand.nextInt(allApps.size());
                 }
-                apps.add(allApps.get(appIndex));
+                apps.add(allApps.get(appIndex).packageName);
                 selected.add(appIndex);
             }
 
@@ -292,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Global.getInstance().addSchedule(getApplicationContext(), new Schedule(sName, tbVec, pVec, mRepeat, i));
-        }
+        }*/
 
     }
 
