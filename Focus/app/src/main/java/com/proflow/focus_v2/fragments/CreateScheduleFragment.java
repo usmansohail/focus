@@ -203,14 +203,14 @@ public class CreateScheduleFragment extends BaseFragment {
                             .setTimeZone("America/Los_Angeles");
                     googleEvent.setStart(start);
 
-                    DateTime endTime = new DateTime("2018-11-21T09:00:00");
+                    DateTime endTime = new DateTime("2018-11-21T10:00:00");
                     EventDateTime end = new EventDateTime()
                             .setDate(endTime)
                             .setTimeZone("America/Los_Angeles");
                     googleEvent.setEnd(end);
 
                     String calendarID = "primary";
-                   // googleEvent = service.events().insert(calendarID, googleEvent).execute();
+                   //googleEvent = service.events().insert(calendarID, googleEvent).execute();
 
 
                     Global.getInstance().modifySchedule(getContext(), mSchedule);
