@@ -1,5 +1,7 @@
 package com.proflow.focus_v2.models;
 
+import android.util.Log;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,7 +45,7 @@ public class FocusNotification{
     }
 
     public FocusNotification(DataSnapshot snapshot){
-        mPackageName = snapshot.child("packagename").getValue(String.class);
+        mPackageName = snapshot.child("packageName").getValue(String.class);
         mName = snapshot.child("name").getValue(String.class);
         mDescription = snapshot.child("description").getValue(String.class);
         id = snapshot.child("id").getValue(Integer.class);

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +14,20 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.MainActivity;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.FocusTimer;
+import com.proflow.focus_v2.models.Profile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateTimerFragment extends BaseFragment {
 
@@ -92,12 +100,30 @@ public class CreateTimerFragment extends BaseFragment {
         mSecondSpinner.setAdapter(mSecondSpinnerAdapter);
 
         mProfileRecycler = layout.findViewById(R.id.create_timer_profile_recycler);
-        mProfileAdapter = new ProfileAdapter(Global.getInstance().getAllProfiles(getContext()), getContext(), true);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Profile> temp = new ArrayList<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    Profile profile = new Profile(id);
+                    temp.add(profile);
+                }
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
-        mProfileRecycler.setLayoutManager(mLayoutManager);
-        mProfileRecycler.setItemAnimator(new DefaultItemAnimator());
-        mProfileRecycler.setAdapter(mProfileAdapter);
+                mProfileAdapter = new ProfileAdapter(temp, getContext(), true);
+
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+                mProfileRecycler.setLayoutManager(mLayoutManager);
+                mProfileRecycler.setItemAnimator(new DefaultItemAnimator());
+                mProfileRecycler.setAdapter(mProfileAdapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
