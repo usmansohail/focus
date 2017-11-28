@@ -6,14 +6,12 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -30,11 +28,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.activities.LoginActivity;
-import com.proflow.focus_v2.activities.MainActivity;
-import com.proflow.focus_v2.adapters.ScheduleAdapter;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
+import com.proflow.focus_v2.models.time;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -192,7 +189,7 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     private void weekViewSetup(View layout) {
-        WeekView mWeekView = layout.findViewById(R.id.weekView);
+        final WeekView mWeekView = layout.findViewById(R.id.weekView);
 
 // Set an action when any event is clicked.
         mWeekView.setOnEventClickListener(new WeekView.EventClickListener() {
@@ -224,31 +221,91 @@ public class SchedulesFragment extends BaseFragment {
             public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
 
                 Log.d(TAG, "onMonthChange");
+                Vector<Schedule> allSchedules = Global.getInstance().getSchedules(getContext());
 
                 List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
 
-                // Calendar Based Method
-                for(Schedule s : Global.getInstance().getSchedules(getContext())){
-                    Log.d(TAG, "Got schedule: " + s.getName());
+                // Calendar Based Method(s)
+                //Attempt 1
+//                for(Schedule s: allSchedules){
+//                    for(TimeBlock tb : s.getTimeBlocks()){
+//                        time start = tb.getStartTime();
+//                        time end = tb.getEndTime();
+//                        for(TimeBlock.day d : tb.getDays()){
+//                            Calendar startCalendar = Calendar.getInstance();
+//                            startCalendar.set(Calendar.YEAR, newYear);
+//                            startCalendar.set(Calendar.MONTH, newMonth - 1);
+//                            startCalendar.set(Calendar.DAY_OF_WEEK, TimeBlock.day.toInteger(d) + 1);
+//                            startCalendar.set(Calendar.HOUR, start.hour);
+//                            startCalendar.set(Calendar.MINUTE, start.minute);
+//                            startCalendar.roll(Calendar.WEEK_OF_YEAR, -1*startCalendar.get(Calendar.WEEK_OF_MONTH));
+//                            Calendar endCalendar = (Calendar) startCalendar.clone();
+//                            endCalendar.set(Calendar.HOUR, end.hour);
+//                            endCalendar.set(Calendar.MINUTE, end.minute);
+//
+//                            int numWeeks = startCalendar.getActualMaximum(Calendar.WEEK_OF_MONTH);
+//                            int originalMonth = startCalendar.get(Calendar.MONTH);
+//
+//                            Log.d(TAG, "START VAL: " + startCalendar);
+//
+//                            for(int i = 0; i < numWeeks; i++){
+////                                if(startCalendar.get(Calendar.MONTH) == originalMonth) {
+//                                    WeekViewEvent event = new WeekViewEvent(s.getId(), s.getName(), (Calendar) startCalendar.clone(), (Calendar) endCalendar.clone());
+//                                    if (s.isActive())
+//                                        event.setColor(getContext().getColor(R.color.ActivatedSwitch));
+//                                    else
+//                                        event.setColor(getContext().getColor(R.color.primaryColor));
+//                                    events.add(event);
+////                                }
+//                                Log.d(TAG, "START AFTER " + i + " ITERATIONS: " + startCalendar);
+//                                startCalendar.roll(Calendar.WEEK_OF_YEAR, 1);
+//                                endCalendar.roll(Calendar.WEEK_OF_YEAR, 1);
+//                            }
+//                        }
+//                    }
+//                }
+
+                for(Schedule s : allSchedules){
                     for(TimeBlock tb : s.getTimeBlocks()){
-                        Calendar startTime = Calendar.getInstance();
-                        startTime.set(Calendar.MONTH, newMonth - 1);
-                        startTime.set(Calendar.YEAR, newYear);
-                        startTime.set(Calendar.HOUR_OF_DAY, tb.getStartTime().hour);
-                        startTime.set(Calendar.MINUTE, tb.getStartTime().minute);
-                        Calendar endTime = (Calendar) startTime.clone();
-                        endTime.set(Calendar.HOUR, tb.getEndTime().hour);
-                        endTime.set(Calendar.MINUTE, tb.getEndTime().minute);
-                        for(TimeBlock.day day : tb.getDays()){
-                            Log.d(TAG, "Got day of Week" + day.toString());
-                            int dayOfWeekInt = TimeBlock.day.toInteger(day);
-                            for(int i = 0; i < 4; i++){
-                                startTime.set(Calendar.DAY_OF_WEEK_IN_MONTH, dayOfWeekInt + (i*dayOfWeekInt));
-                                endTime.set(Calendar.DAY_OF_WEEK_IN_MONTH, dayOfWeekInt + (i*dayOfWeekInt));
-                                WeekViewEvent event = new WeekViewEvent(s.getId(), s.getName(), (Calendar) startTime.clone(), (Calendar) endTime.clone());
-                                event.setColor(getResources().getColor(R.color.ActivatedSwitch));
+                        Vector<Integer> days = new Vector<>();
+                        for(TimeBlock.day d : tb.getDays()){
+                            days.add(TimeBlock.day.toInteger(d) + 1);
+                        }
+                        Calendar startCal = Calendar.getInstance();
+                        startCal.set(Calendar.MONTH, newMonth-1);
+                        startCal.set(Calendar.YEAR, newYear);
+                        startCal.set(Calendar.DAY_OF_MONTH, 1);
+                        if(tb.getStartTime().hour < 12){
+                            startCal.set(Calendar.AM_PM, 0);
+                            startCal.set(Calendar.HOUR, tb.getStartTime().hour);
+                        } else {
+                            startCal.set(Calendar.AM_PM, 1);
+                            startCal.set(Calendar.HOUR, tb.getStartTime().hour-12);
+                        }
+                        startCal.set(Calendar.MINUTE, tb.getStartTime().minute);
+                        int maxDays = startCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        Log.d(TAG, "Max days in month: " + maxDays);
+                        for(int i = 0; i < startCal.getActualMaximum(Calendar.DAY_OF_MONTH); i++){
+                            if(days.contains(startCal.get(Calendar.DAY_OF_WEEK))){
+
+                                Log.d(TAG, "START VAL: " + startCal);
+                                Calendar endCal = (Calendar) startCal.clone();
+                                if(tb.getEndTime().hour < 12){
+                                    endCal.set(Calendar.AM_PM, 0);
+                                    endCal.set(Calendar.HOUR, tb.getEndTime().hour);
+                                } else {
+                                    endCal.set(Calendar.AM_PM, 1);
+                                    endCal.set(Calendar.HOUR, tb.getEndTime().hour-12);
+                                }
+                                endCal.set(Calendar.MINUTE, tb.getEndTime().minute);
+                                WeekViewEvent event = new WeekViewEvent(s.getId(), s.getName(), (Calendar) startCal.clone(),(Calendar)  endCal.clone());
+                                if (s.isActive())
+                                    event.setColor(getContext().getColor(R.color.ActivatedSwitch));
+                                else
+                                    event.setColor(getContext().getColor(R.color.primaryColor));
                                 events.add(event);
                             }
+                            startCal.roll(Calendar.DAY_OF_MONTH, 1);
                         }
                     }
                 }
@@ -278,7 +335,17 @@ public class SchedulesFragment extends BaseFragment {
         mWeekView.setEventLongPressListener(new WeekView.EventLongPressListener() {
             @Override
             public void onEventLongPress(WeekViewEvent event, RectF eventRect) {
-
+                if(event != null){
+                    Schedule current = Global.getInstance().getScheduleById((int) event.getId());
+                    if(current.isActive()){
+                        current.setActive(false);
+                        event.setColor(getContext().getColor(R.color.primaryColor));
+                    } else {
+                        current.setActive(true);
+                        event.setColor(getContext().getColor(R.color.ActivatedSwitch));
+                    }
+                    mWeekView.notifyDatasetChanged();
+                }
             }
         });
 

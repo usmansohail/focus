@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.proflow.focus_v2.activities.ContextActivity;
 import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
@@ -340,7 +341,11 @@ public class Global {
     //Yeah wow that's not a small function.
     public void synchSchedules(Context context) {
         Vector<Schedule> allSchedules = new Vector<>();
-        PackageManager pm = context.getPackageManager();
+//        PackageManager pm = context.getPackageManager();
+        if(context == null){
+            mMostRecentContext = ContextActivity.getAppContext();
+            context = mMostRecentContext;
+        }
         SharedPreferences sp = context.getSharedPreferences(schedules_file_name, 0);
 
         Vector<Integer> scheduleIDs = new Vector<>();
@@ -372,9 +377,11 @@ public class Global {
                 boolean pIsActive = sp.getBoolean(id + "_profile_" + pID + "_isActive", false);
 
                 Profile p = getProfileByID(context, pID);
-                Log.d(TAG, "Found profile: " + p.getId() + " while populating schedule " + sName);
+                if(p != null) {
+                    Log.d(TAG, "Found profile: " + p.getId() + " while populating schedule " + sName);
 
-                sProfiles.add(p);
+                    sProfiles.add(p);
+                }
             }
             //Now on to reconstructing timeblocks!
             Vector<TimeBlock> timeBlocks = new Vector<>();
@@ -591,7 +598,20 @@ public class Global {
 
     public Schedule getScheduleById(int schedID) {
         if (!schedulesValid) {
-            synchSchedules(mMostRecentContext);
+            if(mMostRecentContext != null) {
+                synchSchedules(mMostRecentContext);
+            }
+        }
+        Vector<Schedule> schedules = getSchedules();
+        for (Schedule s : schedules) {
+            if (s.getId() == schedID) return s;
+        }
+        return null;
+    }
+
+    public Schedule getScheduleById(int schedID, Context context) {
+        if (!schedulesValid) {
+            synchSchedules(context);
         }
         Vector<Schedule> schedules = getSchedules();
         for (Schedule s : schedules) {
@@ -895,5 +915,8 @@ public class Global {
             flags.add(sp.getBoolean(i+"_val", false));
         }
         return flags;
+    }
+
+    private class ContextNullException extends Throwable {
     }
 }
