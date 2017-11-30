@@ -57,8 +57,10 @@ public class Global {
     private static Vector<FocusNotification> notifications = new Vector<>();
 
     private static String mUsername;
+    private static boolean mLoggedIn;
 
     private Global() {
+        mLoggedIn = false;
     }
 
 
@@ -71,6 +73,9 @@ public class Global {
     //For saving and returning username
     public void setUsername(String username) { mUsername = username; }
     public String getUsername() { return mUsername; }
+    public void login() { mLoggedIn = true; }
+    public void logout(){ mLoggedIn = false; }
+    public boolean isLoggedIn() { return mLoggedIn; }
 
     public void invalidateApps() {
         appsValid = false;
@@ -340,7 +345,7 @@ public class Global {
     //Yeah wow that's not a small function.
     public void synchSchedules(Context context) {
         Vector<Schedule> allSchedules = new Vector<>();
-        PackageManager pm = context.getPackageManager();
+        //PackageManager pm = context.getPackageManager();
         SharedPreferences sp = context.getSharedPreferences(schedules_file_name, 0);
 
         Vector<Integer> scheduleIDs = new Vector<>();
@@ -372,7 +377,7 @@ public class Global {
                 boolean pIsActive = sp.getBoolean(id + "_profile_" + pID + "_isActive", false);
 
                 Profile p = getProfileByID(context, pID);
-                Log.d(TAG, "Found profile: " + p.getId() + " while populating schedule " + sName);
+                //Log.d(TAG, "Found profile: " + p.getId() + " while populating schedule " + sName);
 
                 sProfiles.add(p);
             }

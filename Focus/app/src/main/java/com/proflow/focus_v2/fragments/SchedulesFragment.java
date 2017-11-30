@@ -83,6 +83,8 @@ public class SchedulesFragment extends BaseFragment {
             int scheduleToDeleteID = getArguments().getInt(getString(R.string.schedule_id_to_delete));
             Schedule scheduleToDelete = Global.getInstance().getScheduleById(scheduleToDeleteID);
             Global.getInstance().removeSchedule(getContext(), scheduleToDelete);
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+            mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(Integer.toString(scheduleToDeleteID)).removeValue();
             resetNotificationFlags();
             this.setArguments(null);
         }

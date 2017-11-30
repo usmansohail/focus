@@ -102,12 +102,13 @@ public class Profile {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                int uniqueId = -1;
-                for(DataSnapshot id : dataSnapshot.getChildren()){
-                    uniqueId = id.child("id").getValue(Integer.class);
+                int uniqueId = 1;
+                /*for(DataSnapshot id : dataSnapshot.getChildren()){
+                    //uniqueId = id.child("id").getValue(Integer.class);
+                    uniqueId++;
                 }
-                uniqueId++;
-                id = uniqueId;
+
+                id = uniqueId;*/
             }
 
             @Override
