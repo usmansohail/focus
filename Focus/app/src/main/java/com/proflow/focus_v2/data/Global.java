@@ -57,10 +57,9 @@ public class Global {
     private static Vector<FocusNotification> notifications = new Vector<>();
 
     private static String mUsername;
-    private static boolean mLoggedIn;
 
     private Global() {
-        mLoggedIn = false;
+
     }
 
 
@@ -73,9 +72,6 @@ public class Global {
     //For saving and returning username
     public void setUsername(String username) { mUsername = username; }
     public String getUsername() { return mUsername; }
-    public void login() { mLoggedIn = true; }
-    public void logout(){ mLoggedIn = false; }
-    public boolean isLoggedIn() { return mLoggedIn; }
 
     public void invalidateApps() {
         appsValid = false;
