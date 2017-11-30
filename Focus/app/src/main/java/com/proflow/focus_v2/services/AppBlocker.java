@@ -22,9 +22,17 @@ import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.helpers.NotificationUtils;
+import com.proflow.focus_v2.models.FocusNotification;
+import com.proflow.focus_v2.models.FocusTimer;
+import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 
 import java.util.ArrayList;
@@ -35,6 +43,8 @@ import java.util.Vector;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
+import static android.app.Notification.EXTRA_TEXT;
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by Patrick Truong on 10/16/2017.
@@ -56,13 +66,91 @@ public class AppBlocker extends Service {
         @Override
         public synchronized void run() {
 
-            checkScheduleNotificationFlags();
+            //checkScheduleNotificationFlags();
             //Added global method for checking if app is blocked.
-            String currentApp = getCurrentApp(getApplicationContext());
-            if(Global.getInstance().appIsBlocked(getApplicationContext(), currentApp)){
-                StartApplication(getApplicationContext(), getPackageName());
-                blocked = true;
-            }
+            final String currentApp = getCurrentApp(getApplicationContext());
+            final Vector<FocusTimer> timers = new Vector<>();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot id : dataSnapshot.getChildren()){
+                        for(DataSnapshot profiles : id.child("profiles").getChildren()){
+                            for(DataSnapshot packages : profiles.child("mPackageNames").getChildren()){
+                                boolean paused = id.child("paused").getValue(boolean.class);
+                                if(!paused){
+                                    if(packages.getValue(String.class).compareToIgnoreCase(currentApp) == 0){
+                                        StartApplication(getApplicationContext(), getPackageName());
+                                        blocked = true;
+                                    }
+                                }
+                            }
+                        }
+                        /*FocusTimer timer = new FocusTimer(id);
+                        timers.add(timer);*/
+                    }
+                    //Do this first cause it should be relatively quick.
+                    /*for(FocusTimer t : timers){
+                        if(!t.isPaused()){
+                            for(String pName : t.getApps()){
+                                if(pName.compareToIgnoreCase(currentApp) == 0){
+                                    StartApplication(getApplicationContext(), getPackageName());
+                                    blocked = true;
+                                }
+                            }
+                        }
+                    }*/
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+            final Vector<Schedule> schedules = new Vector<>();
+            final Vector<PackageInfo> activeApps = new Vector<>();
+            ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Schedules");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot id : dataSnapshot.getChildren()) {
+                        for(DataSnapshot profiles : id.child("profiles").getChildren()){
+                            for(DataSnapshot packages : profiles.child("mPackageNames").getChildren()){
+                                boolean blocking = id.child("blocking").getValue(boolean.class);
+                                if(blocking){
+                                    if(packages.getValue(String.class).compareToIgnoreCase(currentApp) == 0){
+                                        StartApplication(getApplicationContext(), getPackageName());
+                                        blocked = true;
+                                    }
+                                }
+                            }
+                        }
+                        /*Schedule schedule = new Schedule(id);
+                        schedules.add(schedule);*/
+                    }
+                    //Do this first cause it should be relatively quick.
+                    /*for (Schedule s : schedules) {
+                        if (s.isBlocking()) {
+                            Log.d(TAG, "Blocking. Num Profiles:" + s.getProfiles().size());
+                            for (Profile p : s.getProfiles()) {
+                                Log.d(TAG, "Adding apps from profile: " + p.getName());
+                               // activeApps.addAll(p.getApps());
+                            }
+                            for(PackageInfo pi : activeApps){
+                                Log.d("NBL", "Found: " + pi.packageName);
+                                if(pi.packageName.compareToIgnoreCase(currentApp) == 0){
+                                    StartApplication(getApplicationContext(), getPackageName());
+                                    blocked = true;
+                                }
+                            }
+                        }
+                    }*/
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
             mHandler.postDelayed(this, 300);
         }
     };

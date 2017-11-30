@@ -1,10 +1,12 @@
 package com.proflow.focus_v2.activities;
 
+import android.app.AlertDialog;
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -21,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.proflow.focus_v2.Manifest;
 import com.proflow.focus_v2.R;
@@ -33,6 +36,7 @@ import com.proflow.focus_v2.fragments.NotificationsFragment;
 import com.proflow.focus_v2.fragments.ProfilesFragment;
 import com.proflow.focus_v2.fragments.SchedulesFragment;
 import com.proflow.focus_v2.fragments.TimersFragment;
+import com.proflow.focus_v2.helpers.RetrieveTokenTask;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
@@ -51,6 +55,7 @@ import java.util.Vector;
 public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_INTERNET = 1019;
+    private static final int SIGN_IN_FOR_CALENDAR = 42069 ;
     private final String TAG = "MainActivity";
     boolean debug = false;
 
@@ -110,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         checkPermissions();
-
+        getCalendarPermissions();
         //Set up globals from IDs
             //mainFrame = Fragment frame
         mainFrame = (FrameLayout) findViewById(R.id.Main_Frame);
@@ -212,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
         currentFragment = fragmentType.PROFILES;
         Log.d("TAG", "The profiles fragment was just put in the main activity");
 
+
+
     }
 
     private void populateGlobalAppsList() {
@@ -237,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
         Global.getInstance().setAllApps(getApplicationContext(), new Vector<PackageInfo>());
         Global.getInstance().setAllApps(this, packageList1);
-        Global.getInstance().synchAll(getApplicationContext());
+        Global.getInstance().synchApps(getApplicationContext());
 
         //FOR DEBUGGING - note done after apps.
 //        if(debug) {
@@ -246,11 +253,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateFakeData() {
-        Random rand = new Random();
+        /*Random rand = new Random();
 
         //Random profiles!
         for(int i = 0; i < 10; i++){
-            Vector<PackageInfo> apps = new Vector<>();
+            Vector<String> apps = new Vector<>();
             Vector<PackageInfo> allApps = Global.getInstance().getAllApps(getApplicationContext());
 
 
@@ -261,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
                 while(selected.contains(appIndex)){
                     appIndex = rand.nextInt(allApps.size());
                 }
-                apps.add(allApps.get(appIndex));
+                apps.add(allApps.get(appIndex).packageName);
                 selected.add(appIndex);
             }
 
@@ -307,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             Global.getInstance().addSchedule(getApplicationContext(), new Schedule(sName, tbVec, pVec, mRepeat, i));
-        }
+        }*/
 
     }
 
@@ -353,7 +360,58 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public void getCalendarPermissions()
+    {
+        // get permissions for google API
+        final int REQUEST_CODE = 101;
+
+        final String[] permissions = {android.Manifest.permission.WRITE_CALENDAR,
+                android.Manifest.permission.READ_CALENDAR, android.Manifest.permission.INTERNET,
+                android.Manifest.permission.GET_ACCOUNTS};
+
+        String[] permissionNames = {"Write to Calendar", "Read from Calendar", "Use the internet ",
+                "Get Google Accounts"};
+
+        String prompt = "You need to grant all of the following permissions to use this app: " ;
+        for(int i = 0; i < permissions.length; i++)
+        {
+            Log.d("PERMISSION", permissionNames[i]);
+            prompt = prompt + permissionNames[i];
+            if(i < permissions.length - 1)
+            {
+                prompt = prompt + ", ";
+            }
+        }
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),
+                android.Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getApplicationContext(),
+                        android.Manifest.permission.WRITE_CALENDAR) !=
+                PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getApplicationContext(),
+                        android.Manifest.permission.READ_CALENDAR) !=
+                        PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(getApplicationContext(),
+                        android.Manifest.permission.GET_ACCOUNTS) !=
+                        PackageManager.PERMISSION_GRANTED ) {
+            new AlertDialog.Builder(this)
+                    .setMessage(prompt)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            requestPermissions(permissions, REQUEST_CODE);
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                    .show();
+
+        }
+    }
+
     public boolean checkPermissions(){
+
+
+
         if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.INTERNET)
                 != PackageManager.PERMISSION_GRANTED)
         {
@@ -467,6 +525,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         return(alertDialogBuilder.create());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        // get the account
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ACCOUNT_INFO), Context.MODE_PRIVATE);
+        String accountName = sharedPreferences.getString(getString(R.string.ACCOUNT_NAME), "");
+
+        if(requestCode == SIGN_IN_FOR_CALENDAR && resultCode == RESULT_OK)
+        {
+            new RetrieveTokenTask().execute(accountName, this);
+        }
     }
 
 }

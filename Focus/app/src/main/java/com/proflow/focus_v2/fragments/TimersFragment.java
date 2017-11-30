@@ -3,6 +3,7 @@ package com.proflow.focus_v2.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.R;
+import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.activities.LoginActivity;
 import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.adapters.TimerAdapter;
@@ -75,7 +77,7 @@ public class TimersFragment extends BaseFragment {
         resetToolbar();
         //TODO implement timerListView
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Timers");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -172,7 +174,7 @@ public class TimersFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User1").child("Timer");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -214,8 +216,10 @@ class timerUpdaterRunnable implements Runnable {
     @Override
     public void run() {
         adapter.notifyDataSetChanged();
-        if(running)
+        if(running) {
             list.postDelayed(this, delay);
+
+        }
     }
 
     public void stop(){

@@ -29,7 +29,7 @@ import java.util.Vector;
 public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
 
     private static final String TAG = "AppAdapter";
-    private final List<PackageInfo> mApps;
+    private final Vector<PackageInfo> mApps;
     private Context mContext;
     private Vector<String> selectedApps = new Vector<>();
 
@@ -83,28 +83,32 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
         }
     }
 
-    public AppAdapter(List<PackageInfo> apps, Context context){
+    public AppAdapter(Vector<PackageInfo> apps, Context context){
 
         mContext = context.getApplicationContext();
 
         this.mApps = apps;
     }
 
-    public AppAdapter(Profile p, List<PackageInfo> apps, Context context){
+    public AppAdapter(Profile p, Vector<PackageInfo> apps, Context context){
 
         mContext = context.getApplicationContext();
 
         this.mApps = apps;
-        Vector<PackageInfo> selectedAppPackages = p.getApps();
+        for(PackageInfo pi : apps){
+            Log.e("Apps in app adapter: ", pi.packageName);
+        }
+        //Vector<PackageInfo> selectedAppPackages = p.getApps();
+        Vector<String> selectedAppPackages = p.getApps();
 
-        Log.d(TAG, "SelectedAppPackages isEmpty():" + selectedAppPackages.isEmpty());
+        //Log.d(TAG, "SelectedAppPackages isEmpty():" + selectedAppPackages.isEmpty());
 
-        for(PackageInfo pi : selectedAppPackages){
+        for(String pi : selectedAppPackages){
+            Log.e("Selected app: ", pi);
             if(pi != null) {
 //                Log.d(TAG, "PI name: " + pi.applicationInfo.name);
-                selectedApps.add(pi.packageName);
+                selectedApps.add(pi);
             }
-            Log.d(TAG, "PI name: " + pi.applicationInfo.name);
         }
     }
 
@@ -145,6 +149,8 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
     private boolean getAppStatus(String piName) {
 
         for(String pName : selectedApps){
+            Log.e("SelectedApp: ", pName);
+            Log.e("Checked box name: ", piName);
             if(pName.compareTo(piName) == 0){
                 return true;
             }
@@ -152,14 +158,11 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
         return false;
     }
 
-    public Vector<PackageInfo> getSelectedApps() {
-        Vector<PackageInfo> sApps = new Vector<>();
+    public Vector<String> getSelectedApps() {
+
+        Vector<String> sApps = new Vector<>();
         for(String pName : selectedApps){
-            try {
-                sApps.add(mContext.getPackageManager().getPackageInfo(pName, 0));
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+            sApps.add(pName);
         }
         return sApps;
     }

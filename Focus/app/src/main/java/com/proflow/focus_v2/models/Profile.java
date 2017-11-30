@@ -5,7 +5,11 @@ import android.content.pm.PackageInfo;
 import android.os.Parcelable;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.data.Global;
 
 import java.util.Vector;
@@ -20,6 +24,7 @@ import java.util.Vector;
 public class Profile {
 
     private String mName;
+    public Vector<String> mPackageNames = new Vector<>();
     private Vector<PackageInfo> mPackages;
     private boolean mIsActive;
     private int id;
@@ -32,19 +37,20 @@ public class Profile {
         mName = snapshot.child("name").getValue(String.class);
         mIsActive = snapshot.child("active").getValue(Boolean.class);
         id = snapshot.child("id").getValue(Integer.class);
-        /*GenericTypeIndicator<Vector<PackageInfo>> vectorGeneric = new GenericTypeIndicator<Vector<PackageInfo>>() {};
-        mPackages = snapshot.child("apps").getValue(vectorGeneric);*/
+        for(DataSnapshot packages : snapshot.child("mPackageNames").getChildren()){
+            mPackageNames.add(packages.getValue(String.class));
+        }
     }
 
-    public Profile(String name, Vector<PackageInfo> packageIds){
+    public Profile(String name, Vector<String> packageIds){
         mName = name;
-        mPackages = packageIds;
+        mPackageNames = packageIds;
         setUniqueId();
     }
 
-    public Profile(String name, Vector<PackageInfo> packageIds, int _id){
+    public Profile(String name, Vector<String> packageIds, int _id){
         mName = name;
-        mPackages = packageIds;
+        mPackageNames = packageIds;
         id = _id;
     }
 
@@ -56,12 +62,10 @@ public class Profile {
         mName = name;
     }
 
-    public Vector<PackageInfo> getApps(){
-        return mPackages;
-    }
+    public Vector<String> getApps(){ return mPackageNames; }
 
-    public void setApps(Vector<PackageInfo> apps){
-        mPackages = apps;
+    public void setApps(Vector<String> apps){
+        mPackageNames = apps;
     }
 
     public void activate(Context context){
@@ -94,7 +98,24 @@ public class Profile {
     }
 
     private void setUniqueId(){
-        id = Global.getInstance().getProfileUniqueID();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int uniqueId = -1;
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    uniqueId = id.child("id").getValue(Integer.class);
+                }
+                uniqueId++;
+                id = uniqueId;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //id = Global.getInstance().getProfileUniqueID();
     }
 
     private void update(Context context){

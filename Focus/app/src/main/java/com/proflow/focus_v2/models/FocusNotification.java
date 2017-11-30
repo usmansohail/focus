@@ -1,6 +1,10 @@
 package com.proflow.focus_v2.models;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.data.Global;
 
 /**
@@ -12,20 +16,37 @@ public class FocusNotification{
     private String mPackageName;
     private String mName;
     private String mDescription;
-    private int mId;
+    private int id;
 
     public FocusNotification(String packageName, String name, String description) {
         mPackageName = packageName;
         mName = name;
         mDescription = description;
-        setId(Global.getInstance().getUniqueNotificationId());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int uniqueId = -1;
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    uniqueId = id.child("id").getValue(Integer.class);
+                }
+                uniqueId++;
+                id = uniqueId;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //setId(Global.getInstance().getUniqueNotificationId());
     }
 
     public FocusNotification(DataSnapshot snapshot){
         mPackageName = snapshot.child("packagename").getValue(String.class);
         mName = snapshot.child("name").getValue(String.class);
         mDescription = snapshot.child("description").getValue(String.class);
-        mId = snapshot.child("id").getValue(Integer.class);
+        id = snapshot.child("id").getValue(Integer.class);
     }
 
     public String getDescription(){
@@ -41,8 +62,8 @@ public class FocusNotification{
     }
 
     public void setId(int id){
-        mId = id;
+        this.id = id;
     }
 
-    public int getId(){ return mId; }
+    public int getId(){ return id; }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="MY_PERMISSIONS_INTERNET">101</integer>
+    <integer name="MY_PERMISSIONS_READ_CAL">102</integer>
+    <integer name="MY_PERMISSIONS_WRITE_CAL">103</integer>
+</resources>

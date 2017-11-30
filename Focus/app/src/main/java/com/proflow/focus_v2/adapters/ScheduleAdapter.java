@@ -101,7 +101,7 @@ public class ScheduleAdapter extends BaseAdapter {
             public void onClick(View view) {
                 Global.getInstance().removeSchedule(mContext, currentSchedule);
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("User1").child("Schedules").child(Integer.toString(currentSchedule.getId())).removeValue();
+                mDatabase.child(Global.getInstance().getUsername()).child("Schedules").child(Integer.toString(currentSchedule.getId())).removeValue();
                 notifyDataSetChanged();
             }
         });

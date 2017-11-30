@@ -293,5 +293,8 @@
     <string name="sign_in_google">Sign In With Google</string>
     <string name="title_activity_calendar_delete">CalendarDelete</string>
     <string name="logout">Logout</string>
+    <string name="ACCOUNT_NAME">account_name</string>
+    <string name="ACCOUNT_INFO">account_info</string>
+    <string name="add_to_calendar_prompt">Would you like to sync schedule events created on Focus! with your google Calendar?</string>
 
 </resources>

@@ -2,12 +2,24 @@ package com.proflow.focus_v2.models;
 
 import android.app.Notification;
 import android.content.pm.PackageInfo;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.activities.ContextActivity;
+import com.proflow.focus_v2.adapters.ProfileAdapter;
 import com.proflow.focus_v2.data.Global;
 import com.proflow.focus_v2.helpers.NotificationUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -31,6 +43,7 @@ public class FocusTimer {
     private Long mInitialDuration;
     private Long mCurrentDuration;
     private int id;
+    private Vector<String> mApps;
 
     private boolean paused = true;
     private boolean finished = false;
@@ -39,7 +52,7 @@ public class FocusTimer {
 
     public int mPeriod = 1000;
 
-    private Vector<Profile> mProfiles;
+    private Vector<Profile> mProfiles = new Vector();
     private String mNotifMessage;
 
     public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles){
@@ -63,12 +76,31 @@ public class FocusTimer {
                     }
                     else{
                         mCurrentDuration -= mPeriod;
+
                     }
                 }
             }
         }, 0, mPeriod);
 
-        id = Global.getInstance().getUniqueTimerID();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int uniqueId = -1;
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    uniqueId = id.child("id").getValue(Integer.class);
+                }
+                uniqueId++;
+                id = uniqueId;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //id = Global.getInstance().getUniqueTimerID();
     }
 
     public FocusTimer(DataSnapshot snapshot){
@@ -78,16 +110,10 @@ public class FocusTimer {
         mCurrentDuration = snapshot.child("currentDuration").getValue(Long.class);
         mInitialDuration = snapshot.child("initialDuration").getValue(Long.class);
         paused = snapshot.child("paused").getValue(Boolean.class);
-
-    }
-
-    public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles,long currentDuration, int id){
-        mName = name;
-        mInitialDuration = initialDuration;
-        mCurrentDuration = currentDuration;
-        mProfiles = timerProfiles;
-        mNotifMessage = "A timer blocking "+ mProfiles.size()+ " profile(s) has ended";
-
+        for(DataSnapshot userSnapshot : snapshot.child("profiles").getChildren()){
+            Profile profile = new Profile(userSnapshot);
+            mProfiles.add(profile);
+        }
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -104,12 +130,43 @@ public class FocusTimer {
                     }
                     else{
                         mCurrentDuration -= mPeriod;
+
+                    }
+                }
+            }
+        }, 0, mPeriod);
+    }
+
+    public FocusTimer(String name, Long initialDuration, Vector<Profile> timerProfiles,long currentDuration, int mId){
+        mName = name;
+        mInitialDuration = initialDuration;
+        mCurrentDuration = currentDuration;
+        mProfiles = timerProfiles;
+        mNotifMessage = "A timer blocking "+ mProfiles.size()+ " profile(s) has ended";
+        id = mId;
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if(!paused && ! finished){
+                    if(mCurrentDuration <= 0){
+                        togglePause();
+
+                        mCurrentDuration = mInitialDuration;
+
+                        NotificationUtils mNotificationUtils = new NotificationUtils(ContextActivity.getAppContext());
+                        Notification.Builder nb = mNotificationUtils.
+                                getNotification("Timer Ended", mNotifMessage);
+                        mNotificationUtils.notify(101, nb);
+                    }
+                    else{
+                        mCurrentDuration -= mPeriod;
+
                     }
                 }
             }
         }, 0, mPeriod);
         //id = Global.getInstance().getUniqueTimerID();
-        this.id = id;
+
         mProfiles = timerProfiles;
     }
 
@@ -167,15 +224,18 @@ public class FocusTimer {
     public Vector<String> getApps(){
         Vector<String> appBucket = new Vector<>();
 
-        for(Profile p : mProfiles){
-            for(PackageInfo pi : p.getApps()){
-                if(!appBucket.contains(pi.packageName)){
-                    appBucket.add(pi.packageName);
+        for(int i=0; i<mProfiles.size(); i++){
+            Vector<String> temp = mProfiles.get(i).getApps();
+            for(int j = 0; j<temp.size(); j++){
+                if(!appBucket.contains(temp.get(j))){
+                    appBucket.add(temp.get(j));
                 }
             }
         }
         return appBucket;
     }
+
+    public void subtract(){ mCurrentDuration--; }
 
     public int getId() {
         return id;
