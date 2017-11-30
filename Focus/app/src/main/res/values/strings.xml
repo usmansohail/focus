@@ -296,5 +296,6 @@
     <string name="ACCOUNT_NAME">account_name</string>
     <string name="ACCOUNT_INFO">account_info</string>
     <string name="add_to_calendar_prompt">Would you like to sync schedule events created on Focus! with your google Calendar?</string>
+    <string name="signing_in">Signing In</string>
 
 </resources>

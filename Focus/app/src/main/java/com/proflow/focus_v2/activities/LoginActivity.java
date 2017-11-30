@@ -178,6 +178,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 startActivityForResult(signInIntent, 9001);
 
 
+
             }
         });
         findViewById(R.id.sign_out_button).setOnClickListener(new OnClickListener() {
@@ -531,6 +532,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (requestCode == 9001) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
+            showProgress(true);
+            mStatusTextView.setText(R.string.signing_in);
 
         }
     }

@@ -340,12 +340,9 @@ public class CreateScheduleFragment extends BaseFragment {
         }
 
         // create the recurrence string for this event
-        String recurrenceDays = "RRULE:";
+        String recurrenceDays = "RRULE:FREQ=WEEKLY;";
 
-        if(schedule.repeatWeekly())
-        {
-            recurrenceDays += "FREQ=WEEKLY;";
-        }
+
 
         if(days.size() > 0) {
 
@@ -356,10 +353,29 @@ public class CreateScheduleFragment extends BaseFragment {
                 if (i < days.size() - 1) {
                     recurrenceDays += days.elementAt(i) + ',';
                 } else {
-                    recurrenceDays += days.elementAt(i) + ";COUNT=100";
+                    recurrenceDays += days.elementAt(i);
                 }
             }
         }
+
+        int count = 0;
+        // set the count based on the repeate
+        if(schedule.repeatWeekly())
+        {
+            // for now just set the repeate value to 100
+            count = 100;
+        }
+        else
+        {
+            // set the count to the nuber of days that were selected
+            count = days.size();
+        }
+
+        // add the count to the RRCUR string
+        recurrenceDays += ";COUNT=" + count;
+
+        // setup the final  recurrenceDays string that can be accessed from inner class
+        final String finalReccuranceDays = recurrenceDays;
 
         final DayOfWeek finalFirstDay = firstDay.elementAt(0);
 
@@ -368,23 +384,25 @@ public class CreateScheduleFragment extends BaseFragment {
 
         // get the datetime from the timeblock
         Date sDate = Date.from(now.with(TemporalAdjusters.next(finalFirstDay)).atZone(ZoneId.systemDefault()).toInstant());
+        Log.d("TIME", sDate.toInstant().toString());
         // use regular expression to remove the time from the now timestamp
         Pattern p = Pattern.compile(pattern);
         Matcher m = p.matcher(sDate.toInstant().toString());
         String dateString = m.replaceAll("");
         Log.d("TIME", "Truncated: " + dateString + " without: ");
 
-        final String startString = dateString + "T" + timeBlock.getStartTime().getRFCString();
+        TimeZone tz = TimeZone.getDefault();
 
+        final String startString = dateString + "T" + timeBlock.getStartTime().getRFCString() + "-08:00";
+        final boolean singleDay = (days.size() == 1);
 
         Date eDate = sDate;
-        final String endString = dateString + "T" + timeBlock.getEndTime().getRFCString();
+        final String endString = dateString + "T" + timeBlock.getEndTime().getRFCString() + "-08:00";
 
 
         Log.d("TIME", "start time: " + startString);
         Log.d("TIME", "end time: " + endString);
         // create an AddCalendarEvent runnable object
-        final String finalRecurrenceDays = recurrenceDays;
         task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -406,9 +424,11 @@ public class CreateScheduleFragment extends BaseFragment {
                         .setTimeZone("America/Los_Angeles");
                 event.setEnd(end);
 
-                String[] recurrence = new String[] {finalRecurrenceDays};
-                event.setRecurrence(Arrays.asList(recurrence));
-
+                Log.d("RRULE", finalReccuranceDays);
+                if(!singleDay) {
+                    String[] recurrence = new String[]{finalReccuranceDays};
+                    event.setRecurrence(Arrays.asList(recurrence));
+                }
                 EventAttendee[] attendees = new EventAttendee[] {
                 };
                 event.setAttendees(Arrays.asList(attendees));
