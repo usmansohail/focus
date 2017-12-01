@@ -34,7 +34,7 @@ public class TimerAdapter extends BaseAdapter {
 
     public TimerAdapter(Context context, Vector<FocusTimer> timers){
         mContext = context;
-        this.mTimers = timers;
+        this.mTimers = Global.getInstance().getTimers(context);
         //Forces the text views to update. Woo.
     }
 
