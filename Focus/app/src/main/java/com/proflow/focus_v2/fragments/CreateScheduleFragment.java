@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,9 +17,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -59,7 +63,6 @@ import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.google.api.services.calendar.*;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.client.json.gson.GsonFactory;
@@ -79,11 +82,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.api.client.*;
-//import com.google.api.services.calendar.model.Calendar;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
 
 import static android.content.ContentValues.TAG;
 
@@ -95,10 +102,12 @@ public class CreateScheduleFragment extends BaseFragment {
     private TimeBlockAdapter mTimeBlockAdapter;
 
     private boolean mIsNew = false;
-    static AsyncTask<Void, Void, Void> task;
+    private static AsyncTask<Void, Void, Void> task;
     private Schedule mSchedule = null;
     private RecyclerView mProfileRecycler;
     private ProfileAdapter mProfileAdapter;
+
+    private Button footer;
 
     public CreateScheduleFragment() {
         // Required empty public constructor
@@ -152,7 +161,7 @@ public class CreateScheduleFragment extends BaseFragment {
         }
 
         mTimeBlockAdapter = new TimeBlockAdapter(getContext(), mSchedule, mIsNew);
-        Button footer = layout.findViewById(R.id.schedule_add_time_block);
+        footer = layout.findViewById(R.id.schedule_add_time_block);
 
         footer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -271,12 +280,18 @@ public class CreateScheduleFragment extends BaseFragment {
                             })
                             .create()
                             .show();
+
                     //DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
                     /*
                     EventDateTime end = new EventDateTime()
                             .setDate(endTime)
                             .setTimeZone("America/Los_Angeles");
                     googleEvent.setEnd(end);
+//                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+//                    EventDateTime end = new EventDateTime()
+//                            .setDate(endTime)
+//                            .setTimeZone("America/Los_Angeles");
+                    /*googleEvent.setEnd(end);
 
                     String calendarID = "primary";*/
                    // googleEvent = service.events().insert(calendarID, googleEvent).execute();
@@ -585,5 +600,65 @@ public class CreateScheduleFragment extends BaseFragment {
 
     public Vector<Profile> getSelectedProfiles() {
         return mProfileAdapter.getCheckedProfiles();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(!prefs.contains(getString(R.string.firstCreateScheduleKey))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstCreateScheduleKey), false).apply();
+        }
+    }
+
+    Animation mEnterAnimation, mExitAnimation;
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Click here to add a time block to this schedule")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(footer);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Select profiles that you want to block according to this" +
+                                " schedule here.")
+                        .setGravity(Gravity.TOP)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mProfileRecycler);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
     }
 }

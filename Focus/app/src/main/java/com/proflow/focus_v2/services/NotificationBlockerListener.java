@@ -59,36 +59,37 @@ public class NotificationBlockerListener extends NotificationListenerService{
         Log.d("NBL", "looking for: " + packageName);
 
         final Vector<FocusTimer> timers = new Vector<>();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot id : dataSnapshot.getChildren()){
-                    for(DataSnapshot profiles : id.child("profiles").getChildren()){
-                        for(DataSnapshot packages : profiles.child("mPackageNames").getChildren()){
-                            boolean paused = id.child("paused").getValue(boolean.class);
-                            if(!paused){
-                                if(packages.getValue(String.class).compareToIgnoreCase(packageName) == 0){
-                                    cancelNotification(sbn.getKey());
-                                    FocusNotification fn = null;
-                                    try {
-                                        fn = new FocusNotification(packageName,
-                                                pm.getPackageInfo(sbn.getPackageName(),0).applicationInfo.loadLabel(pm).toString() ,
-                                                sbn.getNotification().extras.getString(EXTRA_TEXT));
-                                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                                        mDatabase.child(Global.getInstance().getUsername()).child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
-                                        Global.getInstance().addFocusNotification(getApplicationContext(), fn);
-                                    } catch (PackageManager.NameNotFoundException e) {
-                                        e.printStackTrace();
+        if(Global.getInstance().getUsername() != null) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot id : dataSnapshot.getChildren()) {
+                        for (DataSnapshot profiles : id.child("profiles").getChildren()) {
+                            for (DataSnapshot packages : profiles.child("mPackageNames").getChildren()) {
+                                boolean paused = id.child("paused").getValue(boolean.class);
+                                if (!paused) {
+                                    if (packages.getValue(String.class).compareToIgnoreCase(packageName) == 0) {
+                                        cancelNotification(sbn.getKey());
+                                        FocusNotification fn = null;
+                                        try {
+                                            fn = new FocusNotification(packageName,
+                                                    pm.getPackageInfo(sbn.getPackageName(), 0).applicationInfo.loadLabel(pm).toString(),
+                                                    sbn.getNotification().extras.getString(EXTRA_TEXT));
+                                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                                            mDatabase.child(Global.getInstance().getUsername()).child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
+                                            Global.getInstance().addFocusNotification(getApplicationContext(), fn);
+                                        } catch (PackageManager.NameNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
                     /*FocusTimer timer = new FocusTimer(id);
                     timers.add(timer);*/
-                }
-                //Do this first cause it should be relatively quick.
+                    }
+                    //Do this first cause it should be relatively quick.
                 /*for(FocusTimer t : timers){
                     if(!t.isPaused()){
                         for(String pName : t.getApps()){
@@ -110,45 +111,46 @@ public class NotificationBlockerListener extends NotificationListenerService{
                         }
                     }
                 }*/
-            }
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
 
-        final Vector<Schedule> schedules = new Vector<>();
-        final Vector<PackageInfo> activeApps = new Vector<>();
-        ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Schedules");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot id : dataSnapshot.getChildren()) {
-                    for(DataSnapshot profiles : id.child("profiles").getChildren()){
-                        for(DataSnapshot packages : profiles.child("mPackageNames").getChildren()){
-                            boolean blocking = id.child("blocking").getValue(boolean.class);
-                            if(blocking){
-                                if(packages.getValue(String.class).compareToIgnoreCase(packageName) == 0){
-                                    cancelNotification(sbn.getKey());
-                                    FocusNotification fn = null;
-                                    try {
-                                        fn = new FocusNotification(packageName,
-                                                pm.getPackageInfo(sbn.getPackageName(),0).applicationInfo.loadLabel(pm).toString() ,
-                                                sbn.getNotification().extras.getString(EXTRA_TEXT));
-                                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                                        mDatabase.child(Global.getInstance().getUsername()).child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
-                                        //Global.getInstance().addFocusNotification(getApplicationContext(), fn);
-                                    } catch (PackageManager.NameNotFoundException e) {
-                                        e.printStackTrace();
+
+            final Vector<Schedule> schedules = new Vector<>();
+            final Vector<PackageInfo> activeApps = new Vector<>();
+            ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Schedules");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot id : dataSnapshot.getChildren()) {
+                        for (DataSnapshot profiles : id.child("profiles").getChildren()) {
+                            for (DataSnapshot packages : profiles.child("mPackageNames").getChildren()) {
+                                boolean blocking = id.child("blocking").getValue(boolean.class);
+                                if (blocking) {
+                                    if (packages.getValue(String.class).compareToIgnoreCase(packageName) == 0) {
+                                        cancelNotification(sbn.getKey());
+                                        FocusNotification fn = null;
+                                        try {
+                                            fn = new FocusNotification(packageName,
+                                                    pm.getPackageInfo(sbn.getPackageName(), 0).applicationInfo.loadLabel(pm).toString(),
+                                                    sbn.getNotification().extras.getString(EXTRA_TEXT));
+                                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                                            mDatabase.child(Global.getInstance().getUsername()).child("Notification").child(String.valueOf(fn.getId())).setValue(fn);
+                                            //Global.getInstance().addFocusNotification(getApplicationContext(), fn);
+                                        } catch (PackageManager.NameNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
                     /*Schedule schedule = new Schedule(id);
                     schedules.add(schedule);*/
-                }
-                //Do this first cause it should be relatively quick.
+                    }
+                    //Do this first cause it should be relatively quick.
                 /*for (Schedule s : schedules) {
                     if (s.isBlocking()) {
                         Log.d(TAG, "Blocking. Num Profiles:" + s.getProfiles().size());
@@ -176,11 +178,12 @@ public class NotificationBlockerListener extends NotificationListenerService{
                         }
                     }
                 }*/
-            }
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
     }
 }

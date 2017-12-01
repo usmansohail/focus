@@ -1,17 +1,23 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -38,7 +44,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
 
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
+
 public class SchedulesFragment extends BaseFragment {
+
+    private WeekView mWeekView;
+
     public SchedulesFragment() {
         // Required empty public constructor
     }
@@ -189,7 +203,7 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     private void weekViewSetup(View layout) {
-        final WeekView mWeekView = layout.findViewById(R.id.weekView);
+        mWeekView = layout.findViewById(R.id.weekView);
 
 // Set an action when any event is clicked.
         mWeekView.setOnEventClickListener(new WeekView.EventClickListener() {
@@ -393,5 +407,77 @@ public class SchedulesFragment extends BaseFragment {
             blockingProfiles.add(schedules.get(i).isBlocking());
         }
         Global.getInstance().setScheduleFlags(getContext(), blockingProfiles);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(!prefs.contains(getString(R.string.firstScheduleKey))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstScheduleKey), false).apply();
+        }
+    }
+
+    Animation mEnterAnimation, mExitAnimation;
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setTitle("Schedules")
+                        .setDescription("Schedules are a set of times, and apps, that tell Focus! " +
+                                "when to block apps for you")
+                        .setGravity(Gravity.NO_GRAVITY)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mWeekView);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Just like Profiles, click here to create a schedule.")
+                        .setGravity(Gravity.BOTTOM | Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(addScheduleButton);
+
+        ChainTourGuide tourGuide3 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                .setDescription("When you create a Schedule, it will show up in its designated spot" +
+                        " in the calendar. Tap it if you want to edit, or delete it, and log hold it" +
+                        " to turn it on or off.")
+
+                        .setGravity(Gravity.NO_GRAVITY)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mWeekView);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2, tourGuide3)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
     }
 }
