@@ -280,6 +280,14 @@ public class CreateScheduleFragment extends BaseFragment {
                             })
                             .create()
                             .show();
+
+                    //DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+                    /*
+                    EventDateTime end = new EventDateTime()
+                            .setDate(endTime)
+                            .setTimeZone("America/Los_Angeles");
+                    googleEvent.setEnd(end);
+
 //                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
 //                    EventDateTime end = new EventDateTime()
 //                            .setDate(endTime)

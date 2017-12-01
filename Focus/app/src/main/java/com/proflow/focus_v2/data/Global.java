@@ -96,6 +96,17 @@ public class Global {
     //Used only as a last-resort in the no-context methods. Avoid.
     private Context mMostRecentContext = null;
 
+    public void setProfiles(Vector<Profile> profiles){ profileList = profiles; }
+    public void setSchedules(Vector<Schedule> schedules) {scheduleList = schedules;}
+    public void setTimers(Vector<FocusTimer> timers) { timerList = timers; }
+    public void setNotifications(Vector<FocusNotification> notifications) { this.notifications = notifications; }
+    public void clearAll(){
+        profileList.clear();
+        scheduleList.clear();
+        timerList.clear();
+        notifications.clear();
+
+    }
 
     public void synchAll(Context context) {
         mMostRecentContext = context;

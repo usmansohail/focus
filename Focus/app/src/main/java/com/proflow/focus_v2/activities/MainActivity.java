@@ -18,6 +18,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +28,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.proflow.focus_v2.Manifest;
 import com.proflow.focus_v2.R;
 import com.proflow.focus_v2.comparators.PackageInfoComparator;
@@ -37,6 +45,8 @@ import com.proflow.focus_v2.fragments.ProfilesFragment;
 import com.proflow.focus_v2.fragments.SchedulesFragment;
 import com.proflow.focus_v2.fragments.TimersFragment;
 import com.proflow.focus_v2.helpers.RetrieveTokenTask;
+import com.proflow.focus_v2.models.FocusNotification;
+import com.proflow.focus_v2.models.FocusTimer;
 import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
@@ -193,6 +203,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         populateGlobalAppsList();
+        Global.getInstance().clearAll();
+        Global.getInstance().synchAll(getApplicationContext());
+        populateData();
+
 
         if(savedInstanceState == null){
             currentFragment = null;
@@ -250,6 +264,85 @@ public class MainActivity extends AppCompatActivity {
 //        if(debug) {
 //            populateFakeData();
 //        }
+    }
+
+    private void populateData(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vector<Profile> temp = new Vector<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    Profile profile = new Profile(id);
+                    temp.add(profile);
+                }
+                Global.getInstance().setProfiles(temp);
+                Global.getInstance().synchAll(getApplicationContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference not = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
+        not.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vector<FocusNotification> temp = new Vector<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    FocusNotification notification = new FocusNotification(id);
+                    temp.add(notification);
+                }
+                Global.getInstance().setNotifications(temp);
+                Global.getInstance().synchAll(getApplicationContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference sch = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Schedules");
+        sch.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vector<Schedule> temp = new Vector<>();
+                for(DataSnapshot id : dataSnapshot.getChildren()){
+                    Schedule schedule = new Schedule(id);
+                    temp.add(schedule);
+                }
+                Global.getInstance().setSchedules(temp);
+                Global.getInstance().synchAll(getApplicationContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference tim = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Timers");
+        tim.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Vector<FocusTimer> temp = new Vector<FocusTimer>();
+                for(DataSnapshot id : dataSnapshot.getChildren()) {
+                    FocusTimer timer = new FocusTimer(id);
+                    Log.e("Adding timer!", "Adding timers: " + timer.getId());
+                    temp.add(timer);
+                }
+                Global.getInstance().setTimers(temp);
+                Global.getInstance().synchAll(getApplicationContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void populateFakeData() {

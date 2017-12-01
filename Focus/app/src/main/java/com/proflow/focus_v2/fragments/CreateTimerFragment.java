@@ -143,7 +143,7 @@ public class CreateTimerFragment extends BaseFragment {
                     FocusTimer ft = new FocusTimer("", getDuration(), mProfileAdapter.getCheckedProfiles());
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                     mDatabase.child(Global.getInstance().getUsername()).child("Timers").child(String.valueOf(ft.getId())).setValue(ft);
-                    //Global.getInstance().addTimer(getContext(), ft);
+                    Global.getInstance().addTimer(getContext(), ft);
                     getActivity().onBackPressed();
                 }
             }

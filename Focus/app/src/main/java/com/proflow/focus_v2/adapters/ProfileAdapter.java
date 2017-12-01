@@ -159,7 +159,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ProfileV
                 public void onClick(View view) {
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                     mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
-                    //Global.getInstance().removeProfile(mContext, currentProfile);
+                    Global.getInstance().removeProfile(mContext, currentProfile);
                     notifyDataSetChanged();
                 }
             });

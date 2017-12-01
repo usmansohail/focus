@@ -3,13 +3,16 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            //Insert your config here
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('/Users/alexinaboudreaux/.android/debug.keystore')
+            storePassword 'android'
         }
     }
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.proflow.focus_v2"
+        applicationId "com.fdunlap.focus_v2"
         minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
