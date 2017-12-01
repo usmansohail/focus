@@ -4,6 +4,8 @@ package com.proflow.focus_v2.fragments;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,12 +13,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.FocusFinder;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
@@ -39,6 +44,11 @@ import com.proflow.focus_v2.models.Profile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
 
 public class NotificationsFragment extends BaseFragment {
     public NotificationsFragment() {
@@ -166,6 +176,66 @@ public class NotificationsFragment extends BaseFragment {
         return layout;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        if(!prefs.contains(getString(R.string.firstNotifications))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstNotifications), false).apply();
+        }
+    }
+
+    Animation mEnterAnimation, mExitAnimation;
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Notifications recieved from blocked apps will appear here.")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(notificationRecyclerView);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Tap here to clear all blocked notifications.")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(clearButton);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
+    }
 
 
 }

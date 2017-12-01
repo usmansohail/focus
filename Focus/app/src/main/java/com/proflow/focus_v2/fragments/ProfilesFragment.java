@@ -1,19 +1,25 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -32,6 +38,11 @@ import com.proflow.focus_v2.models.Profile;
 import java.util.ArrayList;
 import java.util.List;
 
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
+
 public class ProfilesFragment extends BaseFragment {
 
     //Fragment globals
@@ -41,6 +52,9 @@ public class ProfilesFragment extends BaseFragment {
 
     //RecyclerView Adapter
     ProfileAdapter mAdapter;
+
+    private Animation mEnterAnimation, mExitAnimation;
+
 
     public ProfilesFragment() {
         // Required empty public constructor
@@ -162,5 +176,86 @@ public class ProfilesFragment extends BaseFragment {
 
         return layout;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(!prefs.contains(getString(R.string.firstProfilesKey))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstProfilesKey), false).apply();
+        }
+    }
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setTitle("BottomBar")
+                        .setDescription("The bottom bar is the primary navigation tool in the app." +
+                                " Use it to switch functionality.")
+                        .setGravity(Gravity.TOP)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(bottomBar);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setTitle("Add a Profile")
+                        .setDescription("This button takes you to a screen where you can create Profiles." +
+                                " Profiles are simply a set of apps to block, and an associated name.")
+                        .setGravity(Gravity.BOTTOM | Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(addItemButton);
+
+        ChainTourGuide tourGuide3 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setTitle("Menu")
+                        .setDescription("This is the menu button - it will have different context" +
+                                " tools based on your location in the app.")
+                        .setGravity(Gravity.BOTTOM | Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(largerMenuButton);
+
+        ChainTourGuide tourGuide4 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setTitle("Profile Area")
+                        .setDescription("This is where profiles will show up once they have been created. ")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(profilesRecyclerView);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2, tourGuide3, tourGuide4)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
+    }
+
 
 }

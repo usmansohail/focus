@@ -1,13 +1,19 @@
 package com.proflow.focus_v2.fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -25,6 +31,11 @@ import com.proflow.focus_v2.models.time;
 
 import java.util.ArrayList;
 import java.util.Vector;
+
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
 
 import static com.proflow.focus_v2.models.TimeBlock.day.FRIDAY;
 import static com.proflow.focus_v2.models.TimeBlock.day.MONDAY;
@@ -492,5 +503,73 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
 
     public int getScheduleId(){
         return mSchedule.getId();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        if(!prefs.contains(getString(R.string.firstCreateTimeBlockKey))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstCreateTimeBlockKey), false).apply();
+        }
+    }
+
+    Animation mEnterAnimation, mExitAnimation;
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Toggle these dates to select the days on which this timeblock should be active.")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mThursdayButton);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Set the start time of the timeblock here...")
+                        .setGravity(Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mStartRadioGroup);
+
+        ChainTourGuide tourGuide3 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("...and the end time here.")
+                        .setGravity(Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mEndRadioGroup);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2, tourGuide3)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
     }
 }

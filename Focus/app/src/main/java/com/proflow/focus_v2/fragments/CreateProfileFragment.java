@@ -1,17 +1,24 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +38,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
+
 public class CreateProfileFragment extends BaseFragment {
 
     private final String TAG = "CreateProfileFragment";
@@ -38,7 +50,11 @@ public class CreateProfileFragment extends BaseFragment {
     private AppAdapter mAdapter;
     private RecyclerView mAppRecyclerView;
     private EditText mProfileNameEditText;
+    private TextView mCreateProfileText;
     private Button mDeleteButton;
+
+
+    private Animation mEnterAnimation, mExitAnimation;
 
     public CreateProfileFragment() {
         // Required empty public constructor
@@ -71,6 +87,7 @@ public class CreateProfileFragment extends BaseFragment {
         mProfileNameEditText = layout.findViewById(R.id.profile_name_edit_text);
         mDeleteButton = layout.findViewById(R.id.create_profile_delete_button);
         mDeleteButton.setVisibility(View.GONE);
+        mCreateProfileText = layout.findViewById(R.id.create_profile_text_view);
 
         Vector<PackageInfo> apps = Global.getInstance().getAllApps(getContext());
 
@@ -192,5 +209,82 @@ public class CreateProfileFragment extends BaseFragment {
     private Vector<String> getSelectedPackages(){
         return mAdapter.getSelectedApps();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(!prefs.contains(getString(R.string.firstCreateProfilesKey))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstCreateProfilesKey), false).apply();
+        }
+    }
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setTitle("Profiles")
+                        .setDescription("Profiles are simply a set of apps to block, and an associated name." +
+                                " You use them to tell Schedules which set(s) of apps to block.")
+                        .setGravity(Gravity.TOP)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mCreateProfileText);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("You can select any number of apps by checking the boxes to" +
+                                "the right of their names.")
+                        .setGravity(Gravity.TOP)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mAppRecyclerView);
+
+        ChainTourGuide tourGuide3 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("When you're finished click here.")
+                        .setGravity(Gravity.BOTTOM | Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(confirmButton);
+
+        ChainTourGuide tourGuide4 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Or if you don't want to create a new profile, click here.")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(navBackButton);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2, tourGuide3, tourGuide4)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
+    }
+
 
 }

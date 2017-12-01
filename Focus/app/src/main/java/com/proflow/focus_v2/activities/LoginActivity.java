@@ -142,7 +142,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         if(account != null)
         {
-            mGoogleSignInClient.signOut();
+            Global.getInstance().setUsername(account.getEmail().replace('.','('));
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         }
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -174,11 +176,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         findViewById(R.id.sign_in_button).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("LoginActivity", "Signing in with Google");
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, 9001);
-
-
-
             }
         });
         findViewById(R.id.sign_out_button).setOnClickListener(new OnClickListener() {
@@ -530,6 +530,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 9001) {
+            Log.d("InRQ9001", "RQ9001");
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
             showProgress(true);
@@ -544,7 +545,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         {
             GoogleSignInAccount account = result.getResult(ApiException.class);
 
-            Log.d("ACCOUNT", account.getAccount().name.toString());
             // put the account name in shared preferences
             SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ACCOUNT_INFO), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -562,7 +562,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         catch (ApiException e)
         {
-
+            Log.e("LoginActivity", "ApiException " + e.getLocalizedMessage());
         }
     }
 
