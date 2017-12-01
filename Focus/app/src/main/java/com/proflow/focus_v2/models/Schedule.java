@@ -216,7 +216,7 @@ public class Schedule implements Serializable  {
                 }
             }
         }
-        Log.d(TAG, "DONT Block Notification!");
+        //Log.d(TAG, "DONT Block Notification!");
         return false;
     }
 }

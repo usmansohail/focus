@@ -3,7 +3,9 @@ package com.proflow.focus_v2.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -49,6 +51,7 @@ import com.google.android.gms.common.api.Status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -96,6 +99,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private GoogleApiClient mGoogleApiClient;
     private GoogleSignInClient mGoogleSignInClient;
 
+    // used to only launch intent once
+    boolean intentStarted;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +109,41 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
+
+        // indicate that an intent has not been started
+        intentStarted = false;
+
+        // [START configure_signin]
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // [END configure_signin]
+
+
+        // create client
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // check if google already signed in    // TODO
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
+        // [START build_client]
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+
+
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        // [END build_client]
+
+
+
+        if(account != null)
+        {
+            mGoogleSignInClient.signOut();
+        }
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -135,60 +176,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             public void onClick(View view) {
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, 9001);
+
+
+
             }
         });
         findViewById(R.id.sign_out_button).setOnClickListener(new OnClickListener() {
                                                                   @Override
                                                                   public void onClick(View view) {
-                                                                      Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                                                                              new ResultCallback<Status>() {
-                                                                                  @Override
-                                                                                  public void onResult(Status status) {
-                                                                                      // [START_EXCLUDE]
-                                                                                      //updateUI(false);
-                                                                                      // [END_EXCLUDE]
-                                                                                  }
-                                                                              });
-                                                                  }
-                                                              });
-                findViewById(R.id.disconnect_button).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+        new ResultCallback<Status>() {
+        @Override
+        public void onResult(Status status) {
+        // [START_EXCLUDE]
+        //updateUI(false);
+        // [END_EXCLUDE]
+                    }
+            });}
+        });
+        findViewById(R.id.disconnect_button).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
                     }
                 });
 
-        // [START configure_signin]
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        // [END configure_signin]
 
-        // create client
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        // check if google already signed in    // TODO
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
         //updateUI
-
-
-        // [START build_client]
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-        // [END build_client]
-        if(account != null)
-        {
-            mGoogleSignInClient.signOut();
-        }
-
-
-
         // [START customize_button]
         // Set the dimensions of the sign-in button.
         SignInButton signInButton = findViewById(R.id.sign_in_button);
@@ -508,6 +523,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Log.d("Error", "onConnectionFailed:" + connectionResult);
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -516,6 +532,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (requestCode == 9001) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
+            showProgress(true);
+            mStatusTextView.setText(R.string.signing_in);
 
         }
     }
@@ -526,7 +544,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         {
             GoogleSignInAccount account = result.getResult(ApiException.class);
 
+            Log.d("ACCOUNT", account.getAccount().name.toString());
+            // put the account name in shared preferences
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ACCOUNT_INFO), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(getString(R.string.ACCOUNT_NAME), account.getAccount().name.toString());
+            editor.commit();
+
+            Log.d("SHARED PREF", "The account should be in shared prefs");
+
+            // get the token to store
+            String token = account.getIdToken();
+
             signInWithGoogle(account);
+
 
         }
         catch (ApiException e)
@@ -538,6 +569,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void signInWithGoogle(GoogleSignInAccount account) {
         //TODO: add the user to the db if its not already in there
 
+
+        SharedPreferences sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
+        Log.d("SHARED PREF", "Account name check" + sharedPreferences.getString(getString(R.string.ACCOUNT_NAME), ""));
+
         // if the user doesn't exist
         //use id as password
         //maybe getid instead getidtoken
@@ -547,6 +582,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // add a listener to the database
         final String email = account.getEmail().toString();
         final String password = account.getId().toString();
+        final Vector<Boolean> numIntents = new Vector<>();
 
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             Boolean success = false;
@@ -571,6 +607,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             mAuthTask = new UserLoginTask(email, password);
                             mAuthTask.execute((Void) null);
                             Log.e("GOOGLE:", "google sign in");
+                            numIntents.add(true);
+
                         }
                     }
                 }
@@ -584,11 +622,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
         String replace = email.replace('.', '(');
-        Log.e("Email before validate", replace);;
+        Log.e("Email before validate", replace);
         mDatabase.child(replace).child("Password").setValue(password);
         Log.e("Success", "Success!");
-        mAuthTask = new UserLoginTask(email, password);
-        mAuthTask.execute((Void) null);
+
+        // if a task hasn't been launched yet, then launch it
+        if(numIntents.size() > 0) {
+            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask.execute((Void) null);
+        }
     }
 
     private interface ProfileQuery {
@@ -648,6 +690,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Global.getInstance().setUsername(replace);
                 Intent enter = new Intent(getApplicationContext(), MainActivity.class);
                 //Intent enter = new Intent(getApplicationContext(), CalendarDelete.class);
+
+                Log.d("INTENT", "entering main activity");
+
                 startActivity(enter);
                 finish();
             } else {

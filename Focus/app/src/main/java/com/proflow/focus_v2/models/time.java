@@ -80,5 +80,30 @@ public class time implements Serializable{
 
         return sb.toString();
     }
+
+    public String getRFCString()
+    {
+        StringBuilder sb = new StringBuilder();
+        if(hour < 10)
+        {
+            sb.append("0" + hour);
+        }
+        else
+        {
+            sb.append(hour);
+        }
+        sb.append(":");
+        if(minute < 10)
+        {
+            sb.append("0" + minute);
+        }
+        else
+        {
+            sb.append(minute);
+        }
+        sb.append(":00");
+
+        return sb.toString();
+    }
 }
 
