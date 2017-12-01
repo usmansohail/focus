@@ -59,7 +59,6 @@ import com.proflow.focus_v2.models.Profile;
 import com.proflow.focus_v2.models.Schedule;
 import com.proflow.focus_v2.models.TimeBlock;
 import com.google.api.services.calendar.*;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.client.json.gson.GsonFactory;
@@ -79,7 +78,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.api.client.*;
-import com.google.api.services.calendar.model.Calendar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -271,11 +269,11 @@ public class CreateScheduleFragment extends BaseFragment {
                             })
                             .create()
                             .show();
-                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
-                    EventDateTime end = new EventDateTime()
-                            .setDate(endTime)
-                            .setTimeZone("America/Los_Angeles");
-                    googleEvent.setEnd(end);
+//                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+//                    EventDateTime end = new EventDateTime()
+//                            .setDate(endTime)
+//                            .setTimeZone("America/Los_Angeles");
+                    /*googleEvent.setEnd(end);
 
                     String calendarID = "primary";*/
                    // googleEvent = service.events().insert(calendarID, googleEvent).execute();

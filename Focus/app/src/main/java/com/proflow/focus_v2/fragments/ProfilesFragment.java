@@ -3,6 +3,7 @@ package com.proflow.focus_v2.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -163,4 +164,18 @@ public class ProfilesFragment extends BaseFragment {
         return layout;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if(!prefs.contains(getString(R.string.firstProfilesKey))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+        }
+    }
+
+    private void runProfileTutorial() {
+
+    }
 }

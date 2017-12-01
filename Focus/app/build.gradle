@@ -3,10 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('C:/Users/Patrick Truong/.android/debug.keystore')
-            storePassword 'android'
+            //Insert your config here
         }
     }
     compileSdkVersion 26
@@ -35,6 +32,9 @@ android {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven() {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 dependencies {
@@ -67,6 +67,10 @@ dependencies {
     compile 'com.thoughtbot:expandablerecyclerview:1.3'
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.github.alamkanak:android-week-view:1.2.6'
+
+    compile ('com.github.worker8:tourguide:1.0.17-SNAPSHOT@aar') {
+        transitive=true
+    }
 }
 
 // google sign in stuff
