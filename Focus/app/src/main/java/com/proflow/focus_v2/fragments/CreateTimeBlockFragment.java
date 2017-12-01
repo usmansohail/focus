@@ -106,7 +106,7 @@ public class CreateTimeBlockFragment extends BaseFragment implements AdapterView
             if(getArguments().containsKey(getString(R.string.scheduleKey))){
                 int lookingForId = getArguments().getInt(getString(R.string.scheduleKey));
 
-                mSchedule = Global.getInstance().getScheduleById(lookingForId);
+                mSchedule = Global.getInstance().getScheduleById(lookingForId, getContext());
             }
             if(getArguments().containsKey(getString(R.string.timeBlockIndex))){
                 mTimeBlock = mSchedule.getTimeBlocks().get(

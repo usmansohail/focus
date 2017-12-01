@@ -50,8 +50,7 @@ public class TimerAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        //TODO update this for our friends in the cloud.
-        return i;
+        return mTimers.get(i).getId();
     }
 
     @Override

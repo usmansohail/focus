@@ -69,7 +69,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_more_horiz"
                 android:layout_marginEnd="8dp"
-                android:visibility="gone"/>
+                android:visibility="gone"
+                android:scaleX="1.5"
+                android:scaleY="1.5"/>
 
             <ImageButton
                 android:id="@+id/toolbar_confirm"

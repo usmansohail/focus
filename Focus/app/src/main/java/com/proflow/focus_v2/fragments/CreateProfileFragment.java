@@ -94,7 +94,6 @@ public class CreateProfileFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 //So right now this just gives a toast
-                //TODO implement confirmation & validation of input.
 
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Global.getInstance().getUsername()).child("Profiles");
                 ref.addListenerForSingleValueEvent(new ValueEventListener() {
