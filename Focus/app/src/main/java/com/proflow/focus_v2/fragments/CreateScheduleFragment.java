@@ -79,7 +79,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.api.client.*;
-import com.google.api.services.calendar.model.Calendar;
+//import com.google.api.services.calendar.model.Calendar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -271,7 +271,8 @@ public class CreateScheduleFragment extends BaseFragment {
                             })
                             .create()
                             .show();
-                    DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+                    //DateTime endTime = new DateTime("2017-11-21T09:00:00-9:00");
+                    /*
                     EventDateTime end = new EventDateTime()
                             .setDate(endTime)
                             .setTimeZone("America/Los_Angeles");

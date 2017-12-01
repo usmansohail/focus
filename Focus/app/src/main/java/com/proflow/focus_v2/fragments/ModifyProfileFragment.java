@@ -98,7 +98,7 @@ public class ModifyProfileFragment extends BaseFragment {
                 mDeleteProfileButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //Global.getInstance().removeProfile(getContext(), currentProfile);
+                        Global.getInstance().removeProfile(getContext(), currentProfile);
                         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                         mDatabase.child(Global.getInstance().getUsername()).child("Profiles").child(String.valueOf(currentProfile.getId())).removeValue();
 

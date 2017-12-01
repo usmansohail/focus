@@ -87,7 +87,7 @@ public class TimersFragment extends BaseFragment {
                     Log.e("Adding timer!", "Adding timers: " + timer.getId());
                     temp.add(timer);
                 }
-                mAdapter = new TimerAdapter(getContext(), temp);
+                mAdapter = new TimerAdapter(getContext(), Global.getInstance().getTimers(getContext()));
                 timerListView.setAdapter(mAdapter);
                 final long delayLoop = 500;
 
