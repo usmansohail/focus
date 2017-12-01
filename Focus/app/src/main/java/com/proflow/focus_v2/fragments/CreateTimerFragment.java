@@ -1,14 +1,20 @@
 package com.proflow.focus_v2.fragments;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -28,6 +34,11 @@ import com.proflow.focus_v2.models.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import tourguide.tourguide.ChainTourGuide;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Sequence;
+import tourguide.tourguide.ToolTip;
 
 public class CreateTimerFragment extends BaseFragment {
 
@@ -168,6 +179,66 @@ public class CreateTimerFragment extends BaseFragment {
 
     private boolean allZero() {
         return getDuration() >= 10*1000;
+    }
+
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+
+        if(!prefs.contains(getString(R.string.firstCreateTimer))){
+            //Then this is the first run of Profiles fragment. run through profile tutorial.
+            runProfileTutorial();
+            prefs.edit().putBoolean(getString(R.string.firstCreateTimer), false).apply();
+        }
+    }
+
+    Animation mEnterAnimation, mExitAnimation;
+
+    private void runProfileTutorial() {
+        /* setup enter and exit animation */
+        mEnterAnimation = new AlphaAnimation(0f, 1f);
+        mEnterAnimation.setDuration(600);
+        mEnterAnimation.setFillAfter(true);
+
+        mExitAnimation = new AlphaAnimation(1f, 0f);
+        mExitAnimation.setDuration(600);
+        mExitAnimation.setFillAfter(true);
+
+        runOverlay_ContinueMethod();
+    }
+
+    private void runOverlay_ContinueMethod(){
+        // the return handler is used to manipulate the cleanup of all the tutorial elements
+        ChainTourGuide tourGuide1 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("Set the time to block here, and select the profiles to " +
+                                "block below.")
+                        .setGravity(Gravity.BOTTOM)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(mMinuteSpinner);
+
+        ChainTourGuide tourGuide2 = ChainTourGuide.init(getActivity())
+                .setToolTip(new ToolTip()
+                        .setDescription("When you're finished, tap here.")
+                        .setGravity(Gravity.BOTTOM | Gravity.LEFT)
+                        .setBackgroundColor(Color.parseColor("#333333"))
+                )
+                .playLater(confirmButton);
+
+        Sequence sequence = new Sequence.SequenceBuilder()
+                .add(tourGuide1, tourGuide2)
+                .setDefaultOverlay(new Overlay()
+                        .setEnterAnimation(mEnterAnimation)
+                        .setExitAnimation(mExitAnimation)
+                )
+                .setDefaultPointer(null)
+                .setContinueMethod(Sequence.ContinueMethod.Overlay)
+                .build();
+
+
+        ChainTourGuide.init(getActivity()).playInSequence(sequence);
     }
 
 }

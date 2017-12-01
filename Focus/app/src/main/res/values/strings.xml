@@ -299,5 +299,12 @@
     <string name="signing_in">Signing In</string>
     <string name="firstStartKey">FIRSTSTARTKEYLOLOLOL</string>
     <string name="firstProfilesKey">FIRSTPROFILEKEYLOL</string>
+    <string name="firstCreateProfilesKey">FIRSTCREATEPROFILESLOL</string>
+    <string name="firstScheduleKey">FIRSTSCHEDULELOL</string>
+    <string name="firstCreateScheduleKey">FIRSTCREATESCHEDULELOL</string>
+    <string name="firstCreateTimeBlockKey">FIRSTCREATETIMEBLOCKLOL</string>
+    <string name="firstTimer">FIRSTTIMERLOL</string>
+    <string name="firstCreateTimer">FIRSTCRTEATETIMERLOLOWASDF</string>
+    <string name="firstNotifications">FIRSTNOTIFICATIONSLOL</string>
 
 </resources>
