@@ -45,7 +45,7 @@ public class Profile {
     public Profile(String name, Vector<String> packageIds){
         mName = name;
         mPackageNames = packageIds;
-        setUniqueId();
+        id = Global.getInstance().getProfileUniqueID();
     }
 
     public Profile(String name, Vector<String> packageIds, int _id){
