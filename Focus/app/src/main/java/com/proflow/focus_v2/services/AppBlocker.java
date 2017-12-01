@@ -203,7 +203,7 @@ public class AppBlocker extends Service {
         running = true;
 
         //Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
+        //mBlockedPackages = intent.getStringArrayListExtra("mBlockedPackages");
         mHandler.post(mRunnableCode);
 
         // If we get killed, after returning from here, restart
