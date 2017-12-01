@@ -105,6 +105,7 @@ public class Global {
         scheduleList.clear();
         timerList.clear();
         notifications.clear();
+
     }
 
     public void synchAll(Context context) {

@@ -204,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
         populateGlobalAppsList();
         Global.getInstance().clearAll();
+        Global.getInstance().synchAll(getApplicationContext());
         populateData();
 
 
@@ -276,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
                     temp.add(profile);
                 }
                 Global.getInstance().setProfiles(temp);
+                Global.getInstance().synchAll(getApplicationContext());
             }
 
             @Override
@@ -294,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     temp.add(notification);
                 }
                 Global.getInstance().setNotifications(temp);
+                Global.getInstance().synchAll(getApplicationContext());
             }
 
             @Override
@@ -312,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
                     temp.add(schedule);
                 }
                 Global.getInstance().setSchedules(temp);
+                Global.getInstance().synchAll(getApplicationContext());
             }
 
             @Override
@@ -331,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
                     temp.add(timer);
                 }
                 Global.getInstance().setTimers(temp);
+                Global.getInstance().synchAll(getApplicationContext());
             }
 
             @Override
